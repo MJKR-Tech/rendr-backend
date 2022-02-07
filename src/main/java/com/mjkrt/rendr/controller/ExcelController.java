@@ -1,17 +1,16 @@
 package com.mjkrt.rendr.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.apache.poi.ss.usermodel.Workbook;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mjkrt.rendr.entity.ExcelForm;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
@@ -29,27 +28,12 @@ public class ExcelController {
         return "Hello World!";
     }
     
-    @GetMapping("/loadSample")
-    public ResponseEntity<?> loadSampleExcel() {
+    @GetMapping("/loadSampleData")
+    public void loadSampleExcel(HttpServletResponse response) throws IOException {
         LOG.info("loadSampleExcel called");
-        try {
-            Workbook workbook = service.generateWorkBook();
-            return ResponseEntity.ok(workbook);
-        } catch (IOException ex) {
-            LOG.warning("Excel failed to generate: " + ex.getLocalizedMessage());
-            return ResponseEntity.internalServerError().body("Unable to generate excel file.");
-        }
-    }
-
-    @PostMapping("/download")
-    public Object getExcel(@RequestBody ExcelForm form) {
-        LOG.info("getExcel called");
-        try {
-            Workbook workbook = service.generateWorkBook();
-            return ResponseEntity.ok(workbook);
-        } catch (IOException ex) {
-            LOG.warning("Excel failed to generate: " + ex.getLocalizedMessage());
-            return ResponseEntity.internalServerError().body("Unable to generate excel file.");
-        }
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=sampleData.xlsx");
+        ByteArrayInputStream stream = service.generateWorkBook();
+        IOUtils.copy(stream, response.getOutputStream());
     }
 }

@@ -1,11 +1,16 @@
 package com.mjkrt.rendr.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,40 +27,50 @@ public class ExcelServiceImpl implements ExcelService {
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
     
     @Override
-    public Workbook generateWorkBook() throws IOException {
-        List<FinancialData> financialDataList = SampleData.getSampleFinancialData();
-        String excelFilePath = "SampleFinancialData.xls";
+    public ByteArrayInputStream generateWorkBook() {
+        
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Sample Data");
 
-        Workbook workbook = new XSSFWorkbook();
-        writeExcel(workbook, financialDataList, excelFilePath);
-        return workbook;
-    }
+            Row row = sheet.createRow(0);
+            CellStyle headerCellStyle = workbook.createCellStyle();
+            headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+            headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            // Creating header
+            Cell cell = row.createCell(0); 
+            cell.setCellValue("Title");
+            cell.setCellStyle(headerCellStyle);
 
-    private void writeExcel(Workbook workbook, List<FinancialData> listBook, String excelFilePath) throws IOException {
-        Sheet sheet = workbook.createSheet();
-        int rowCount = 0;
+            cell = row.createCell(1);
+            cell.setCellValue("Author");
+            cell.setCellStyle(headerCellStyle);
 
-        for (FinancialData data : listBook) {
-            rowCount++;
-            Row row = sheet.createRow(rowCount);
-            writeBook(data, row);
-        }
+            cell = row.createCell(2);
+            cell.setCellValue("Price");
+            cell.setCellStyle(headerCellStyle);
 
-        try (FileOutputStream outputStream = new FileOutputStream(excelFilePath)) {
+            // Creating data rows for each customer
+            List<FinancialData> data = SampleData.getSampleFinancialData();
+            for(int i = 0; i < data.size(); i++) {
+                Row dataRow = sheet.createRow(i + 1);
+                dataRow.createCell(0).setCellValue(data.get(i).getTitle());
+                dataRow.createCell(1).setCellValue(data.get(i).getAuthor());
+                dataRow.createCell(2).setCellValue(data.get(i).getPrice());
+            }
+
+            // Making size of column auto resize to fit with data
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(2);
+            sheet.autoSizeColumn(3);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
-        } catch (Exception ex) {
-            throw new IOException(ex.getMessage());
+            return new ByteArrayInputStream(outputStream.toByteArray());
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
         }
-    }
-
-    private void writeBook(FinancialData data, Row row) {
-        Cell cell = row.createCell(1);
-        cell.setCellValue(data.getTitle());
-
-        cell = row.createCell(2);
-        cell.setCellValue(data.getAuthor());
-
-        cell = row.createCell(3);
-        cell.setCellValue(data.getPrice());
     }
 }
