@@ -26,5 +26,4 @@ public class SimpleRowService {
     public Iterable<SimpleRow> save(List<SimpleRow> simpleRows) {
         return simpleRowRepository.saveAll(simpleRows);
     }
-
 }

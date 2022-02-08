@@ -1,18 +1,21 @@
 package com.mjkrt.rendr.controller;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.mjkrt.rendr.entity.SimpleRow;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,22 +32,32 @@ public class ExcelController {
     
     @GetMapping("/hello")
     public String greet() {
-        LOG.info("greeting called");
+        LOG.info("GET /hello called");
         return "Hello World!";
     }
     
     @GetMapping("/loadSampleData")
     public void loadSampleExcel(HttpServletResponse response) throws IOException {
-        LOG.info("loadSampleExcel called");
+        LOG.info("GET /loadSampleExcel called");
+        
+        String fileName = "sampleData";
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=sampleData.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
 
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<SimpleRow>> typeReference = new TypeReference<>(){};
-        InputStream inputStream = TypeReference.class.getResourceAsStream("/json/Simple.json");
-        List<SimpleRow> simpleRows = mapper.readValue(inputStream, typeReference);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<SimpleRow>>() {});
+
+        // to get json file from resources folder
+        String jsonFileLocation = "json/Simple.json";
+        File file = new ClassPathResource(jsonFileLocation).getFile();
+        JsonNode data = mapper.readTree(file);
+        JsonNode body = data.path("body");
+        JsonNode report = body.path("SIMPLE_REPORT");
+        JsonNode rows = report.path("rows");
+        List<SimpleRow> simpleRows = reader.readValue(rows);
 
         ByteArrayInputStream stream = service.generateWorkBook(simpleRows);
+        LOG.info("Writing excel to response stream");
         IOUtils.copy(stream, response.getOutputStream());
     }
 }
