@@ -1,6 +1,5 @@
 package com.mjkrt.rendr.entity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +15,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 public class SimpleRow {
 
-    public SimpleRow() {}
-
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String instrumentType;
     private @Id String ticker;
@@ -32,6 +29,8 @@ public class SimpleRow {
     private int currentFace;
     private String currency;
     private String contractCode;
+    
+    public SimpleRow() {}
 
     public String getInstrumentType() {
         return instrumentType;
@@ -159,12 +158,38 @@ public class SimpleRow {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleRow simpleRow = (SimpleRow) o;
-        return coupon == simpleRow.coupon && Double.compare(simpleRow.originalFace, originalFace) == 0 && Double.compare(simpleRow.marketValue, marketValue) == 0 && Double.compare(simpleRow.price, price) == 0 && currentFace == simpleRow.currentFace && Objects.equals(instrumentType, simpleRow.instrumentType) && Objects.equals(ticker, simpleRow.ticker) && Objects.equals(isin, simpleRow.isin) && Objects.equals(portfolio, simpleRow.portfolio) && Objects.equals(maturityDate, simpleRow.maturityDate) && Objects.equals(positionDate, simpleRow.positionDate) && Objects.equals(currency, simpleRow.currency) && Objects.equals(contractCode, simpleRow.contractCode);
+        return coupon == simpleRow.coupon
+                && Double.compare(simpleRow.originalFace, originalFace) == 0
+                && Double.compare(simpleRow.marketValue, marketValue) == 0
+                && Double.compare(simpleRow.price, price) == 0
+                && currentFace == simpleRow.currentFace
+                && Objects.equals(instrumentType, simpleRow.instrumentType)
+                && Objects.equals(ticker, simpleRow.ticker)
+                && Objects.equals(isin, simpleRow.isin)
+                && Objects.equals(portfolio, simpleRow.portfolio)
+                && Objects.equals(maturityDate, simpleRow.maturityDate)
+                && Objects.equals(positionDate, simpleRow.positionDate)
+                && Objects.equals(currency, simpleRow.currency)
+                && Objects.equals(contractCode, simpleRow.contractCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(instrumentType, ticker, coupon, originalFace, marketValue, isin, portfolio, maturityDate, price, positionDate, currentFace, currency, contractCode);
+        return Objects.hash(
+                instrumentType, 
+                ticker,
+                coupon,
+                originalFace,
+                marketValue,
+                isin,
+                portfolio,
+                maturityDate,
+                price, 
+                positionDate,
+                currentFace,
+                currency,
+                contractCode
+        );
     }
 
     @Override
