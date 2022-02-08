@@ -75,7 +75,7 @@
                     "coupon": 0,
                     "originalFace": 5.85,
                     "marketValue": 5.85,
-                    "ISIN": "CASH",
+
                     "portfolio": "100001",
                     "maturityDate": null,
                     "price": 1,
@@ -90,7 +90,7 @@
                     "coupon": 0,
                     "originalFace": -26,
                     "marketValue": -6441175,
-                    "ISIN": "01H0000A2",
+
                     "portfolio": "100001",
                     "maturityDate": "4/1/2021",
                     "price": 99.09,
@@ -105,7 +105,7 @@
                     "coupon": 0,
                     "originalFace": -70,
                     "marketValue": -8711171.88,
-                    "ISIN": "US00000CAA01",
+
                     "portfolio": "100001",
                     "maturityDate": "1/1/2021",
                     "price": 124.45,
@@ -120,7 +120,7 @@
                     "coupon": 0,
                     "originalFace": -81,
                     "marketValue": -17873156.25,
-                    "ISIN": "US00000CAA02",
+
                     "portfolio": "100001",
                     "maturityDate": "1/1/2021",
                     "price": 110.33,
@@ -135,7 +135,7 @@
                     "coupon": 0,
                     "originalFace": 139,
                     "marketValue": 18688984.38,
-                    "ISIN": "US00000CAA03",
+
                     "portfolio": "100001",
                     "maturityDate": "1/1/2021",
                     "price": 134.45,
@@ -151,7 +151,7 @@
                     "coupon": 2,
                     "originalFace": 112000000,
                     "marketValue": 114713211.2,
-                    "ISIN": "US000000A001",
+
                     "portfolio": "100001",
                     "maturityDate": "5/1/2021",
                     "price": 102.42,
@@ -166,7 +166,7 @@
                     "coupon": 2.5,
                     "originalFace": 121000000,
                     "marketValue": 125817070.5,
-                    "ISIN": "US000000A002",
+
                     "portfolio": "100001",
                     "maturityDate": "5/1/2021",
                     "price": 103.98,
@@ -181,7 +181,7 @@
                     "coupon": 3,
                     "originalFace": 82000000,
                     "marketValue": 85808301.4,
-                    "ISIN": "US000000A003",
+
                     "portfolio": "100001",
                     "maturityDate": "5/1/2021",
                     "price": 104.64,
@@ -196,7 +196,7 @@
                     "coupon": 3,
                     "originalFace": 31000000,
                     "marketValue": 32390074.1,
-                    "ISIN": "US000000A004",
+
                     "portfolio": "100001",
                     "maturityDate": "5/1/2021",
                     "price": 104.48,
@@ -211,7 +211,7 @@
                     "coupon": 3.5,
                     "originalFace": 2777250,
                     "marketValue": 205768.65,
-                    "ISIN": "01H0000A3",
+
                     "portfolio": "100001",
                     "maturityDate": "4/1/2021",
                     "price": 109.1,
@@ -226,7 +226,7 @@
                     "coupon": 3.5,
                     "originalFace": 287764,
                     "marketValue": 142323.92,
-                    "ISIN": "01H0000A4",
+
                     "portfolio": "100001",
                     "maturityDate": "4/1/2021",
                     "price": 109.1,
@@ -241,7 +241,7 @@
                     "coupon": 3,
                     "originalFace": 23300000,
                     "marketValue": 14440294.34,
-                    "ISIN": "01H0000A1",
+
                     "portfolio": "100001",
                     "maturityDate": "3/1/2021",
                     "price": 104.7,
@@ -256,7 +256,7 @@
                     "coupon": 0,
                     "originalFace": 64000000,
                     "marketValue": 63999526.4,
-                    "ISIN": "GSAM1",
+
                     "portfolio": "100001",
                     "maturityDate": "6/1/2021",
                     "price": 100,
@@ -271,7 +271,7 @@
                     "coupon": 0,
                     "originalFace": 92000000,
                     "marketValue": 91998535.35,
-                    "ISIN": "GSAM2",
+
                     "portfolio": "100001",
                     "maturityDate": "6/1/2021",
                     "price": 100,
@@ -286,7 +286,7 @@
                     "coupon": 0,
                     "originalFace": 26500000,
                     "marketValue": 26495621.67,
-                    "ISIN": "GSAM3",
+
                     "portfolio": "100001",
                     "maturityDate": "6/1/2021",
                     "price": 99.98,
@@ -301,7 +301,7 @@
                     "coupon": 0,
                     "originalFace": 41000000,
                     "marketValue": 40992687.24,
-                    "ISIN": "GSAM4",
+
                     "portfolio": "100001",
                     "maturityDate": "6/1/2021",
                     "price": 99.98,
@@ -316,7 +316,7 @@
                     "coupon": 0,
                     "originalFace": 24000000,
                     "marketValue": 23998877.76,
-                    "ISIN": "GSAM5",
+
                     "portfolio": "100001",
                     "maturityDate": "6/1/2021",
                     "price": 100,
@@ -331,7 +331,7 @@
                     "coupon": 1,
                     "originalFace": 9880000,
                     "marketValue": 9877014.07,
-                    "ISIN": "US00000CMO01",
+
                     "portfolio": "100001",
                     "maturityDate": "2/1/2021",
                     "price": 99.97,
