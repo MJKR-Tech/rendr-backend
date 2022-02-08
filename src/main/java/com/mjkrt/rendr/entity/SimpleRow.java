@@ -25,27 +25,6 @@ public class SimpleRow {
     private String currency;
     private String contractCode;
 
-
-//    public SimpleRow( String instrumentType, String ticker, int coupon,
-//                      double originalFace,  double marketValue,
-//                      String ISIN,  String portfolio,  Date maturityDate,
-//                      double price,  String positionDate,  int currentFace,
-//                      String currency,  String contractCode) {
-//        this.instrumentType = instrumentType;
-//        this.ticker = ticker;
-//        this.coupon = coupon;
-//        this.originalFace = originalFace;
-//        this.marketValue = marketValue;
-//        this.ISIN = ISIN;
-//        this.portfolio = portfolio;
-//        this.maturityDate = maturityDate;
-//        this.price = price;
-//        this.positionDate = positionDate;
-//        this.currentFace = currentFace;
-//        this.currency = currency;
-//        this.contractCode = contractCode;
-//    }
-
     public String getInstrumentType() {
         return instrumentType;
     }

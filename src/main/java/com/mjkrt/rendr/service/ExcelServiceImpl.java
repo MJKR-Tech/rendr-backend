@@ -36,6 +36,7 @@ public class ExcelServiceImpl implements ExcelService {
             CellStyle headerCellStyle = workbook.createCellStyle();
             headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
             headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
             // Creating header
             Cell cell = row.createCell(0); 
             cell.setCellValue("Instrument Type");

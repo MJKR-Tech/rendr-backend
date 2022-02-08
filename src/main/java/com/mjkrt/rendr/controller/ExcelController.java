@@ -59,8 +59,8 @@ public class ExcelController {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader reader = mapper.readerFor(new TypeReference<List<SimpleRow>>() {});
-//        InputStream inputStream = TypeReference.class.getResourceAsStream();
 
+        // to get json file from resources folder
         File file = new ClassPathResource("json/Simple.json").getFile();
         JsonNode data = mapper.readTree(file);
         JsonNode body = data.path("body");
