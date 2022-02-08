@@ -6,6 +6,5 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface ExcelService {
-
     ByteArrayInputStream generateWorkBook(List<SimpleRow> simpleRows);
 }

@@ -1,9 +1,17 @@
 package com.mjkrt.rendr.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class SimpleRow {
@@ -12,11 +20,11 @@ public class SimpleRow {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String instrumentType;
-    @Id
-    private String ticker;
+    private @Id String ticker;
     private int coupon;
     private double originalFace;
     private double marketValue;
+    private @JsonProperty("ISIN") String isin;
     private String portfolio;
     private String maturityDate;
     private double price;
@@ -63,6 +71,14 @@ public class SimpleRow {
 
     public void setMarketValue(double marketValue) {
         this.marketValue = marketValue;
+    }
+
+    public String getIsin() {
+        return isin;
+    }
+
+    public void setIsin(String isin) {
+        this.isin = isin;
     }
 
     public String getPortfolio() {
@@ -120,6 +136,53 @@ public class SimpleRow {
     public void setContractCode(String contractCode) {
         this.contractCode = contractCode;
     }
+    
+    @JsonIgnore
+    public static List<String> getFields() {
+        return Arrays.asList(
+                "Instrument Type",
+                "Ticker",
+                "Contract Code",
+                "Coupon",
+                "Maturity",
+                "Currency",
+                "ISIN",
+                "Current Face",
+                "Original Face",
+                "Price",
+                "Market Value"
+        );
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleRow simpleRow = (SimpleRow) o;
+        return coupon == simpleRow.coupon && Double.compare(simpleRow.originalFace, originalFace) == 0 && Double.compare(simpleRow.marketValue, marketValue) == 0 && Double.compare(simpleRow.price, price) == 0 && currentFace == simpleRow.currentFace && Objects.equals(instrumentType, simpleRow.instrumentType) && Objects.equals(ticker, simpleRow.ticker) && Objects.equals(isin, simpleRow.isin) && Objects.equals(portfolio, simpleRow.portfolio) && Objects.equals(maturityDate, simpleRow.maturityDate) && Objects.equals(positionDate, simpleRow.positionDate) && Objects.equals(currency, simpleRow.currency) && Objects.equals(contractCode, simpleRow.contractCode);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(instrumentType, ticker, coupon, originalFace, marketValue, isin, portfolio, maturityDate, price, positionDate, currentFace, currency, contractCode);
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleRow{" +
+                "instrumentType='" + instrumentType + '\'' +
+                ", ticker='" + ticker + '\'' +
+                ", coupon=" + coupon +
+                ", originalFace=" + originalFace +
+                ", marketValue=" + marketValue +
+                ", isin='" + isin + '\'' +
+                ", portfolio='" + portfolio + '\'' +
+                ", maturityDate='" + maturityDate + '\'' +
+                ", price=" + price +
+                ", positionDate='" + positionDate + '\'' +
+                ", currentFace=" + currentFace +
+                ", currency='" + currency + '\'' +
+                ", contractCode='" + contractCode + '\'' +
+                '}';
+    }
 }

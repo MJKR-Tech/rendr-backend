@@ -27,89 +27,70 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public ByteArrayInputStream generateWorkBook(List<SimpleRow> data) {
         
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Sample Data");
+        LOG.info("Generating workbook");
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Sample Data");
 
-            Row row = sheet.createRow(0);
-            CellStyle headerCellStyle = workbook.createCellStyle();
-            headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
-            headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        int rowCount = 0;
+        Row headerRow = sheet.createRow(rowCount++);
+        CellStyle headerCellStyle = generateHeaderStyle(workbook);
 
-            // Creating header
-            Cell cell = row.createCell(0); 
-            cell.setCellValue("Instrument Type");
+        List<String> headers = SimpleRow.getFields();
+        generateHeaders(headerRow, headerCellStyle, headers);
+
+        LOG.info("Generating " + data.size() +" dataRows");
+        for (SimpleRow datum : data) {
+            Row dataRow = sheet.createRow(rowCount++);
+            addDataToRow(dataRow, datum);
+        }
+        
+        for (int i = 0; i < headers.size(); i++) {
+            sheet.autoSizeColumn(i);
+        }
+        
+        return writeToStream(workbook);
+    }
+    
+    private void generateHeaders(Row headerRow, CellStyle headerCellStyle, List<String> headers) {
+        LOG.info("Generating headers " + headers);
+        for (int i = 0; i < headers.size(); i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers.get(i));
             cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(1);
-            cell.setCellValue("Ticker");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(2);
-            cell.setCellValue("Contract Code");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(3);
-            cell.setCellValue("Coupon");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(4);
-            cell.setCellValue("Maturity");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(5);
-            cell.setCellValue("Currency");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(6);
-            cell.setCellValue("Current Face");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(7);
-            cell.setCellValue("Original Face");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(8);
-            cell.setCellValue("Price");
-            cell.setCellStyle(headerCellStyle);
-
-            cell = row.createCell(9);
-            cell.setCellValue("Market Value");
-            cell.setCellStyle(headerCellStyle);
-
-            // Creating data rows for each customer
-//            List<FinancialData> data = SampleData.getSampleFinancialData();
-            for(int i = 0; i < data.size(); i++) {
-                Row dataRow = sheet.createRow(i + 1);
-                dataRow.createCell(0).setCellValue(data.get(i).getInstrumentType());
-                dataRow.createCell(1).setCellValue(data.get(i).getTicker());
-                dataRow.createCell(2).setCellValue(data.get(i).getContractCode());
-                dataRow.createCell(3).setCellValue(data.get(i).getCoupon());
-                dataRow.createCell(4).setCellValue(data.get(i).getMaturityDate());
-                dataRow.createCell(5).setCellValue(data.get(i).getCurrency());
-                dataRow.createCell(6).setCellValue(data.get(i).getCurrentFace());
-                dataRow.createCell(7).setCellValue(data.get(i).getOriginalFace());
-                dataRow.createCell(8).setCellValue(data.get(i).getPrice());
-                dataRow.createCell(9).setCellValue(data.get(i).getMarketValue());
-            }
-
-            // Making size of column auto resize to fit with data
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-            sheet.autoSizeColumn(2);
-            sheet.autoSizeColumn(3);
-            sheet.autoSizeColumn(4);
-            sheet.autoSizeColumn(5);
-            sheet.autoSizeColumn(6);
-            sheet.autoSizeColumn(7);
-            sheet.autoSizeColumn(8);
-            sheet.autoSizeColumn(9);
-
-
+        }
+    }
+    
+    private CellStyle generateHeaderStyle(Workbook workbook) {
+        LOG.info("Generating header style");
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return headerCellStyle;
+    }
+    
+    private void addDataToRow(Row dataRow, SimpleRow datum) {
+        dataRow.createCell(0).setCellValue(datum.getInstrumentType());
+        dataRow.createCell(1).setCellValue(datum.getTicker());
+        dataRow.createCell(2).setCellValue(datum.getContractCode());
+        dataRow.createCell(3).setCellValue(datum.getCoupon());
+        dataRow.createCell(4).setCellValue(datum.getMaturityDate());
+        dataRow.createCell(5).setCellValue(datum.getCurrency());
+        dataRow.createCell(6).setCellValue(datum.getIsin());
+        dataRow.createCell(7).setCellValue(datum.getCurrentFace());
+        dataRow.createCell(8).setCellValue(datum.getOriginalFace());
+        dataRow.createCell(9).setCellValue(datum.getPrice());
+        dataRow.createCell(10).setCellValue(datum.getMarketValue());
+    }
+    
+    private ByteArrayInputStream writeToStream(Workbook workbook) {
+        try {
+            LOG.info("Writing to output stream");
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             return new ByteArrayInputStream(outputStream.toByteArray());
-            
+
         } catch (IOException ex) {
+            LOG.warning("IOException faced.");
             ex.printStackTrace();
             return null;
         }
