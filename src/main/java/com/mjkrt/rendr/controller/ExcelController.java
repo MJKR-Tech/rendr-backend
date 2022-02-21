@@ -17,6 +17,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mjkrt.rendr.service.ExcelService;
@@ -37,7 +38,7 @@ public class ExcelController {
     }
     
     @GetMapping("/loadSampleData")
-    public void loadSampleExcel(HttpServletResponse response) throws IOException {
+    public void loadSampleExcel(HttpServletResponse response, @RequestBody JsonNode jsonNode) throws IOException {
         LOG.info("GET /loadSampleExcel called");
         
         String fileName = "sampleData";
@@ -48,12 +49,11 @@ public class ExcelController {
         ObjectReader reader = mapper.readerFor(new TypeReference<List<SimpleRow>>() {});
 
         // to get json file from resources folder
-        String jsonFileLocation = "json/Simple.json";
-        File file = new ClassPathResource(jsonFileLocation).getFile();
-        JsonNode data = mapper.readTree(file);
-        JsonNode body = data.path("body");
-        JsonNode report = body.path("SIMPLE_REPORT");
-        JsonNode rows = report.path("rows");
+        JsonNode body = jsonNode.path("body");
+        List<JsonNode> bodyChildren = body.findParents("rows");
+        JsonNode columns = bodyChildren.get(0).path("columns");
+        JsonNode rows = bodyChildren.get(0).path("rows");
+        List<SimpleRow> simpleColumns = reader.readValue(rows);
         List<SimpleRow> simpleRows = reader.readValue(rows);
 
         ByteArrayInputStream stream = service.generateWorkBook(simpleRows);
