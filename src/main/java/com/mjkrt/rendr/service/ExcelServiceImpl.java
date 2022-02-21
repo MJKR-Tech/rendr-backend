@@ -10,6 +10,8 @@ import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -28,11 +30,11 @@ public class ExcelServiceImpl implements ExcelService {
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
 
     @Override
-    public ByteArrayInputStream generateExcel(List<ColumnHeader> headers, List<JsonNode> rows) {
+    public ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
         LOG.info("Generating excel");
         
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Sample Data");
+        Sheet sheet = workbook.createSheet(excelName);
         
         int rowCount = 0;
         Row headerRow = sheet.createRow(rowCount++);
@@ -65,7 +67,11 @@ public class ExcelServiceImpl implements ExcelService {
         int i = 0;
         for (ColumnHeader header : selectedHeaders) {
             Cell cell = headerRow.createCell(i);
-            cell.setCellValue(header.getName());
+            String headerName = StringUtils.capitalize(
+                    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(header.getName()), ' ')
+            );
+            
+            cell.setCellValue(headerName);
             cell.setCellStyle(headerCellStyle);
             i++;
         }
@@ -82,14 +88,24 @@ public class ExcelServiceImpl implements ExcelService {
 
     private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
         LOG.info("Generating for row " + node);
-        List<String> headerNames = selectedHeaders.stream()
-                .map(ColumnHeader::getName)
-                .collect(Collectors.toList());
 
         int i = 0;
-        for (String headerName : headerNames) {
+        for (ColumnHeader header : selectedHeaders) {
+            String headerName = header.getName();
+            JsonNode field = node.get(headerName);
             dataRow.createCell(i);
-            dataRow.createCell(i).setCellValue(node.get(headerName).asText());
+            
+            switch (header.getType()) {
+            case DECIMAL:
+                dataRow.createCell(i).setCellValue(field.asInt());
+                break;
+            case DOUBLE:
+                dataRow.createCell(i).setCellValue(field.asDouble());
+                break;
+            default:
+                // DATE || STRING
+                dataRow.createCell(i).setCellValue(field.asText());
+            }
             i++;
         }
     }

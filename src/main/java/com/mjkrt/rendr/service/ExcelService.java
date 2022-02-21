@@ -7,5 +7,5 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface ExcelService {
-    ByteArrayInputStream generateExcel(List<ColumnHeader> headers, List<JsonNode> rows);
+    ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
 }

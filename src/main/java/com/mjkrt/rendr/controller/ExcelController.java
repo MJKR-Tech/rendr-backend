@@ -44,14 +44,10 @@ public class ExcelController {
     
     @PostMapping("/loadSampleData")
     public void loadSampleExcel(HttpServletResponse response, @RequestBody JsonNode jsonNode) throws IOException {
-        LOG.info("GET /loadSampleExcel called");
-        
-        String fileName = "sampleData";
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+        LOG.info("POST /loadSampleExcel called");
 
         ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<ColumnHeader>>() {});
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<ColumnHeader>>(){});
 
         // to get json file from resources folder
         JsonNode body = jsonNode.path("body");
@@ -61,12 +57,17 @@ public class ExcelController {
         List<ColumnHeader> simpleColumns = reader.readValue(columns);
 
         Iterator<JsonNode> children = rows.elements();
-        final List<JsonNode> childrenList = new ArrayList<>();
+        List<JsonNode> childrenList = new ArrayList<>();
         while (children.hasNext()) {
             childrenList.add(children.next());
         }
-
-        ByteArrayInputStream stream = service.generateExcel(simpleColumns, childrenList);
+        
+        String fileName = body.fieldNames().next();
+        ByteArrayInputStream stream = service.generateExcel(fileName, simpleColumns, childrenList);
+        
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+        
         IOUtils.copy(stream, response.getOutputStream());
     }
 }

@@ -5,14 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ColumnHeader {
 
     public enum Types {
-        @JsonProperty("string")
-        STRING,
-        @JsonProperty("decimal")
-        DECIMAL,
-        @JsonProperty("date")
-        DATE,
-        @JsonProperty("double")
-        DOUBLE
+        @JsonProperty("string") STRING,
+        @JsonProperty("decimal") DECIMAL,
+        @JsonProperty("date") DATE,
+        @JsonProperty("double") DOUBLE
     }
 
     String name;
