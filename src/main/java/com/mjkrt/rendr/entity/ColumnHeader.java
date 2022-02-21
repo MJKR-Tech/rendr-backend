@@ -9,7 +9,7 @@ public class ColumnHeader {
     }
 
     String name;
-    String type;
+    Types type;
     String field;
     boolean isSelected;
 
@@ -31,11 +31,11 @@ public class ColumnHeader {
         this.name = name;
     }
 
-    public String getType() {
+    public Types getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Types type) {
         this.type = type;
     }
 

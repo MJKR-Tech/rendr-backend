@@ -17,6 +17,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +38,7 @@ public class ExcelController {
         return "Hello World!";
     }
     
-    @GetMapping("/loadSampleData")
+    @PostMapping("/loadSampleData")
     public void loadSampleExcel(HttpServletResponse response, @RequestBody JsonNode jsonNode) throws IOException {
         LOG.info("GET /loadSampleExcel called");
         
