@@ -1,7 +1,6 @@
 package com.mjkrt.rendr.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,14 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.mjkrt.rendr.entity.ColumnHeader;
-import com.mjkrt.rendr.entity.SimpleRow;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+@CrossOrigin(origins = "http://localhost:3000") // TODO remove after merging services together
 @RestController
 public class ExcelController {
 
