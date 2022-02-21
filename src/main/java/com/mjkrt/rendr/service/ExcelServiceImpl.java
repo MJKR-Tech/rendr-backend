@@ -5,8 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import com.mjkrt.rendr.entity.SimpleRow;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.mjkrt.rendr.entity.ColumnHeader;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -23,65 +26,74 @@ import com.mjkrt.rendr.utils.LogsCenter;
 public class ExcelServiceImpl implements ExcelService {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
-    
+
     @Override
-    public ByteArrayInputStream generateWorkBook(List<SimpleRow> data) {
+    public ByteArrayInputStream generateExcel(List<ColumnHeader> headers, List<JsonNode> rows) {
+        LOG.info("Generating excel");
         
-        LOG.info("Generating workbook");
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sample Data");
-
+        
         int rowCount = 0;
         Row headerRow = sheet.createRow(rowCount++);
-        CellStyle headerCellStyle = generateHeaderStyle(workbook);
 
-        List<String> headers = SimpleRow.getFields();
-        generateHeaders(headerRow, headerCellStyle, headers);
+        // TODO, sort to custom requirements first or we filter and sort before calling this method
+        List<ColumnHeader> selectedHeaders = filterColumns(headers); 
+        generateHeaders(workbook, headerRow, selectedHeaders);
 
-        LOG.info("Generating " + data.size() +" dataRows");
-        for (SimpleRow datum : data) {
+        for (JsonNode node : rows) {
             Row dataRow = sheet.createRow(rowCount++);
-            addDataToRow(dataRow, datum);
+            addDataToRow(dataRow, selectedHeaders, node);
         }
-        
-        for (int i = 0; i < headers.size(); i++) {
-            sheet.autoSizeColumn(i);
-        }
-        
+
+        IntStream.range(0, headers.size())
+                .forEach(sheet::autoSizeColumn);
+
         return writeToStream(workbook);
     }
     
-    private void generateHeaders(Row headerRow, CellStyle headerCellStyle, List<String> headers) {
-        LOG.info("Generating headers " + headers);
-        for (int i = 0; i < headers.size(); i++) {
+    private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
+        return headers.stream()
+                .filter(ColumnHeader::isSelected)
+                .collect(Collectors.toList());
+    }
+
+    private void generateHeaders(Workbook workbook, Row headerRow, List<ColumnHeader> selectedHeaders) {
+        LOG.info("Generating selected headers " + selectedHeaders);
+        CellStyle headerCellStyle = generateHeaderStyle(workbook);
+
+        int i = 0;
+        for (ColumnHeader header : selectedHeaders) {
             Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers.get(i));
+            cell.setCellValue(header.getName());
             cell.setCellStyle(headerCellStyle);
+            i++;
         }
     }
-    
+
     private CellStyle generateHeaderStyle(Workbook workbook) {
         LOG.info("Generating header style");
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
         headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        
         return headerCellStyle;
     }
-    
-    private void addDataToRow(Row dataRow, SimpleRow datum) {
-        dataRow.createCell(0).setCellValue(datum.getInstrumentType());
-        dataRow.createCell(1).setCellValue(datum.getTicker());
-        dataRow.createCell(2).setCellValue(datum.getContractCode());
-        dataRow.createCell(3).setCellValue(datum.getCoupon());
-        dataRow.createCell(4).setCellValue(datum.getMaturityDate());
-        dataRow.createCell(5).setCellValue(datum.getCurrency());
-        dataRow.createCell(6).setCellValue(datum.getIsin());
-        dataRow.createCell(7).setCellValue(datum.getCurrentFace());
-        dataRow.createCell(8).setCellValue(datum.getOriginalFace());
-        dataRow.createCell(9).setCellValue(datum.getPrice());
-        dataRow.createCell(10).setCellValue(datum.getMarketValue());
+
+    private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
+        LOG.info("Generating for row " + node);
+        List<String> headerNames = selectedHeaders.stream()
+                .map(ColumnHeader::getName)
+                .collect(Collectors.toList());
+
+        int i = 0;
+        for (String headerName : headerNames) {
+            dataRow.createCell(i);
+            dataRow.createCell(i).setCellValue(node.get(headerName).asText());
+            i++;
+        }
     }
-    
+
     private ByteArrayInputStream writeToStream(Workbook workbook) {
         try {
             LOG.info("Writing to output stream");
