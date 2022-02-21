@@ -1,17 +1,24 @@
 package com.mjkrt.rendr.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ColumnHeader {
 
     public enum Types {
+        @JsonProperty("string")
         STRING,
+        @JsonProperty("decimal")
         DECIMAL,
-        DATE
+        @JsonProperty("date")
+        DATE,
+        @JsonProperty("double")
+        DOUBLE
     }
 
     String name;
     Types type;
     String field;
-    boolean isSelected;
+    @JsonProperty(value="isSelected") boolean isSelected;
 
     public ColumnHeader() {}
 
