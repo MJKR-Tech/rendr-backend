@@ -1,10 +1,11 @@
 package com.mjkrt.rendr.service;
 
-import com.mjkrt.rendr.entity.SimpleRow;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.mjkrt.rendr.entity.ColumnHeader;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface ExcelService {
-    ByteArrayInputStream generateWorkBook(List<SimpleRow> simpleRows);
+    ByteArrayInputStream generateExcel(List<ColumnHeader> headers, List<JsonNode> rows);
 }
