@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -92,19 +93,22 @@ public class ExcelServiceImpl implements ExcelService {
         int i = 0;
         for (ColumnHeader header : selectedHeaders) {
             String headerName = header.getName();
-            JsonNode field = node.get(headerName);
+            Optional<JsonNode> optField = Optional.ofNullable(node.get(headerName));
             dataRow.createCell(i);
-            
-            switch (header.getType()) {
-            case DECIMAL:
-                dataRow.createCell(i).setCellValue(field.asInt());
-                break;
-            case DOUBLE:
-                dataRow.createCell(i).setCellValue(field.asDouble());
-                break;
-            default:
-                // DATE || STRING
-                dataRow.createCell(i).setCellValue(field.asText());
+
+            if (optField.isPresent()) {
+                JsonNode field = optField.get();
+                switch (header.getType()) {
+                case DECIMAL:
+                    dataRow.createCell(i).setCellValue(field.asInt());
+                    break;
+                case DOUBLE:
+                    dataRow.createCell(i).setCellValue(field.asDouble());
+                    break;
+                default:
+                    // DATE || STRING
+                    dataRow.createCell(i).setCellValue(field.asText());
+                }
             }
             i++;
         }

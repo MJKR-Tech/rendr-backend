@@ -2,17 +2,12 @@ package com.mjkrt.rendr.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.mjkrt.rendr.entity.ColumnHeader;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +15,25 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mjkrt.rendr.service.ExcelService;
+import com.mjkrt.rendr.service.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @CrossOrigin(origins = "http://localhost:3000") // TODO remove after merging services together
+@RequestMapping("/api/v1")
 @RestController
 public class ExcelController {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelController.class);
     
     @Autowired
-    private ExcelService service;
+    private ExcelService excelService;
+    
+    @Autowired
+    private JsonService jsonService;
     
     @GetMapping("/hello")
     public String greet() {
@@ -40,32 +41,18 @@ public class ExcelController {
         return "Hello World!";
     }
     
-    @PostMapping("/loadSampleData")
-    public void loadSampleExcel(HttpServletResponse response, @RequestBody JsonNode jsonNode) throws IOException {
-        LOG.info("POST /loadSampleExcel called");
+    @PostMapping("/generateData")
+    public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
+        LOG.info("POST /generateData called");
 
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<ColumnHeader>>(){});
-
-        // to get json file from resources folder
-        JsonNode body = jsonNode.path("body");
-        List<JsonNode> bodyChildren = body.findParents("rows");
-        JsonNode columns = bodyChildren.get(0).path("columns");
-        JsonNode rows = bodyChildren.get(0).path("rows");
-        List<ColumnHeader> simpleColumns = reader.readValue(columns);
-
-        Iterator<JsonNode> children = rows.elements();
-        List<JsonNode> childrenList = new ArrayList<>();
-        while (children.hasNext()) {
-            childrenList.add(children.next());
-        }
+        List<ColumnHeader> headers = jsonService.getHeaders(json);
+        List<JsonNode> rows = jsonService.getRows(json);
+        String fileName = "Sample"; // todo add excel file name in frontend/request
         
-        String fileName = body.fieldNames().next();
-        ByteArrayInputStream stream = service.generateExcel(fileName, simpleColumns, childrenList);
+        ByteArrayInputStream stream = excelService.generateExcel(fileName, headers, rows);
         
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
-        
         IOUtils.copy(stream, response.getOutputStream());
     }
 }

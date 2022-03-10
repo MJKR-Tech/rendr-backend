@@ -1,8 +1,10 @@
 package com.mjkrt.rendr.entity;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ColumnHeader {
+public class ColumnHeader implements Comparable<ColumnHeader> {
 
     public enum Types {
         @JsonProperty("string") STRING,
@@ -48,5 +50,33 @@ public class ColumnHeader {
 
     public void setField(String field) {
         this.field = field;
+    }
+
+    @Override
+    public int compareTo(ColumnHeader that) {
+        return this.getName().compareTo(that.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ColumnHeader that = (ColumnHeader) o;
+        return isSelected == that.isSelected && Objects.equals(name, that.name) && type == that.type && Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, field, isSelected);
+    }
+
+    @Override
+    public String toString() {
+        return "ColumnHeader{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", field='" + field + '\'' +
+                ", isSelected=" + isSelected +
+                '}';
     }
 }
