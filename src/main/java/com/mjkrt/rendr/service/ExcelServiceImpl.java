@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -22,6 +23,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.utils.LogsCenter;
 
@@ -54,7 +56,7 @@ public class ExcelServiceImpl implements ExcelService {
 
         return writeToStream(workbook);
     }
-    
+
     private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
         return headers.stream()
                 .filter(ColumnHeader::isSelected)
@@ -126,5 +128,36 @@ public class ExcelServiceImpl implements ExcelService {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public boolean readFromFile(MultipartFile file) {
+        LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
+        
+        LOG.info("File content type: " + file.getContentType());
+        List<String> excelTypes = List.of(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
+                "application/vnd.ms-excel" // xls
+        );
+        if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
+            return false;
+        }
+
+        Workbook workbook;
+        try {
+            workbook = (excelTypes.get(0).equals(file.getContentType()))
+                    ? new XSSFWorkbook(file.getInputStream())
+                    : new HSSFWorkbook(file.getInputStream());
+        } catch (IOException io) {
+            LOG.warning("File is unable to be read.");
+            return false;
+        }
+
+        int sheetCount = workbook.getNumberOfSheets();
+        for (int i = 0; i < sheetCount; i++) {
+            Sheet sheet = workbook.getSheetAt(i);
+            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
+        }
+        return true;
     }
 }
