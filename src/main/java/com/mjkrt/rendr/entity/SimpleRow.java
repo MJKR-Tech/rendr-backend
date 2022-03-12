@@ -15,18 +15,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 public class SimpleRow {
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    private String ticker;
+    
     private String instrumentType;
-    private @Id String ticker;
-    private int coupon;
-    private double originalFace;
-    private double marketValue;
+    private Double coupon;
+    private Double originalFace;
+    private Double marketValue;
     private @JsonProperty("ISIN") String isin;
     private String portfolio;
     private String maturityDate;
-    private double price;
+    private Double price;
     private String positionDate;
-    private int currentFace;
+    private Integer currentFace;
     private String currency;
     private String contractCode;
     
@@ -48,27 +49,27 @@ public class SimpleRow {
         this.ticker = ticker;
     }
 
-    public int getCoupon() {
+    public Double getCoupon() {
         return coupon;
     }
 
-    public void setCoupon(int coupon) {
+    public void setCoupon(Double coupon) {
         this.coupon = coupon;
     }
 
-    public double getOriginalFace() {
+    public Double getOriginalFace() {
         return originalFace;
     }
 
-    public void setOriginalFace(double originalFace) {
+    public void setOriginalFace(Double originalFace) {
         this.originalFace = originalFace;
     }
 
-    public double getMarketValue() {
+    public Double getMarketValue() {
         return marketValue;
     }
 
-    public void setMarketValue(double marketValue) {
+    public void setMarketValue(Double marketValue) {
         this.marketValue = marketValue;
     }
 
@@ -96,11 +97,11 @@ public class SimpleRow {
         this.maturityDate = maturityDate;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -112,11 +113,11 @@ public class SimpleRow {
         this.positionDate = positionDate;
     }
 
-    public int getCurrentFace() {
+    public Integer getCurrentFace() {
         return currentFace;
     }
 
-    public void setCurrentFace(int currentFace) {
+    public void setCurrentFace(Integer currentFace) {
         this.currentFace = currentFace;
     }
 
@@ -158,11 +159,11 @@ public class SimpleRow {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleRow simpleRow = (SimpleRow) o;
-        return coupon == simpleRow.coupon
+        return Objects.equals(coupon, simpleRow.coupon)
                 && Double.compare(simpleRow.originalFace, originalFace) == 0
                 && Double.compare(simpleRow.marketValue, marketValue) == 0
                 && Double.compare(simpleRow.price, price) == 0
-                && currentFace == simpleRow.currentFace
+                && Objects.equals(currentFace, simpleRow.currentFace)
                 && Objects.equals(instrumentType, simpleRow.instrumentType)
                 && Objects.equals(ticker, simpleRow.ticker)
                 && Objects.equals(isin, simpleRow.isin)
