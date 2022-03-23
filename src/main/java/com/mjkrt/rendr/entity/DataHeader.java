@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "DataHeader")
 public class DataHeader {
     
     @Id
@@ -48,26 +49,25 @@ public class DataHeader {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DataHeader that = (DataHeader) o;
-        return headerId == that.headerId && headerOrder == that.headerOrder && Objects.equals(headerName, that.headerName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(headerId, headerName, headerOrder);
-    }
-
-    @Override
     public String toString() {
         return "DataHeader{" +
                 "headerId=" + headerId +
-                ", headerName='" + headerName +
+                ", dataTable=" + dataTable.getTableId() +
+                ", headerName='" + headerName + '\'' +
                 ", headerOrder=" + headerOrder +
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataHeader that = (DataHeader) o;
+        return headerId == that.headerId && headerOrder == that.headerOrder && Objects.equals(dataTable.getTableId(), that.dataTable.getTableId()) && Objects.equals(headerName, that.headerName);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder);
+    }
 }

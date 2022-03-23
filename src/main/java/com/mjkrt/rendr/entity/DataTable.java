@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Table(name = "DataTable")
 public class DataTable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tableId")
@@ -16,7 +17,7 @@ public class DataTable {
 
     //primary key
     @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY)
-    private Set<DataHeader> dataHeader;
+    private List<DataHeader> dataHeader;
 
     //foreign key
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,24 +55,26 @@ public class DataTable {
     }
 
     @Override
+    public String toString() {
+        return "DataTable{" +
+                "tableId=" + tableId +
+                ", dataHeader=" + dataHeader +
+                ", sheet=" + sheet.getSheetId() +
+                ", rowNum=" + rowNum +
+                ", colNum=" + colNum +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataTable dataTable = (DataTable) o;
-        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum;
+        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum && Objects.equals(dataHeader, dataTable.dataHeader) && Objects.equals(sheet.getSheetId(), dataTable.sheet.getSheetId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableId, rowNum, colNum);
-    }
-
-    @Override
-    public String toString() {
-        return "DataTable{" +
-                "tableId=" + tableId +
-                ", rowNum=" + rowNum +
-                ", colNum=" + colNum +
-                '}';
+        return Objects.hash(tableId, dataHeader, sheet.getSheetId(), rowNum, colNum);
     }
 }

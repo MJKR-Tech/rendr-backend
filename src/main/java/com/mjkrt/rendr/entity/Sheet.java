@@ -1,6 +1,7 @@
 package com.mjkrt.rendr.entity;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ public class Sheet {
     private long sheetId;
 
     @OneToMany(mappedBy = "sheet", fetch = FetchType.LAZY)
-    private Set<DataTable> dataTable;
+    private List<DataTable> dataTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
@@ -35,23 +36,25 @@ public class Sheet {
     }
 
     @Override
+    public String toString() {
+        return "Sheet{" +
+                "sheetId=" + sheetId +
+                ", dataTable=" + dataTable +
+                ", template=" + template.getTemplateId() +
+                ", sheetName='" + sheetName + '\'' +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sheet sheet = (Sheet) o;
-        return sheetId == sheet.sheetId && Objects.equals(sheetName, sheet.sheetName);
+        return sheetId == sheet.sheetId && Objects.equals(dataTable, sheet.dataTable) && Objects.equals(template.getTemplateId(), sheet.template.getTemplateId()) && Objects.equals(sheetName, sheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, sheetName);
-    }
-
-    @Override
-    public String toString() {
-        return "Sheet{" +
-                "sheetId=" + sheetId +
-                ", sheetName='" + sheetName + '\'' +
-                '}';
+        return Objects.hash(sheetId, dataTable, template.getTemplateId(), sheetName);
     }
 }

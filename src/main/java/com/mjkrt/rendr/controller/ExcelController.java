@@ -9,7 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
+import com.mjkrt.rendr.entity.DataHeader;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.Template;
+import com.mjkrt.rendr.repository.DataHeaderRepository;
+import com.mjkrt.rendr.repository.DataTableRepository;
 import com.mjkrt.rendr.repository.TemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,12 @@ public class ExcelController {
 
     @Autowired
     private TemplateRepository templateRepository;
+
+    @Autowired
+    private DataTableRepository dataTableRepository;
+
+    @Autowired
+    private DataHeaderRepository dataHeaderRepository;
     
     @GetMapping("/hello")
     public String greet() {
@@ -48,6 +58,12 @@ public class ExcelController {
 
         List<Template> listTemplate = templateRepository.findAll();
         LOG.info("templates " + listTemplate);
+
+        List<DataTable> listDataTable = dataTableRepository.findAll();
+        LOG.info("tables " + listDataTable);
+
+        List<DataHeader> listDataHeader = dataHeaderRepository.findAll();
+        LOG.info("headers " + listDataHeader);
 
         return "Hello World!";
     }
