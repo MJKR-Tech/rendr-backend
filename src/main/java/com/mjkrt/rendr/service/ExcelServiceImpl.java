@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.*;
 
-import com.mjkrt.rendr.repository.DataHeaderRepository;
-import com.mjkrt.rendr.repository.DataSheetRepository;
-import com.mjkrt.rendr.repository.DataTableRepository;
+import com.mjkrt.rendr.entity.ColumnHeader;
+import com.mjkrt.rendr.entity.DataHeader;
+import com.mjkrt.rendr.entity.DataSheet;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.entity.DataTemplate;
-import com.mjkrt.rendr.repository.DataTemplateRepository;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Service
@@ -58,7 +57,7 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public boolean uploadTemplateFromFile(MultipartFile file) {
         LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
-        
+
         LOG.info("File content type: " + file.getContentType());
         List<String> excelTypes = List.of(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
@@ -73,33 +72,86 @@ public class ExcelServiceImpl implements ExcelService {
             workbook = (excelTypes.get(0).equals(file.getContentType()))
                     ? new XSSFWorkbook(file.getInputStream())
                     : new HSSFWorkbook(file.getInputStream());
-            
         } catch (IOException io) {
             LOG.warning("File is unable to be read.");
             return false;
         }
 
+        //template
+        DataTemplate dataTemplate = makeDataTemplate(file.getOriginalFilename());
+        ArrayList<DataSheet> listDataSheet = new ArrayList<DataSheet>();
+
         int sheetCount = workbook.getNumberOfSheets();
-        
         for (int i = 0; i < sheetCount; i++) {
+
             Sheet datatypeSheet = workbook.getSheetAt(i);
             Iterator<Row> iterator = datatypeSheet.iterator();
-            Sheet sheet = workbook.getSheetAt(i);
-            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
-            
-            while (iterator.hasNext()) {
-                Row currentRow = iterator.next();
 
-                for (Cell currentCell : currentRow) {
+            Sheet sheet = workbook.getSheetAt(i);
+
+            //datasheet
+            DataSheet dataSheet = makeDataSheet(sheet.getSheetName());
+            ArrayList<DataTable> listDataTable = new ArrayList<>();
+            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
+            while (iterator.hasNext()) {
+
+                long orderNumber = 0;
+                Row currentRow = iterator.next();
+                Iterator<Cell> cellIterator = currentRow.iterator();
+
+                //datatable
+                DataTable dataTable = makeDataTable(currentRow.getRowNum(), 0);
+                ArrayList<DataHeader> listDataHeader = new ArrayList<>();
+                while (cellIterator.hasNext()) {
+                    //dataheader
+                    DataHeader dataHeader = makeDataHeader("headerName", orderNumber++);
+                    Cell currentCell = cellIterator.next();
+
+                    dataTable.setColNum(currentCell.getColumnIndex());
+                    //getCellTypeEnum shown as deprecated for version 3.15
+                    //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
                     if (currentCell.getCellType() == CellType.STRING) {
-                        System.out.print(currentCell.getStringCellValue() + "--");
+                        String headerName = currentCell.getStringCellValue();
+                        dataHeader.setHeaderName(headerName);
+                        //save data header
+                        listDataHeader.add(dataHeader);
+                        System.out.print(headerName + "--");
+
+
                     } else if (currentCell.getCellType() == CellType.NUMERIC) {
                         System.out.print(currentCell.getNumericCellValue() + "--");
                     }
+                    //save data table
+                    dataTable.setDataHeader(listDataHeader);
                 }
+                //save data sheet
+
+                listDataTable.add(dataTable);
+                System.out.println();
             }
+            //save data sheet
+            dataSheet.setDataTable(listDataTable);
+            listDataSheet.add(dataSheet);
         }
+        dataTemplate.setDataSheet(listDataSheet);
+        dataTemplateRepository.save(dataTemplate);
         return true;
+    }
+
+    public DataTemplate makeDataTemplate(String templateName) {
+        return new DataTemplate(templateName);
+    }
+
+    public DataSheet makeDataSheet(String sheetName) {
+        return new DataSheet(sheetName);
+    }
+
+    public DataTable makeDataTable(long row, long col) {
+        return new DataTable(row, col);
+    }
+
+    public DataHeader makeDataHeader(String headerName, long headerOrder) {
+        return new DataHeader(headerName, headerOrder);
     }
 
     @Override
@@ -111,18 +163,6 @@ public class ExcelServiceImpl implements ExcelService {
         dataTemplateRepository.delete(toDelete);
         return true;
     }
-
-    @Autowired
-    private DataTemplateRepository dataTemplateRepository;
-
-    @Autowired
-    private DataSheetRepository dataSheetRepository;
-
-    @Autowired
-    private DataTableRepository dataTableRepository;
-
-    @Autowired
-    private DataHeaderRepository dataHeaderRepository;
 
     @Override
     public ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
@@ -220,109 +260,5 @@ public class ExcelServiceImpl implements ExcelService {
             ex.printStackTrace();
             return null;
         }
-    }
-
-    @Override
-    public boolean readFromFile(MultipartFile file) {
-        LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
-        
-        LOG.info("File content type: " + file.getContentType());
-        List<String> excelTypes = List.of(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
-                "application/vnd.ms-excel" // xls
-        );
-        if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
-            return false;
-        }
-
-        Workbook workbook;
-        try {
-            workbook = (excelTypes.get(0).equals(file.getContentType()))
-                    ? new XSSFWorkbook(file.getInputStream())
-                    : new HSSFWorkbook(file.getInputStream());
-        } catch (IOException io) {
-            LOG.warning("File is unable to be read.");
-            return false;
-        }
-
-        //template
-        DataTemplate dataTemplate = makeDataTemplate(file.getOriginalFilename());
-        ArrayList<DataSheet> listDataSheet = new ArrayList<DataSheet>();
-
-        int sheetCount = workbook.getNumberOfSheets();
-        for (int i = 0; i < sheetCount; i++) {
-
-            Sheet datatypeSheet = workbook.getSheetAt(i);
-            Iterator<Row> iterator = datatypeSheet.iterator();
-
-            Sheet sheet = workbook.getSheetAt(i);
-
-            //datasheet
-            DataSheet dataSheet = makeDataSheet(sheet.getSheetName());
-            ArrayList<DataTable> listDataTable = new ArrayList<DataTable>();
-            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
-            while (iterator.hasNext()) {
-
-                long orderNumber = 0;
-                Row currentRow = iterator.next();
-                Iterator<Cell> cellIterator = currentRow.iterator();
-
-                //datatable
-                DataTable dataTable = makeDataTable(currentRow.getRowNum(), 0);
-                ArrayList<DataHeader> listDataHeader = new ArrayList<DataHeader>();
-                while (cellIterator.hasNext()) {
-                    //dataheader
-                    DataHeader dataHeader = makeDataHeader("headerName", orderNumber++);
-                    Cell currentCell = cellIterator.next();
-
-                    dataTable.setColNum(currentCell.getColumnIndex());
-                    //getCellTypeEnum shown as deprecated for version 3.15
-                    //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
-                    if (currentCell.getCellType() == CellType.STRING) {
-                        String headerName = currentCell.getStringCellValue();
-                        dataHeader.setHeaderName(headerName);
-                        //save data header
-                        listDataHeader.add(dataHeader);
-                        System.out.print(headerName + "--");
-
-
-                    } else if (currentCell.getCellType() == CellType.NUMERIC) {
-                        System.out.print(currentCell.getNumericCellValue() + "--");
-                    }
-                    //save data table
-                    dataTable.setDataHeader(listDataHeader);
-                }
-                //save data sheet
-
-                listDataTable.add(dataTable);
-                System.out.println();
-            }
-            //save data sheet
-            dataSheet.setDataTable(listDataTable);
-            listDataSheet.add(dataSheet);
-        }
-        dataTemplate.setDataSheet(listDataSheet);
-        dataTemplateRepository.save(dataTemplate);
-        return true;
-    }
-
-    public DataTemplate makeDataTemplate(String templateName) {
-        DataTemplate dataTemplate = new DataTemplate(templateName);
-        return dataTemplate;
-    }
-
-    public DataSheet makeDataSheet(String sheetName) {
-        DataSheet dataSheet = new DataSheet(sheetName);
-        return dataSheet;
-    }
-
-    public DataTable makeDataTable(long row, long col) {
-        DataTable dataTable = new DataTable(row, col);
-        return dataTable;
-    }
-
-    public DataHeader makeDataHeader(String headerName, long headerOrder) {
-        DataHeader dataHeader = new DataHeader(headerName, headerOrder);
-        return dataHeader;
     }
 }

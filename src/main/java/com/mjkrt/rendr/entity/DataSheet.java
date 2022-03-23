@@ -19,13 +19,17 @@ public class DataSheet {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long sheetId;
 
-    @OneToMany(mappedBy = "sheet", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dataSheet", fetch = FetchType.LAZY)
     private List<DataTable> dataTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
     private DataTemplate dataTemplate;
+    
     private String sheetName;
+
+    public DataSheet() {
+    }
 
     public DataSheet(String sheetName) {
         this.sheetName = sheetName;
@@ -56,28 +60,28 @@ public class DataSheet {
     }
 
     @Override
-    public String toString() {
-        return "Sheet{" +
-                "sheetId=" + sheetId +
-                ", dataTable=" + dataTable +
-                ", dataTemplate=" + dataTemplate.getTemplateId() +
-                ", sheetName='" + sheetName + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DataSheet sheet = (DataSheet) o;
-        return sheetId == sheet.sheetId
-                && Objects.equals(dataTable, sheet.dataTable)
-                && Objects.equals(dataTemplate.getTemplateId(), sheet.dataTemplate.getTemplateId())
-                && Objects.equals(sheetName, sheet.sheetName);
+        DataSheet dataSheet = (DataSheet) o;
+        return sheetId == dataSheet.sheetId
+                && Objects.equals(dataTable, dataSheet.dataTable)
+                && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId())
+                && Objects.equals(sheetName, dataSheet.sheetName);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName);
+    }
+
+    @Override
+    public String toString() {
+        return "DataSheet{" +
+                "sheetId=" + sheetId +
+                ", dataTable=" + dataTable +
+                ", dataTemplate=" + dataTemplate.getTemplateId() +
+                ", sheetName='" + sheetName + '\'' +
+                '}';
     }
 }

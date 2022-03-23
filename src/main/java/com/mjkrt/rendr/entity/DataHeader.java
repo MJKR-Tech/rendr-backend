@@ -22,7 +22,11 @@ public class DataHeader {
     private DataTable dataTable;
 
     private String headerName;
+    
     private long headerOrder;
+
+    public DataHeader() {
+    }
 
     public DataHeader(String headerName, long headerOrder) {
         this.headerName = headerName;
@@ -54,16 +58,6 @@ public class DataHeader {
     }
 
     @Override
-    public String toString() {
-        return "DataHeader{" +
-                "headerId=" + headerId +
-                ", dataTable=" + dataTable.getTableId() +
-                ", headerName='" + headerName + '\'' +
-                ", headerOrder=" + headerOrder +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -77,5 +71,15 @@ public class DataHeader {
     @Override
     public int hashCode() {
         return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder);
+    }
+
+    @Override
+    public String toString() {
+        return "DataHeader{" +
+                "headerId=" + headerId +
+                ", dataTable=" + dataTable.getTableId() +
+                ", headerName='" + headerName + '\'' +
+                ", headerOrder=" + headerOrder +
+                '}';
     }
 }

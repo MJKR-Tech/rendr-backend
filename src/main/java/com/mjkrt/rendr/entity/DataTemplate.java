@@ -1,6 +1,6 @@
 package com.mjkrt.rendr.entity;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,12 +18,28 @@ public class DataTemplate {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long templateId;
 
-    @OneToMany(mappedBy = "template", fetch = FetchType.LAZY)
-    private List<DataSheet> sheet;
+    @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY)
+    private List<DataSheet> dataSheet;
 
     private String templateName;
     
-    private Date dateCreated;
+    private LocalDate dateCreated;
+
+    public DataTemplate() {
+    }
+
+    public DataTemplate(String templateName) {
+        this.templateName = templateName;
+        this.dateCreated = LocalDate.now();
+    }
+
+    public List<DataSheet> getDataSheet() {
+        return dataSheet;
+    }
+
+    public void setDataSheet(List<DataSheet> dataSheet) {
+        this.dataSheet = dataSheet;
+    }
 
     public long getTemplateId() {
         return templateId;
@@ -33,7 +49,7 @@ public class DataTemplate {
         return templateName;
     }
 
-    public Date getDateCreated() {
+    public LocalDate getDateCreated() {
         return dateCreated;
     }
 
@@ -45,33 +61,33 @@ public class DataTemplate {
         this.templateName = templateName;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(LocalDate dateCreated) {
         this.dateCreated = dateCreated;
-    }
-
-    @Override
-    public String toString() {
-        return "Template{" +
-                "templateId=" + templateId +
-                ", sheet=" + sheet +
-                ", templateName='" + templateName + '\'' +
-                ", dateCreated=" + dateCreated +
-                '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DataTemplate template = (DataTemplate) o;
-        return templateId == template.templateId
-                && Objects.equals(sheet, template.sheet)
-                && Objects.equals(templateName, template.templateName)
-                && Objects.equals(dateCreated, template.dateCreated);
+        DataTemplate dataTemplate = (DataTemplate) o;
+        return templateId == dataTemplate.templateId
+                && Objects.equals(dataSheet, dataTemplate.dataSheet) 
+                && Objects.equals(templateName, dataTemplate.templateName)
+                && Objects.equals(dateCreated, dataTemplate.dateCreated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(templateId, sheet, templateName, dateCreated);
+        return Objects.hash(templateId, dataSheet, templateName, dateCreated);
+    }
+
+    @Override
+    public String toString() {
+        return "DataTemplate{" +
+                "templateId=" + templateId +
+                ", sheet=" + dataSheet +
+                ", templateName='" + templateName + '\'' +
+                ", dateCreated=" + dateCreated +
+                '}';
     }
 }

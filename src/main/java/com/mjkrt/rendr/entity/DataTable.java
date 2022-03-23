@@ -14,7 +14,6 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class DataTable {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long tableId;
@@ -31,6 +30,9 @@ public class DataTable {
     private long rowNum;
     
     private long colNum;
+
+    public DataTable() {
+    }
 
     public DataTable(long rowNum, long colNum) {
         this.rowNum = rowNum;
@@ -70,17 +72,6 @@ public class DataTable {
     }
 
     @Override
-    public String toString() {
-        return "DataTable{" +
-                "tableId=" + tableId +
-                ", dataHeader=" + dataHeader +
-                ", sheet=" + dataSheet.getSheetId() +
-                ", rowNum=" + rowNum +
-                ", colNum=" + colNum +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -89,11 +80,22 @@ public class DataTable {
                 && rowNum == dataTable.rowNum
                 && colNum == dataTable.colNum
                 && Objects.equals(dataHeader, dataTable.dataHeader)
-                && Objects.equals(sheet.getSheetId(), dataTable.sheet.getSheetId());
+                && Objects.equals(dataSheet.getSheetId(), dataTable.dataSheet.getSheetId());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
+    }
+
+    @Override
+    public String toString() {
+        return "DataTable{" +
+                "tableId=" + tableId +
+                ", dataHeader=" + dataHeader +
+                ", sheet=" + dataSheet.getSheetId() +
+                ", rowNum=" + rowNum +
+                ", colNum=" + colNum +
+                '}';
     }
 }
