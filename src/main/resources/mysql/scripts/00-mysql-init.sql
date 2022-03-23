@@ -1,37 +1,36 @@
-DROP TABLE IF EXISTS simple_row;
-
 -- init table
-CREATE TABLE simple_row (
-	ticker VARCHAR(255) NOT NULL,
-	instrumentType VARCHAR(255) DEFAULT NULL,
-	coupon DOUBLE DEFAULT NULL,
-	originalFace DOUBLE DEFAULT NULL,
-	marketValue DOUBLE DEFAULT NULL,
-	isin VARCHAR(255) DEFAULT NULL,
-	portfolio VARCHAR(255) DEFAULT NULL,
-	maturityDate VARCHAR(255) DEFAULT NULL,
-	price DOUBLE DEFAULT NULL,
-	positionDate VARCHAR(255) DEFAULT NULL,
-	currentFace INT DEFAULT NULL,
-	currency VARCHAR(255) DEFAULT NULL,
-	contractCode VARCHAR(255) DEFAULT NULL,
-	PRIMARY KEY (ticker)
+DROP TABLE IF EXISTS Template, Sheet, DataTable, DataHeader;
+
+CREATE TABLE Template (
+    template_id BIGINT AUTO_INCREMENT,
+    template_name VARCHAR(255) NOT NULL,
+    date_created DATE NOT NULL,
+    PRIMARY KEY (template_id) 
 );
 
--- sample value
-INSERT INTO simple_row
-VALUES (
-    "TB",
-    "TBILL",
-    2.5,
-    121000000,
-    125817070.5,
-    "US000000A002",
-    "100001",
-    "5/1/2021",
-    103.98,
-    "20210730",
-    121000000,
-    "USD",
-    null
+CREATE TABLE Sheet (
+    sheet_id BIGINT AUTO_INCREMENT,
+    template_id BIGINT NOT NULL,
+    sheet_name VARCHAR(255) NOT NULL,
+    sheet_order INT NOT NULL,
+    PRIMARY KEY (sheet_id),
+    FOREIGN KEY (template_id) REFERENCES Template(template_id)
+);
+
+CREATE TABLE DataTable (
+    table_id BIGINT AUTO_INCREMENT,
+    sheet_id BIGINT NOT NULL,
+    row_num INT NOT NULL,
+    col_num INT NOT NULL,
+    PRIMARY KEY (table_id),
+    FOREIGN KEY (sheet_id) REFERENCES Sheet(sheet_id)
+);
+
+CREATE TABLE DataHeader (
+    header_id BIGINT AUTO_INCREMENT,
+    table_id BIGINT NOT NULL,
+    header_name VARCHAR(255) NOT NULL,
+    header_order INT NOT NULL,
+    PRIMARY KEY (header_id),
+    FOREIGN KEY (table_id) REFERENCES DataTable(table_id)
 );
