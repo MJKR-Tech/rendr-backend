@@ -98,25 +98,24 @@ public class ExcelServiceImpl implements ExcelService {
 
             Sheet datatypeSheet = workbook.getSheetAt(i);
             Iterator<Row> iterator = datatypeSheet.iterator();
-
-            Sheet sheet = workbook.getSheetAt(i);
-
-            //datasheet
-            DataSheet dataSheet = makeDataSheet(sheet.getSheetName(), dataTemplate);
-            ArrayList<DataTable> listDataTable = new ArrayList<>();
-            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
+            DataSheet dataSheet = makeDataSheet(datatypeSheet.getSheetName(), dataTemplate);
+            
+            List<DataTable> listDataTable = new ArrayList<>();
+            LOG.info("Now reading sheet #" + i + " " + datatypeSheet.getSheetName());
             while (iterator.hasNext()) {
 
                 long orderNumber = 0;
                 Row currentRow = iterator.next();
+                int rowNum = currentRow.getRowNum();
+                int colNum = -1;
                 Iterator<Cell> cellIterator = currentRow.iterator();
 
-                //datatable
-                DataTable dataTable = makeDataTable(currentRow.getRowNum(), 0, dataSheet);
-                ArrayList<DataHeader> listDataHeader = new ArrayList<>();
+                List<DataHeader> listDataHeader = new ArrayList<>();
                 while (cellIterator.hasNext()) {
                     Cell currentCell = cellIterator.next();
-                    dataTable.setColNum(currentCell.getColumnIndex());
+                    if (colNum < 0) {
+                        colNum = currentCell.getColumnIndex();
+                    }
                     
                     if (currentCell.getCellType() == CellType.STRING) {
                         String headerName = currentCell.getStringCellValue();
@@ -124,21 +123,34 @@ public class ExcelServiceImpl implements ExcelService {
                             continue;
                         }
                         //save data header
-                        DataHeader dataHeader = makeDataHeader(headerName, orderNumber++, dataTable);
-                        listDataHeader.add(dataHeader);
+                        listDataHeader.add(new DataHeader(headerName, orderNumber++));
                         System.out.print(headerName + "--");
+                        
                     } else if (currentCell.getCellType() == CellType.NUMERIC) {
                         System.out.print(currentCell.getNumericCellValue() + "--");
                     }
-                    
-                    //save data table
-                    dataTable.setDataHeader(listDataHeader);
                 }
-                //save data sheet
+                
+                if (listDataHeader.isEmpty()) {
+                    continue;
+                }
+                //save data table
+                DataTable dataTable = makeDataTable(rowNum, colNum, dataSheet);
+                listDataHeader = listDataHeader.stream()
+                        .map(header -> makeDataHeader(header.getHeaderName(), header.getHeaderOrder(), dataTable))
+                        .collect(Collectors.toList());
+                dataTable.setDataHeader(listDataHeader);
+                
+                //add to data sheet
                 listDataTable.add(dataTable);
             }
-            //save data sheet
+            
+            if (listDataTable.isEmpty()) {
+                continue;
+            }
             dataSheet.setDataTable(listDataTable);
+            
+            // add to data template
             listDataSheet.add(dataSheet);
         }
         dataTemplate.setDataSheet(listDataSheet);
