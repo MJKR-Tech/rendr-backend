@@ -4,20 +4,19 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
 public class Sheet {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "sheetId")
     private long sheetId;
 
-    @OneToMany(mappedBy = "sheet")
+    @OneToMany(mappedBy = "sheet", fetch = FetchType.LAZY)
     private Set<DataTable> dataTable;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
-    private Table template;
+    private Template template;
     private String sheetName;
-
-    private long templateId;
 
     public void setSheetId(long sheetId) {
         this.sheetId = sheetId;
@@ -25,10 +24,6 @@ public class Sheet {
 
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
-    }
-
-    public void setTemplateId(long templateId) {
-        this.templateId = templateId;
     }
 
     public long getSheetId() {
@@ -39,21 +34,17 @@ public class Sheet {
         return sheetName;
     }
 
-    public long getTemplateId() {
-        return templateId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sheet sheet = (Sheet) o;
-        return sheetId == sheet.sheetId && templateId == sheet.templateId && Objects.equals(sheetName, sheet.sheetName);
+        return sheetId == sheet.sheetId && Objects.equals(sheetName, sheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, sheetName, templateId);
+        return Objects.hash(sheetId, sheetName);
     }
 
     @Override
@@ -61,7 +52,6 @@ public class Sheet {
         return "Sheet{" +
                 "sheetId=" + sheetId +
                 ", sheetName='" + sheetName + '\'' +
-                ", templateId=" + templateId +
                 '}';
     }
 }

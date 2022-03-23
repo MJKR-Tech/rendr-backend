@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
+import com.mjkrt.rendr.entity.Template;
+import com.mjkrt.rendr.repository.TemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,10 +38,17 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    @Autowired
+    private TemplateRepository templateRepository;
     
     @GetMapping("/hello")
     public String greet() {
         LOG.info("GET /hello called");
+
+        List<Template> listTemplate = templateRepository.findAll();
+        LOG.info("templates " + listTemplate);
+
         return "Hello World!";
     }
     

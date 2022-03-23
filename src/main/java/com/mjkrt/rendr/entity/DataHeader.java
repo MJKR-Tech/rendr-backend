@@ -14,7 +14,7 @@ public class DataHeader {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "headerId")
     private long headerId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="tableId", nullable = false)
     private DataTable dataTable;
 

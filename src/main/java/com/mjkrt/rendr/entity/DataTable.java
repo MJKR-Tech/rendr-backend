@@ -8,17 +8,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
 public class DataTable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tableId")
     private long tableId;
 
     //primary key
-    @OneToMany(mappedBy = "dataTable")
-    private Set<DataHeader> dataHeaders;
+    @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY)
+    private Set<DataHeader> dataHeader;
 
     //foreign key
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sheetId", nullable = false)
     private Sheet sheet;
 

@@ -1,19 +1,17 @@
 package com.mjkrt.rendr.entity;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.Date;
+import javax.persistence.*;
+import java.sql.Date;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
 public class Template {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "templateId")
     private long templateId;
 
-    @OneToMany(mappedBy = "dataTable")
+    @OneToMany(mappedBy = "template", fetch = FetchType.LAZY)
     private Set<Sheet> sheet;
 
     private String templateName;
