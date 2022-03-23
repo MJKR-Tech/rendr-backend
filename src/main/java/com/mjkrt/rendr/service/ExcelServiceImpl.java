@@ -17,6 +17,9 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
+import com.mjkrt.rendr.repository.DataHeaderRepository;
+import com.mjkrt.rendr.repository.DataSheetRepository;
+import com.mjkrt.rendr.repository.DataTableRepository;
 import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -44,6 +47,15 @@ public class ExcelServiceImpl implements ExcelService {
     
     @Autowired
     private DataTemplateRepository dataTemplateRepository;
+
+    @Autowired
+    private DataSheetRepository dataSheetRepository;
+
+    @Autowired
+    private DataTableRepository dataTableRepository;
+
+    @Autowired
+    private DataHeaderRepository dataHeaderRepository;
 
     @Override
     public List<DataTemplate> getTemplates() {
@@ -79,7 +91,7 @@ public class ExcelServiceImpl implements ExcelService {
 
         //template
         DataTemplate dataTemplate = makeDataTemplate(file.getOriginalFilename());
-        ArrayList<DataSheet> listDataSheet = new ArrayList<DataSheet>();
+        ArrayList<DataSheet> listDataSheet = new ArrayList<>();
 
         int sheetCount = workbook.getNumberOfSheets();
         for (int i = 0; i < sheetCount; i++) {
@@ -90,7 +102,7 @@ public class ExcelServiceImpl implements ExcelService {
             Sheet sheet = workbook.getSheetAt(i);
 
             //datasheet
-            DataSheet dataSheet = makeDataSheet(sheet.getSheetName());
+            DataSheet dataSheet = makeDataSheet(sheet.getSheetName(), dataTemplate);
             ArrayList<DataTable> listDataTable = new ArrayList<>();
             LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
             while (iterator.hasNext()) {
@@ -100,34 +112,30 @@ public class ExcelServiceImpl implements ExcelService {
                 Iterator<Cell> cellIterator = currentRow.iterator();
 
                 //datatable
-                DataTable dataTable = makeDataTable(currentRow.getRowNum(), 0);
+                DataTable dataTable = makeDataTable(currentRow.getRowNum(), 0, dataSheet);
                 ArrayList<DataHeader> listDataHeader = new ArrayList<>();
                 while (cellIterator.hasNext()) {
-                    //dataheader
-                    DataHeader dataHeader = makeDataHeader("headerName", orderNumber++);
                     Cell currentCell = cellIterator.next();
-
                     dataTable.setColNum(currentCell.getColumnIndex());
-                    //getCellTypeEnum shown as deprecated for version 3.15
-                    //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+                    
                     if (currentCell.getCellType() == CellType.STRING) {
                         String headerName = currentCell.getStringCellValue();
-                        dataHeader.setHeaderName(headerName);
+                        if (headerName.isEmpty()) {
+                            continue;
+                        }
                         //save data header
+                        DataHeader dataHeader = makeDataHeader(headerName, orderNumber++, dataTable);
                         listDataHeader.add(dataHeader);
                         System.out.print(headerName + "--");
-
-
                     } else if (currentCell.getCellType() == CellType.NUMERIC) {
                         System.out.print(currentCell.getNumericCellValue() + "--");
                     }
+                    
                     //save data table
                     dataTable.setDataHeader(listDataHeader);
                 }
                 //save data sheet
-
                 listDataTable.add(dataTable);
-                System.out.println();
             }
             //save data sheet
             dataSheet.setDataTable(listDataTable);
@@ -139,19 +147,25 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     public DataTemplate makeDataTemplate(String templateName) {
-        return new DataTemplate(templateName);
+        return dataTemplateRepository.save(new DataTemplate(templateName));
     }
 
-    public DataSheet makeDataSheet(String sheetName) {
-        return new DataSheet(sheetName);
+    public DataSheet makeDataSheet(String sheetName, DataTemplate template) {
+        DataSheet newSheet = new DataSheet(sheetName);
+        newSheet.setDataTemplate(template);
+        return dataSheetRepository.save(newSheet);
     }
 
-    public DataTable makeDataTable(long row, long col) {
-        return new DataTable(row, col);
+    public DataTable makeDataTable(long row, long col, DataSheet sheet) {
+        DataTable newTable = new DataTable(row, col);
+        newTable.setDataSheet(sheet);
+        return dataTableRepository.save(newTable);
     }
 
-    public DataHeader makeDataHeader(String headerName, long headerOrder) {
-        return new DataHeader(headerName, headerOrder);
+    public DataHeader makeDataHeader(String headerName, long headerOrder, DataTable table) {
+        DataHeader newHeader = new DataHeader(headerName, headerOrder);
+        newHeader.setDataTable(table);
+        return dataHeaderRepository.save(newHeader);
     }
 
     @Override

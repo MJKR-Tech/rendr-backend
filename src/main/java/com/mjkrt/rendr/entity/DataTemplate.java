@@ -1,6 +1,7 @@
 package com.mjkrt.rendr.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ public class DataTemplate {
     private long templateId;
 
     @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY)
-    private List<DataSheet> dataSheet;
+    private List<DataSheet> dataSheet = new ArrayList<>();
 
     private String templateName;
     
@@ -38,7 +39,9 @@ public class DataTemplate {
     }
 
     public void setDataSheet(List<DataSheet> dataSheet) {
-        this.dataSheet = dataSheet;
+        this.dataSheet.clear();
+        this.dataSheet.addAll(dataSheet);
+        dataSheet.forEach(sheet -> sheet.setDataTemplate(this));
     }
 
     public long getTemplateId() {

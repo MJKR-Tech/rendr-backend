@@ -1,5 +1,6 @@
 package com.mjkrt.rendr.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,17 +13,21 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class DataTable {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long tableId;
 
     //primary key
     @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY)
-    private List<DataHeader> dataHeader;
+    private List<DataHeader> dataHeader = new ArrayList<>();
 
     //foreign key
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sheetId", nullable = false)
     private DataSheet dataSheet;
@@ -40,7 +45,17 @@ public class DataTable {
     }
 
     public void setDataHeader(List<DataHeader> dataHeader) {
-        this.dataHeader = dataHeader;
+        this.dataHeader.clear();
+        this.dataHeader.addAll(dataHeader);
+        dataHeader.forEach(header -> header.setDataTable(this));
+    }
+
+    public DataSheet getDataSheet() {
+        return dataSheet;
+    }
+
+    public void setDataSheet(DataSheet dataSheet) {
+        this.dataSheet = dataSheet;
     }
 
     public List<DataHeader> getDataHeader() {

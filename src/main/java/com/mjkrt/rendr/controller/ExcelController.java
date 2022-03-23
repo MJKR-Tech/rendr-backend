@@ -76,5 +76,6 @@ public class ExcelController {
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
+        LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
     }
 }

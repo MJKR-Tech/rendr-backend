@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class DataHeader {
     
@@ -17,6 +19,7 @@ public class DataHeader {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long headerId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="tableId", nullable = false)
     private DataTable dataTable;
@@ -31,6 +34,14 @@ public class DataHeader {
     public DataHeader(String headerName, long headerOrder) {
         this.headerName = headerName;
         this.headerOrder = headerOrder;
+    }
+
+    public DataTable getDataTable() {
+        return dataTable;
+    }
+
+    public void setDataTable(DataTable dataTable) {
+        this.dataTable = dataTable;
     }
 
     public void setHeaderId(long headerId) {
