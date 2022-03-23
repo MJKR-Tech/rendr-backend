@@ -1,14 +1,22 @@
 package com.mjkrt.rendr.entity;
 
-import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
-public class Sheet {
+public class DataSheet {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "sheetId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long sheetId;
 
     @OneToMany(mappedBy = "sheet", fetch = FetchType.LAZY)
@@ -16,7 +24,8 @@ public class Sheet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
-    private Template template;
+    private DataTemplate template;
+    
     private String sheetName;
 
     public void setSheetId(long sheetId) {
@@ -49,8 +58,11 @@ public class Sheet {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Sheet sheet = (Sheet) o;
-        return sheetId == sheet.sheetId && Objects.equals(dataTable, sheet.dataTable) && Objects.equals(template.getTemplateId(), sheet.template.getTemplateId()) && Objects.equals(sheetName, sheet.sheetName);
+        DataSheet sheet = (DataSheet) o;
+        return sheetId == sheet.sheetId
+                && Objects.equals(dataTable, sheet.dataTable)
+                && Objects.equals(template.getTemplateId(), sheet.template.getTemplateId())
+                && Objects.equals(sheetName, sheet.sheetName);
     }
 
     @Override

@@ -1,18 +1,22 @@
 package com.mjkrt.rendr.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
-@Table(name = "DataTable")
 public class DataTable {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "tableId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long tableId;
 
     //primary key
@@ -22,9 +26,10 @@ public class DataTable {
     //foreign key
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sheetId", nullable = false)
-    private Sheet sheet;
+    private DataSheet sheet;
 
     private long rowNum;
+    
     private long colNum;
 
     public DataTable() {}
@@ -32,7 +37,6 @@ public class DataTable {
     public long getTableId() {
         return tableId;
     }
-
 
     public long getRowNum() {
         return rowNum;
@@ -70,7 +74,11 @@ public class DataTable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataTable dataTable = (DataTable) o;
-        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum && Objects.equals(dataHeader, dataTable.dataHeader) && Objects.equals(sheet.getSheetId(), dataTable.sheet.getSheetId());
+        return tableId == dataTable.tableId
+                && rowNum == dataTable.rowNum
+                && colNum == dataTable.colNum
+                && Objects.equals(dataHeader, dataTable.dataHeader)
+                && Objects.equals(sheet.getSheetId(), dataTable.sheet.getSheetId());
     }
 
     @Override

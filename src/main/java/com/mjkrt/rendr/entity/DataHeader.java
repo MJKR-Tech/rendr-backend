@@ -1,18 +1,20 @@
 package com.mjkrt.rendr.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 @Entity
-@Table(name = "DataHeader")
 public class DataHeader {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "headerId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long headerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -63,7 +65,10 @@ public class DataHeader {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataHeader that = (DataHeader) o;
-        return headerId == that.headerId && headerOrder == that.headerOrder && Objects.equals(dataTable.getTableId(), that.dataTable.getTableId()) && Objects.equals(headerName, that.headerName);
+        return headerId == that.headerId
+                && headerOrder == that.headerOrder
+                && Objects.equals(dataTable.getTableId(), that.dataTable.getTableId())
+                && Objects.equals(headerName, that.headerName);
     }
 
     @Override

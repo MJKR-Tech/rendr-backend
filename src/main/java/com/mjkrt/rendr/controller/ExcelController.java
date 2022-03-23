@@ -9,16 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
-import com.mjkrt.rendr.entity.DataHeader;
-import com.mjkrt.rendr.entity.DataTable;
-import com.mjkrt.rendr.entity.Template;
+import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.repository.DataHeaderRepository;
 import com.mjkrt.rendr.repository.DataTableRepository;
-import com.mjkrt.rendr.repository.TemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,9 +43,6 @@ public class ExcelController {
     private JsonService jsonService;
 
     @Autowired
-    private TemplateRepository templateRepository;
-
-    @Autowired
     private DataTableRepository dataTableRepository;
 
     @Autowired
@@ -55,17 +51,25 @@ public class ExcelController {
     @GetMapping("/hello")
     public String greet() {
         LOG.info("GET /hello called");
-
-        List<Template> listTemplate = templateRepository.findAll();
-        LOG.info("templates " + listTemplate);
-
-        List<DataTable> listDataTable = dataTableRepository.findAll();
-        LOG.info("tables " + listDataTable);
-
-        List<DataHeader> listDataHeader = dataHeaderRepository.findAll();
-        LOG.info("headers " + listDataHeader);
-
         return "Hello World!";
+    }
+
+    @GetMapping("/getTemplates")
+    public List<DataTemplate> getTemplates() {
+        LOG.info("GET /getTemplates called");
+        return excelService.getTemplates();
+    }
+
+    @PostMapping("/uploadTemplate")
+    public boolean uploadExcel(@RequestParam("file") MultipartFile file) {
+        LOG.info("POST /uploadTemplate called");
+        return excelService.uploadTemplateFromFile(file);
+    }
+
+    @DeleteMapping("/deleteTemplate/{id}")
+    public boolean deleteTemplate(@PathVariable("id") long templateId) {
+        LOG.info("DELETE /deleteTemplate called");
+        return excelService.deleteTemplate(templateId); // TODO
     }
     
     @PostMapping("/generateData")
@@ -81,11 +85,5 @@ public class ExcelController {
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
-    }
-    
-    @PostMapping("/uploadExcel")
-    public boolean uploadExcel(@RequestParam("file") MultipartFile file) {
-        LOG.info("POST /uploadExcel called");
-        return excelService.readFromFile(file);
     }
 }

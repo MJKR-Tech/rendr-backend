@@ -24,28 +24,101 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.repository.DataTemplateRepository;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Service
 public class ExcelServiceImpl implements ExcelService {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
+    
+    @Autowired
+    private DataTemplateRepository dataTemplateRepository;
+
+    @Override
+    public List<DataTemplate> getTemplates() {
+        LOG.info("Getting all templates.");
+        
+        List<DataTemplate> templates = dataTemplateRepository.findAll(Sort.by(Sort.Direction.ASC, "templateId"));
+        LOG.info(templates.size() + " templates found: " + templates);
+        return templates;
+    }
+
+    @Override
+    public boolean uploadTemplateFromFile(MultipartFile file) {
+        LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
+        
+        LOG.info("File content type: " + file.getContentType());
+        List<String> excelTypes = List.of(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
+                "application/vnd.ms-excel" // xls
+        );
+        if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
+            return false;
+        }
+
+        Workbook workbook;
+        try {
+            workbook = (excelTypes.get(0).equals(file.getContentType()))
+                    ? new XSSFWorkbook(file.getInputStream())
+                    : new HSSFWorkbook(file.getInputStream());
+            
+        } catch (IOException io) {
+            LOG.warning("File is unable to be read.");
+            return false;
+        }
+
+        int sheetCount = workbook.getNumberOfSheets();
+        
+        for (int i = 0; i < sheetCount; i++) {
+            Sheet datatypeSheet = workbook.getSheetAt(i);
+            Iterator<Row> iterator = datatypeSheet.iterator();
+            Sheet sheet = workbook.getSheetAt(i);
+            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
+            
+            while (iterator.hasNext()) {
+                Row currentRow = iterator.next();
+
+                for (Cell currentCell : currentRow) {
+                    if (currentCell.getCellType() == CellType.STRING) {
+                        System.out.print(currentCell.getStringCellValue() + "--");
+                    } else if (currentCell.getCellType() == CellType.NUMERIC) {
+                        System.out.print(currentCell.getNumericCellValue() + "--");
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deleteTemplate(long templateId) {
+        LOG.info("Delete template with ID "+ templateId);
+        DataTemplate toDelete = dataTemplateRepository.getById(templateId);
+        
+        LOG.info("Deleting template " + toDelete);
+        dataTemplateRepository.delete(toDelete);
+        return true;
+    }
 
     @Override
     public ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
         LOG.info("Generating excel");
-        
+
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(excelName);
-        
+
         int rowCount = 0;
         Row headerRow = sheet.createRow(rowCount++);
 
         // TODO, sort to custom requirements first or we filter and sort before calling this method
-        List<ColumnHeader> selectedHeaders = filterColumns(headers); 
+        List<ColumnHeader> selectedHeaders = filterColumns(headers);
         generateHeaders(workbook, headerRow, selectedHeaders);
 
         for (JsonNode node : rows) {
@@ -75,7 +148,7 @@ public class ExcelServiceImpl implements ExcelService {
             String headerName = StringUtils.capitalize(
                     StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(header.getName()), ' ')
             );
-            
+
             cell.setCellValue(headerName);
             cell.setCellStyle(headerCellStyle);
             i++;
@@ -87,7 +160,7 @@ public class ExcelServiceImpl implements ExcelService {
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
         headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        
+
         return headerCellStyle;
     }
 
@@ -103,15 +176,15 @@ public class ExcelServiceImpl implements ExcelService {
             if (optField.isPresent()) {
                 JsonNode field = optField.get();
                 switch (header.getType()) {
-                case DECIMAL:
-                    dataRow.createCell(i).setCellValue(field.asInt());
-                    break;
-                case DOUBLE:
-                    dataRow.createCell(i).setCellValue(field.asDouble());
-                    break;
-                default:
-                    // DATE || STRING
-                    dataRow.createCell(i).setCellValue(field.asText());
+                    case DECIMAL:
+                        dataRow.createCell(i).setCellValue(field.asInt());
+                        break;
+                    case DOUBLE:
+                        dataRow.createCell(i).setCellValue(field.asDouble());
+                        break;
+                    default:
+                        // DATE || STRING
+                        dataRow.createCell(i).setCellValue(field.asText());
                 }
             }
             i++;
@@ -130,65 +203,5 @@ public class ExcelServiceImpl implements ExcelService {
             ex.printStackTrace();
             return null;
         }
-    }
-
-    @Override
-    public boolean readFromFile(MultipartFile file) {
-        LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
-        
-        LOG.info("File content type: " + file.getContentType());
-        List<String> excelTypes = List.of(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
-                "application/vnd.ms-excel" // xls
-        );
-        if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
-            return false;
-        }
-
-        Workbook workbook;
-        try {
-            workbook = (excelTypes.get(0).equals(file.getContentType()))
-                    ? new XSSFWorkbook(file.getInputStream())
-                    : new HSSFWorkbook(file.getInputStream());
-
-
-
-            int sheetCount = workbook.getNumberOfSheets();
-            for (int i = 0; i < sheetCount; i++) {
-                Sheet datatypeSheet = workbook.getSheetAt(i);
-                Iterator<Row> iterator = datatypeSheet.iterator();
-
-                Sheet sheet = workbook.getSheetAt(i);
-                LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
-                while (iterator.hasNext()) {
-
-                    Row currentRow = iterator.next();
-                    Iterator<Cell> cellIterator = currentRow.iterator();
-
-                    while (cellIterator.hasNext()) {
-
-                        Cell currentCell = cellIterator.next();
-                        //getCellTypeEnum shown as deprecated for version 3.15
-                        //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
-                        if (currentCell.getCellType() == CellType.STRING) {
-                            System.out.print(currentCell.getStringCellValue() + "--");
-                        } else if (currentCell.getCellType() == CellType.NUMERIC) {
-                            System.out.print(currentCell.getNumericCellValue() + "--");
-                        }
-
-                    }
-                    System.out.println();
-                }
-
-            }
-
-            
-        } catch (IOException io) {
-            LOG.warning("File is unable to be read.");
-            return false;
-        }
-
-
-        return true;
     }
 }
