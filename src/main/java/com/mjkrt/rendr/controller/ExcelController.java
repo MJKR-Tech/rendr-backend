@@ -8,10 +8,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
-import com.mjkrt.rendr.repository.DataHeaderRepository;
-import com.mjkrt.rendr.repository.DataTableRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,12 +38,6 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
-
-    @Autowired
-    private DataTableRepository dataTableRepository;
-
-    @Autowired
-    private DataHeaderRepository dataHeaderRepository;
     
     @GetMapping("/hello")
     public String greet() {
@@ -75,12 +66,12 @@ public class ExcelController {
     @PostMapping("/generateData")
     public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateData called");
-
-        List<ColumnHeader> headers = jsonService.getHeaders(json);
-        List<JsonNode> rows = jsonService.getRows(json);
-        String fileName = "Sample"; // todo add excel file name in frontend/request
         
-        ByteArrayInputStream stream = excelService.generateExcel(fileName, headers, rows);
+        String fileName = "Sample"; // todo add excel file name in frontend/request
+        ByteArrayInputStream stream = excelService.generateExcel(
+                fileName,
+                jsonService.getHeaders(json),
+                jsonService.getRows(json));
         
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
