@@ -1,14 +1,21 @@
 package com.mjkrt.rendr.entity;
 
-import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
 @Entity
-@Table(name = "DataTable")
 public class DataTable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "tableId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long tableId;
 
     //primary key
@@ -21,7 +28,11 @@ public class DataTable {
     private DataSheet dataSheet;
 
     private long rowNum;
+    
     private long colNum;
+
+    public DataTable() {
+    }
 
     public DataTable(long rowNum, long colNum) {
         this.rowNum = rowNum;
@@ -61,6 +72,23 @@ public class DataTable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataTable dataTable = (DataTable) o;
+        return tableId == dataTable.tableId
+                && rowNum == dataTable.rowNum
+                && colNum == dataTable.colNum
+                && Objects.equals(dataHeader, dataTable.dataHeader)
+                && Objects.equals(dataSheet.getSheetId(), dataTable.dataSheet.getSheetId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
+    }
+
+    @Override
     public String toString() {
         return "DataTable{" +
                 "tableId=" + tableId +
@@ -69,18 +97,5 @@ public class DataTable {
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DataTable dataTable = (DataTable) o;
-        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum && Objects.equals(dataHeader, dataTable.dataHeader) && Objects.equals(dataSheet.getSheetId(), dataTable.dataSheet.getSheetId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
     }
 }

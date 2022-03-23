@@ -1,18 +1,20 @@
 package com.mjkrt.rendr.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 @Entity
-@Table(name = "DataHeader")
 public class DataHeader {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "headerId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long headerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -20,7 +22,11 @@ public class DataHeader {
     private DataTable dataTable;
 
     private String headerName;
+    
     private long headerOrder;
+
+    public DataHeader() {
+    }
 
     public DataHeader(String headerName, long headerOrder) {
         this.headerName = headerName;
@@ -52,6 +58,22 @@ public class DataHeader {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataHeader that = (DataHeader) o;
+        return headerId == that.headerId
+                && headerOrder == that.headerOrder
+                && Objects.equals(dataTable.getTableId(), that.dataTable.getTableId())
+                && Objects.equals(headerName, that.headerName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder);
+    }
+
+    @Override
     public String toString() {
         return "DataHeader{" +
                 "headerId=" + headerId +
@@ -59,18 +81,5 @@ public class DataHeader {
                 ", headerName='" + headerName + '\'' +
                 ", headerOrder=" + headerOrder +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DataHeader that = (DataHeader) o;
-        return headerId == that.headerId && headerOrder == that.headerOrder && Objects.equals(dataTable.getTableId(), that.dataTable.getTableId()) && Objects.equals(headerName, that.headerName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder);
     }
 }

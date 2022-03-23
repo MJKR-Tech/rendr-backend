@@ -1,21 +1,32 @@
 package com.mjkrt.rendr.entity;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
 @Entity
 public class DataTemplate {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "templateId")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long templateId;
 
-    @OneToMany(mappedBy = "template", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY)
     private List<DataSheet> dataSheet;
 
     private String templateName;
+    
     private LocalDate dateCreated;
+
+    public DataTemplate() {
+    }
 
     public DataTemplate(String templateName) {
         this.templateName = templateName;
@@ -59,7 +70,10 @@ public class DataTemplate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataTemplate dataTemplate = (DataTemplate) o;
-        return templateId == dataTemplate.templateId && Objects.equals(dataSheet, dataTemplate.dataSheet) && Objects.equals(templateName, dataTemplate.templateName) && Objects.equals(dateCreated, dataTemplate.dateCreated);
+        return templateId == dataTemplate.templateId
+                && Objects.equals(dataSheet, dataTemplate.dataSheet) 
+                && Objects.equals(templateName, dataTemplate.templateName)
+                && Objects.equals(dateCreated, dataTemplate.dateCreated);
     }
 
     @Override
