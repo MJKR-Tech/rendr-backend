@@ -3,6 +3,7 @@ package com.mjkrt.rendr.service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -148,17 +150,45 @@ public class ExcelServiceImpl implements ExcelService {
             workbook = (excelTypes.get(0).equals(file.getContentType()))
                     ? new XSSFWorkbook(file.getInputStream())
                     : new HSSFWorkbook(file.getInputStream());
+
+
+
+            int sheetCount = workbook.getNumberOfSheets();
+            for (int i = 0; i < sheetCount; i++) {
+                Sheet datatypeSheet = workbook.getSheetAt(i);
+                Iterator<Row> iterator = datatypeSheet.iterator();
+
+                Sheet sheet = workbook.getSheetAt(i);
+                LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
+                while (iterator.hasNext()) {
+
+                    Row currentRow = iterator.next();
+                    Iterator<Cell> cellIterator = currentRow.iterator();
+
+                    while (cellIterator.hasNext()) {
+
+                        Cell currentCell = cellIterator.next();
+                        //getCellTypeEnum shown as deprecated for version 3.15
+                        //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+                        if (currentCell.getCellType() == CellType.STRING) {
+                            System.out.print(currentCell.getStringCellValue() + "--");
+                        } else if (currentCell.getCellType() == CellType.NUMERIC) {
+                            System.out.print(currentCell.getNumericCellValue() + "--");
+                        }
+
+                    }
+                    System.out.println();
+                }
+
+            }
+
             
         } catch (IOException io) {
             LOG.warning("File is unable to be read.");
             return false;
         }
 
-        int sheetCount = workbook.getNumberOfSheets();
-        for (int i = 0; i < sheetCount; i++) {
-            Sheet sheet = workbook.getSheetAt(i);
-            LOG.info("Now reading sheet #" + i + " " + sheet.getSheetName());
-        }
+
         return true;
     }
 }
