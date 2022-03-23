@@ -24,9 +24,20 @@ public class DataSheet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
-    private DataTemplate template;
-    
+    private DataTemplate dataTemplate;
     private String sheetName;
+
+    public DataSheet(String sheetName) {
+        this.sheetName = sheetName;
+    }
+
+    public List<DataTable> getDataTable() {
+        return dataTable;
+    }
+
+    public void setDataTable(List<DataTable> dataTable) {
+        this.dataTable = dataTable;
+    }
 
     public void setSheetId(long sheetId) {
         this.sheetId = sheetId;
@@ -49,7 +60,7 @@ public class DataSheet {
         return "Sheet{" +
                 "sheetId=" + sheetId +
                 ", dataTable=" + dataTable +
-                ", template=" + template.getTemplateId() +
+                ", dataTemplate=" + dataTemplate.getTemplateId() +
                 ", sheetName='" + sheetName + '\'' +
                 '}';
     }
@@ -61,12 +72,12 @@ public class DataSheet {
         DataSheet sheet = (DataSheet) o;
         return sheetId == sheet.sheetId
                 && Objects.equals(dataTable, sheet.dataTable)
-                && Objects.equals(template.getTemplateId(), sheet.template.getTemplateId())
+                && Objects.equals(dataTemplate.getTemplateId(), sheet.dataTemplate.getTemplateId())
                 && Objects.equals(sheetName, sheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, template.getTemplateId(), sheetName);
+        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName);
     }
 }

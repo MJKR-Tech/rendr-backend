@@ -24,7 +24,10 @@ public class DataHeader {
     private String headerName;
     private long headerOrder;
 
-    public DataHeader() {}
+    public DataHeader(String headerName, long headerOrder) {
+        this.headerName = headerName;
+        this.headerOrder = headerOrder;
+    }
 
     public void setHeaderId(long headerId) {
         this.headerId = headerId;

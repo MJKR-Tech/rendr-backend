@@ -26,13 +26,24 @@ public class DataTable {
     //foreign key
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sheetId", nullable = false)
-    private DataSheet sheet;
+    private DataSheet dataSheet;
 
     private long rowNum;
     
     private long colNum;
 
-    public DataTable() {}
+    public DataTable(long rowNum, long colNum) {
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+    }
+
+    public void setDataHeader(List<DataHeader> dataHeader) {
+        this.dataHeader = dataHeader;
+    }
+
+    public List<DataHeader> getDataHeader() {
+        return dataHeader;
+    }
 
     public long getTableId() {
         return tableId;
@@ -63,7 +74,7 @@ public class DataTable {
         return "DataTable{" +
                 "tableId=" + tableId +
                 ", dataHeader=" + dataHeader +
-                ", sheet=" + sheet.getSheetId() +
+                ", sheet=" + dataSheet.getSheetId() +
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
                 '}';
@@ -83,6 +94,6 @@ public class DataTable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableId, dataHeader, sheet.getSheetId(), rowNum, colNum);
+        return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
     }
 }

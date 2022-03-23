@@ -38,6 +38,15 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    @Autowired
+    private DataTemplateRepository dataTemplateRepository;
+
+    @Autowired
+    private DataTableRepository dataTableRepository;
+
+    @Autowired
+    private DataHeaderRepository dataHeaderRepository;
     
     @GetMapping("/hello")
     public String greet() {
