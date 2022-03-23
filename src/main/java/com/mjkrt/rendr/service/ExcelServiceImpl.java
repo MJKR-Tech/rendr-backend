@@ -148,6 +148,7 @@ public class ExcelServiceImpl implements ExcelService {
             workbook = (excelTypes.get(0).equals(file.getContentType()))
                     ? new XSSFWorkbook(file.getInputStream())
                     : new HSSFWorkbook(file.getInputStream());
+            
         } catch (IOException io) {
             LOG.warning("File is unable to be read.");
             return false;
