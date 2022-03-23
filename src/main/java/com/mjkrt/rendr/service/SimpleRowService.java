@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 @Service
 public class SimpleRowService {
-
     private static final Logger LOG = LogsCenter.getLogger(SimpleRowService.class);
 
     @Autowired

@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataTable;
-import com.mjkrt.rendr.entity.Template;
+import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.repository.DataHeaderRepository;
 import com.mjkrt.rendr.repository.DataTableRepository;
-import com.mjkrt.rendr.repository.TemplateRepository;
+import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -44,7 +44,7 @@ public class ExcelController {
     private JsonService jsonService;
 
     @Autowired
-    private TemplateRepository templateRepository;
+    private DataTemplateRepository dataTemplateRepository;
 
     @Autowired
     private DataTableRepository dataTableRepository;
@@ -56,8 +56,8 @@ public class ExcelController {
     public String greet() {
         LOG.info("GET /hello called");
 
-        List<Template> listTemplate = templateRepository.findAll();
-        LOG.info("templates " + listTemplate);
+        List<DataTemplate> listDataTemplate = dataTemplateRepository.findAll();
+        LOG.info("templates " + listDataTemplate);
 
         List<DataTable> listDataTable = dataTableRepository.findAll();
         LOG.info("tables " + listDataTable);

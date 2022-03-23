@@ -3,10 +3,9 @@ package com.mjkrt.rendr.entity;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
-public class Sheet {
+public class DataSheet {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "sheetId")
     private long sheetId;
@@ -16,8 +15,20 @@ public class Sheet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="templateId", nullable=false)
-    private Template template;
+    private DataTemplate dataTemplate;
     private String sheetName;
+
+    public DataSheet(String sheetName) {
+        this.sheetName = sheetName;
+    }
+
+    public List<DataTable> getDataTable() {
+        return dataTable;
+    }
+
+    public void setDataTable(List<DataTable> dataTable) {
+        this.dataTable = dataTable;
+    }
 
     public void setSheetId(long sheetId) {
         this.sheetId = sheetId;
@@ -40,7 +51,7 @@ public class Sheet {
         return "Sheet{" +
                 "sheetId=" + sheetId +
                 ", dataTable=" + dataTable +
-                ", template=" + template.getTemplateId() +
+                ", dataTemplate=" + dataTemplate.getTemplateId() +
                 ", sheetName='" + sheetName + '\'' +
                 '}';
     }
@@ -49,12 +60,12 @@ public class Sheet {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Sheet sheet = (Sheet) o;
-        return sheetId == sheet.sheetId && Objects.equals(dataTable, sheet.dataTable) && Objects.equals(template.getTemplateId(), sheet.template.getTemplateId()) && Objects.equals(sheetName, sheet.sheetName);
+        DataSheet dataSheet = (DataSheet) o;
+        return sheetId == dataSheet.sheetId && Objects.equals(dataTable, dataSheet.dataTable) && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId()) && Objects.equals(sheetName, dataSheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, template.getTemplateId(), sheetName);
+        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName);
     }
 }

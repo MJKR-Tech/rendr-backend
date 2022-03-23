@@ -1,12 +1,8 @@
 package com.mjkrt.rendr.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "DataTable")
@@ -22,17 +18,27 @@ public class DataTable {
     //foreign key
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sheetId", nullable = false)
-    private Sheet sheet;
+    private DataSheet dataSheet;
 
     private long rowNum;
     private long colNum;
 
-    public DataTable() {}
+    public DataTable(long rowNum, long colNum) {
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+    }
+
+    public void setDataHeader(List<DataHeader> dataHeader) {
+        this.dataHeader = dataHeader;
+    }
+
+    public List<DataHeader> getDataHeader() {
+        return dataHeader;
+    }
 
     public long getTableId() {
         return tableId;
     }
-
 
     public long getRowNum() {
         return rowNum;
@@ -59,7 +65,7 @@ public class DataTable {
         return "DataTable{" +
                 "tableId=" + tableId +
                 ", dataHeader=" + dataHeader +
-                ", sheet=" + sheet.getSheetId() +
+                ", sheet=" + dataSheet.getSheetId() +
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
                 '}';
@@ -70,11 +76,11 @@ public class DataTable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataTable dataTable = (DataTable) o;
-        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum && Objects.equals(dataHeader, dataTable.dataHeader) && Objects.equals(sheet.getSheetId(), dataTable.sheet.getSheetId());
+        return tableId == dataTable.tableId && rowNum == dataTable.rowNum && colNum == dataTable.colNum && Objects.equals(dataHeader, dataTable.dataHeader) && Objects.equals(dataSheet.getSheetId(), dataTable.dataSheet.getSheetId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableId, dataHeader, sheet.getSheetId(), rowNum, colNum);
+        return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
     }
 }
