@@ -336,7 +336,7 @@ public class ExcelServiceImpl implements ExcelService {
                     for (JsonNode node : lstJsonNodes) {
                         for (String key : strings.keySet()) {
                             String ch = columnHeaders.get(0).getName();
-                            if (node.has(ch) && node.findValue(ch).equals(key)) {
+                            if (node.has(ch) && node.findValue(ch).asText().equals(key)) {
                                 List<String> temp = strings.get(key);
                                 temp.add(node.get(headerName).asText());
                             }
