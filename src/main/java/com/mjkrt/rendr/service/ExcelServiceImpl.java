@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -297,8 +298,9 @@ public class ExcelServiceImpl implements ExcelService {
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
 
         long id = 1;
-        List<DataTable> dataTables = dataTemplateService.findById(id)
-                .getDataSheet().get(1).getDataTable(); // todo clean up
+        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
+        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
+        List<DataTable> dataTables = dataSheets.get(1).getDataTable(); // todo clean up
 
         for (DataTable dataTable : dataTables) {
             long tableId = dataTable.getTableId();
