@@ -293,7 +293,10 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<JsonNode> rows) {
+    //Long = table ID
+    // Pair<all the column headers with left most as pivot
+    // value of pair --> Map of strings
+    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows) {
 
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
 
@@ -307,10 +310,11 @@ public class ExcelServiceImpl implements ExcelService {
             List<DataHeader> dataHeaders = dataTable.getDataHeader();
             List<ColumnHeader> columnHeaders = new ArrayList<>();
             for (DataHeader dataHeader : dataHeaders) {
-                String headerName = dataHeader.getHeaderName();
-//                long orderNum = dataHeader.getHeaderOrder();
-                ColumnHeader columnHeader = new ColumnHeader(headerName);
-                columnHeaders.add(columnHeader);
+                for (ColumnHeader ch : headers) {
+                    if (ch.getName().equals(dataHeader.getHeaderName())) {
+                        columnHeaders.add(ch);
+                    }
+                }
             }
 
             int i = 0;

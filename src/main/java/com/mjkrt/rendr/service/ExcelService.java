@@ -18,5 +18,5 @@ public interface ExcelService {
 
     ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
 
-    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<JsonNode> rows);
+    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows);
 }

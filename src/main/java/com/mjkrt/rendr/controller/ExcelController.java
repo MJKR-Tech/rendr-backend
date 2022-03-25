@@ -84,9 +84,9 @@ public class ExcelController {
 
     @PostMapping("/testUploadMapping")
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-            @RequestBody JsonNode json) {
+            @RequestBody JsonNode json) throws IOException {
         
         LOG.info("POST /generateJsonMapping called");
-        return excelService.generateJsonMapping(jsonService.getRows(json));
+        return excelService.generateJsonMapping(jsonService.getHeaders(json) ,jsonService.getRows(json));
     }
 }
