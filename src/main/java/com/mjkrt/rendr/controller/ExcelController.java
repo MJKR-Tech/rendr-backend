@@ -3,14 +3,16 @@ package com.mjkrt.rendr.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -78,5 +80,13 @@ public class ExcelController {
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
         LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
+    }
+
+    @PostMapping("/testUploadMapping")
+    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+            @RequestBody JsonNode json) {
+        
+        LOG.info("POST /generateJsonMapping called");
+        return excelService.generateJsonMapping(jsonService.getRows(json));
     }
 }

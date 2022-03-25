@@ -19,6 +19,10 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     @JsonProperty(value="isSelected") boolean isSelected;
 
     public ColumnHeader() {}
+    
+    public ColumnHeader(String headerName) {
+        this.name = headerName;
+    }
 
     public boolean isSelected() {
         return isSelected;

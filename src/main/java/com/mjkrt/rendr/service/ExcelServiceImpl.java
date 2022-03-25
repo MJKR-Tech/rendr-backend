@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -287,5 +290,57 @@ public class ExcelServiceImpl implements ExcelService {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<JsonNode> rows) {
+
+        Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
+
+        long id = 1;
+        List<DataTable> dataTables = dataTemplateService.findById(id)
+                .getDataSheet().get(1).getDataTable(); // todo clean up
+
+        for (DataTable dataTable : dataTables) {
+            long tableId = dataTable.getTableId();
+            List<DataHeader> dataHeaders = dataTable.getDataHeader();
+            List<ColumnHeader> columnHeaders = new ArrayList<>();
+            for (DataHeader dataHeader : dataHeaders) {
+                String headerName = dataHeader.getHeaderName();
+//                long orderNum = dataHeader.getHeaderOrder();
+                ColumnHeader columnHeader = new ColumnHeader(headerName);
+                columnHeaders.add(columnHeader);
+            }
+
+            int i = 0;
+            Map<String, List<String>> strings = new HashMap<>();
+            for (ColumnHeader columnHeader : columnHeaders) {
+                String headerName = columnHeader.getName();
+                List<JsonNode> lstJsonNodes = new ArrayList<>();
+
+                for (JsonNode node : rows) {
+                    List<JsonNode> nodes = node.findValues(headerName);
+                    lstJsonNodes.addAll(nodes);
+                }
+
+                if (i == 0) {
+                    for (JsonNode node : lstJsonNodes) {
+                        strings.put(node.get(headerName).asText(), new ArrayList<>());
+                    }
+                    i++;
+                } else {
+                    for (JsonNode node : lstJsonNodes) {
+                        for (String key : strings.keySet()) {
+                            if (node.has(key)) {
+                                List<String> temp = strings.get(key);
+                                temp.add(node.get(headerName).asText());
+                            }
+                        }
+                    }
+                }
+            }
+            Pair<List<ColumnHeader>, Map<String, List<String>>> pair = new Pair<>(columnHeaders, strings);
+            map.put(tableId, pair);
+        }
+        return map;
     }
 }

@@ -24,6 +24,10 @@ public class DataTemplateService {
         return dataTemplateRepository.findAll(sortByTemplateIdAsc);
     }
     
+    public DataTemplate findById(long id) {
+        return dataTemplateRepository.getById(id);
+    }
+    
     public DataTemplate save(DataTemplate dataTemplate) {
         LOG.info("Saving dataTemplate " + dataTemplate);
         return dataTemplateRepository.save(dataTemplate);
