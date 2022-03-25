@@ -64,6 +64,8 @@ public class ExcelServiceImpl implements ExcelService {
                 .map(this::saveTemplate);
         return optionalTemplate.isPresent();
     }
+
+
     
     private Workbook readAsWorkBook(MultipartFile file) {
         LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
@@ -196,28 +198,30 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
+    public ByteArrayInputStream generateExcel(Workbook workbook, String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
         LOG.info("Generating excel");
 
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet(excelName);
 
-        int rowCount = 0;
-        Row headerRow = sheet.createRow(rowCount++);
 
-        // TODO, sort to custom requirements first or we filter and sort before calling this method
-        List<ColumnHeader> selectedHeaders = filterColumns(headers);
-        generateHeaders(workbook, headerRow, selectedHeaders);
-
-        for (JsonNode node : rows) {
-            Row dataRow = sheet.createRow(rowCount++);
-            addDataToRow(dataRow, selectedHeaders, node);
-        }
-
-        IntStream.range(0, headers.size())
-                .forEach(sheet::autoSizeColumn);
-
-        return writeToStream(workbook);
+//        Workbook workbook = new XSSFWorkbook();
+//        Sheet sheet = workbook.createSheet(excelName);
+//
+//        int rowCount = 0;
+//        Row headerRow = sheet.createRow(rowCount++);
+//
+//        // TODO, sort to custom requirements first or we filter and sort before calling this method
+//        List<ColumnHeader> selectedHeaders = filterColumns(headers);
+//        generateHeaders(workbook, headerRow, selectedHeaders);
+//
+//        for (JsonNode node : rows) {
+//            Row dataRow = sheet.createRow(rowCount++);
+//            addDataToRow(dataRow, selectedHeaders, node);
+//        }
+//
+//        IntStream.range(0, headers.size())
+//                .forEach(sheet::autoSizeColumn);
+//
+//        return writeToStream(workbook);
     }
 
     private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {

@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ExcelService {
     List<DataTemplate> getTemplates();
+
     boolean uploadTemplateFromFile(MultipartFile file);
+
     boolean deleteTemplate(long templateId);
 
     ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
