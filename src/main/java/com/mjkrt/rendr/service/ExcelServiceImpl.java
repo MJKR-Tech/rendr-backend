@@ -300,7 +300,7 @@ public class ExcelServiceImpl implements ExcelService {
         long id = 1;
         List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
         dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
-        List<DataTable> dataTables = dataSheets.get(1).getDataTable(); // todo clean up
+        List<DataTable> dataTables = dataSheets.get(0).getDataTable(); // todo clean up
 
         for (DataTable dataTable : dataTables) {
             long tableId = dataTable.getTableId();
@@ -320,19 +320,23 @@ public class ExcelServiceImpl implements ExcelService {
                 List<JsonNode> lstJsonNodes = new ArrayList<>();
 
                 for (JsonNode node : rows) {
-                    List<JsonNode> nodes = node.findValues(headerName);
-                    lstJsonNodes.addAll(nodes);
+                    if (node.findValue(headerName) == null) {
+                        continue;
+                    }
+                    lstJsonNodes.add(node);
                 }
 
                 if (i == 0) {
                     for (JsonNode node : lstJsonNodes) {
+                        String s = node.get(headerName).asText();
                         strings.put(node.get(headerName).asText(), new ArrayList<>());
                     }
                     i++;
                 } else {
                     for (JsonNode node : lstJsonNodes) {
                         for (String key : strings.keySet()) {
-                            if (node.has(key)) {
+                            String ch = columnHeaders.get(0).getName();
+                            if (node.has(ch) && node.findValue(ch).equals(key)) {
                                 List<String> temp = strings.get(key);
                                 temp.add(node.get(headerName).asText());
                             }
