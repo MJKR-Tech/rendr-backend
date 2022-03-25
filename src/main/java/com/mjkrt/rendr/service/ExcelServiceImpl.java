@@ -39,6 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+import javax.xml.crypto.Data;
+
 @Service
 public class ExcelServiceImpl implements ExcelService {
 
@@ -297,17 +299,25 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
+    public List<DataTable> getDataTables() {
+        // not sure how to change ID
+        long id = 1;
+        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
+        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
+        List<DataTable> dataTables = new ArrayList<>();
+        for (DataSheet ds : dataSheets) {
+            dataTables.addAll(ds.getDataTable());
+        }
+        return dataTables;
+    }
+
     //Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows) {
 
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
-
-        long id = 1;
-        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
-        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
-        List<DataTable> dataTables = dataSheets.get(0).getDataTable(); // todo clean up
+        List<DataTable> dataTables = getDataTables();
 
         for (DataTable dataTable : dataTables) {
             long tableId = dataTable.getTableId();
