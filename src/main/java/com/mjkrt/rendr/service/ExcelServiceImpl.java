@@ -17,10 +17,6 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
-import com.mjkrt.rendr.repository.DataHeaderRepository;
-import com.mjkrt.rendr.repository.DataSheetRepository;
-import com.mjkrt.rendr.repository.DataTableRepository;
-import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -33,7 +29,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,37 +41,24 @@ public class ExcelServiceImpl implements ExcelService {
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
     
     @Autowired
-    private DataTemplateRepository dataTemplateRepository;
-
-    @Autowired
-    private DataSheetRepository dataSheetRepository;
-
-    @Autowired
-    private DataTableRepository dataTableRepository;
-
-    @Autowired
-    private DataHeaderRepository dataHeaderRepository;
+    private DataTemplateService dataTemplateService;
 
     @Override
     public List<DataTemplate> getTemplates() {
-        LOG.info("Getting all templates.");
+        LOG.info("Getting all templates");
         
-        List<DataTemplate> templates = dataTemplateRepository.findAll(Sort.by(Sort.Direction.ASC, "templateId"));
+        List<DataTemplate> templates = dataTemplateService.listAll();
         LOG.info(templates.size() + " templates found: " + templates);
         return templates;
     }
     
     @Override
     public boolean uploadTemplateFromFile(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
+        LOG.info("Uploading file " + file.getOriginalFilename() + " as dataTemplate");
         Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
-                .map(workbook -> processTemplate(workbook, fileName))
+                .map(workbook -> processTemplate(workbook, file.getOriginalFilename()))
                 .map(this::saveTemplate);
-        if (optionalTemplate.isEmpty()) {
-            return false;
-        }
-        long savedId = optionalTemplate.get().getTemplateId(); // use id to return so more meaningful
-        return true;
+        return optionalTemplate.isPresent();
     }
     
     private Workbook readAsWorkBook(MultipartFile file) {
@@ -103,7 +85,14 @@ public class ExcelServiceImpl implements ExcelService {
 
     }
 
-    private DataTemplate processTemplate(Workbook workbook, String templateName) {
+    private DataTemplate processTemplate(Workbook workbook, String fileName) {
+        if (fileName == null) {
+            LOG.warning("Filename provided is null");
+            return null;
+        }
+        String templateName = fileName.substring(0, fileName.lastIndexOf('.'));
+        
+        LOG.info("Processing template " + templateName);
         DataTemplate dataTemplate = new DataTemplate(templateName);
         List<DataSheet> dataSheets = new ArrayList<>();
         
@@ -123,6 +112,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataSheet processSheet(Sheet sheet) {
+        LOG.info("Processing sheet " + sheet.getSheetName());
         DataSheet dataSheet = new DataSheet(sheet.getSheetName());
         Iterator<Row> rowIterator = sheet.iterator();
         List<DataTable> dataTables = new ArrayList<>();
@@ -143,6 +133,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataTable processHorizontalTable(Row currentRow) {
+        LOG.info("Processing row " + currentRow.getRowNum());
         long orderNumber = 0;
         int rowNum = currentRow.getRowNum();
         int colNum = -1;
@@ -166,6 +157,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataHeader processHeader(Cell cell, long headerOrder) {
+        LOG.info("Processing header " + cell.getStringCellValue());
         String headerName = cell.getStringCellValue();
         return (headerName.isBlank() || cell.getCellType() != CellType.STRING)
             ? null
@@ -173,6 +165,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataTemplate saveTemplate(DataTemplate template) {
+        LOG.info("Linking template and recursive entities");
         for (int i = 0; i < template.getDataSheet().size(); i++) {
             DataSheet sheet = template.getDataSheet().get(i);
             
@@ -187,16 +180,14 @@ public class ExcelServiceImpl implements ExcelService {
             }
             sheet.setDataTemplate(template);
         }
-        return dataTemplateRepository.save(template);
+        LOG.info("Saving template " + template);
+        return dataTemplateService.save(template);
     }
 
     @Override
     public boolean deleteTemplate(long templateId) {
         LOG.info("Delete template with ID "+ templateId);
-        DataTemplate toDelete = dataTemplateRepository.getById(templateId);
-        
-        LOG.info("Deleting template " + toDelete);
-        dataTemplateRepository.delete(toDelete);
+        dataTemplateService.deleteById(templateId);
         return true;
     }
 

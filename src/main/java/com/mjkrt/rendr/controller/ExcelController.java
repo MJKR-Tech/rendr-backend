@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class ExcelController {
     @DeleteMapping("/deleteTemplate/{id}")
     public boolean deleteTemplate(@PathVariable("id") long templateId) {
         LOG.info("DELETE /deleteTemplate called");
-        return excelService.deleteTemplate(templateId); // TODO
+        return excelService.deleteTemplate(templateId);
     }
     
     @PostMapping("/generateData")
