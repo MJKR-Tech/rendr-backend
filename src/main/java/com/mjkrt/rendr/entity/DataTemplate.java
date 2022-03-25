@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class DataTemplate {
@@ -19,7 +22,8 @@ public class DataTemplate {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long templateId;
 
-    @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataSheet> dataSheet = new ArrayList<>();
 
     private String templateName;

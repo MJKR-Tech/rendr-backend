@@ -65,119 +65,129 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info(templates.size() + " templates found: " + templates);
         return templates;
     }
-
+    
     @Override
     public boolean uploadTemplateFromFile(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
+                .map(workbook -> processTemplate(workbook, fileName))
+                .map(this::saveTemplate);
+        if (optionalTemplate.isEmpty()) {
+            return false;
+        }
+        long savedId = optionalTemplate.get().getTemplateId(); // use id to return so more meaningful
+        return true;
+    }
+    
+    private Workbook readAsWorkBook(MultipartFile file) {
         LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
-
         LOG.info("File content type: " + file.getContentType());
         List<String> excelTypes = List.of(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
                 "application/vnd.ms-excel" // xls
         );
+        
         if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
-            return false;
+            LOG.warning("Invalid file type fed");
+            return null;
         }
-
-        Workbook workbook;
+        
         try {
-            workbook = (excelTypes.get(0).equals(file.getContentType()))
+            return (excelTypes.get(0).equals(file.getContentType()))
                     ? new XSSFWorkbook(file.getInputStream())
                     : new HSSFWorkbook(file.getInputStream());
         } catch (IOException io) {
-            LOG.warning("File is unable to be read.");
-            return false;
+            LOG.warning("Unable to read excel");
+            return null;
         }
 
-        //template
-        DataTemplate dataTemplate = makeDataTemplate(file.getOriginalFilename());
-        ArrayList<DataSheet> listDataSheet = new ArrayList<>();
+    }
 
+    private DataTemplate processTemplate(Workbook workbook, String templateName) {
+        DataTemplate dataTemplate = new DataTemplate(templateName);
+        List<DataSheet> dataSheets = new ArrayList<>();
+        
         int sheetCount = workbook.getNumberOfSheets();
         for (int i = 0; i < sheetCount; i++) {
-
-            Sheet datatypeSheet = workbook.getSheetAt(i);
-            Iterator<Row> iterator = datatypeSheet.iterator();
-            DataSheet dataSheet = makeDataSheet(datatypeSheet.getSheetName(), dataTemplate);
-            
-            List<DataTable> listDataTable = new ArrayList<>();
-            LOG.info("Now reading sheet #" + i + " " + datatypeSheet.getSheetName());
-            while (iterator.hasNext()) {
-
-                long orderNumber = 0;
-                Row currentRow = iterator.next();
-                int rowNum = currentRow.getRowNum();
-                int colNum = -1;
-                Iterator<Cell> cellIterator = currentRow.iterator();
-
-                List<DataHeader> listDataHeader = new ArrayList<>();
-                while (cellIterator.hasNext()) {
-                    Cell currentCell = cellIterator.next();
-                    if (colNum < 0) {
-                        colNum = currentCell.getColumnIndex();
-                    }
-                    
-                    if (currentCell.getCellType() == CellType.STRING) {
-                        String headerName = currentCell.getStringCellValue();
-                        if (headerName.isEmpty()) {
-                            continue;
-                        }
-                        //save data header
-                        listDataHeader.add(new DataHeader(headerName, orderNumber++));
-                        System.out.print(headerName + "--");
-                        
-                    } else if (currentCell.getCellType() == CellType.NUMERIC) {
-                        System.out.print(currentCell.getNumericCellValue() + "--");
-                    }
-                }
-                
-                if (listDataHeader.isEmpty()) {
-                    continue;
-                }
-                //save data table
-                DataTable dataTable = makeDataTable(rowNum, colNum, dataSheet);
-                listDataHeader = listDataHeader.stream()
-                        .map(header -> makeDataHeader(header.getHeaderName(), header.getHeaderOrder(), dataTable))
-                        .collect(Collectors.toList());
-                dataTable.setDataHeader(listDataHeader);
-                
-                //add to data sheet
-                listDataTable.add(dataTable);
-            }
-            
-            if (listDataTable.isEmpty()) {
+            Sheet sheet = workbook.getSheetAt(i);
+            if (sheet == null) {
                 continue;
             }
-            dataSheet.setDataTable(listDataTable);
-            
-            // add to data template
-            listDataSheet.add(dataSheet);
+            dataSheets.add(processSheet(sheet));
         }
-        dataTemplate.setDataSheet(listDataSheet);
-        dataTemplateRepository.save(dataTemplate);
-        return true;
+        
+        dataTemplate.setDataSheet(dataSheets);
+        return (dataSheets.isEmpty())
+                ? null
+                : dataTemplate;
     }
-
-    public DataTemplate makeDataTemplate(String templateName) {
-        return dataTemplateRepository.save(new DataTemplate(templateName));
+    
+    private DataSheet processSheet(Sheet sheet) {
+        DataSheet dataSheet = new DataSheet(sheet.getSheetName());
+        Iterator<Row> rowIterator = sheet.iterator();
+        List<DataTable> dataTables = new ArrayList<>();
+        
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            DataTable table = processHorizontalTable(row);
+            if (table == null) {
+                continue;
+            }
+            dataTables.add(table);
+        }
+        
+        dataSheet.setDataTable(dataTables);
+        return (dataTables.isEmpty())
+                ? null
+                : dataSheet;
     }
-
-    public DataSheet makeDataSheet(String sheetName, DataTemplate template) {
-        DataSheet newSheet = new DataSheet(sheetName);
-        newSheet.setDataTemplate(template);
-        return dataSheetRepository.save(newSheet);
+    
+    private DataTable processHorizontalTable(Row currentRow) {
+        long orderNumber = 0;
+        int rowNum = currentRow.getRowNum();
+        int colNum = -1;
+        List<DataHeader> dataHeaders = new ArrayList<>();
+        
+        for (Cell currentCell : currentRow) {
+            DataHeader header = processHeader(currentCell, orderNumber);
+            if (header == null) {
+                continue;
+            }
+            colNum = (colNum < 0) ? currentCell.getColumnIndex(): colNum;
+            dataHeaders.add(header);
+            orderNumber++;
+        }
+        
+        DataTable table = new DataTable(rowNum, colNum);
+        table.setDataHeader(dataHeaders);
+        return (colNum < 0 || dataHeaders.isEmpty())
+                ? null
+                : table;
     }
-
-    public DataTable makeDataTable(long row, long col, DataSheet sheet) {
-        DataTable newTable = new DataTable(row, col);
-        newTable.setDataSheet(sheet);
-        return dataTableRepository.save(newTable);
+    
+    private DataHeader processHeader(Cell cell, long headerOrder) {
+        String headerName = cell.getStringCellValue();
+        return (headerName.isBlank() || cell.getCellType() != CellType.STRING)
+            ? null
+            : new DataHeader(headerName, headerOrder);
     }
-
-    public DataHeader makeDataHeader(String headerName, long headerOrder, DataTable table) {
-        DataHeader newHeader = new DataHeader(headerName, headerOrder);
-        newHeader.setDataTable(table);
-        return dataHeaderRepository.save(newHeader);
+    
+    private DataTemplate saveTemplate(DataTemplate template) {
+        for (int i = 0; i < template.getDataSheet().size(); i++) {
+            DataSheet sheet = template.getDataSheet().get(i);
+            
+            for (int j = 0; j < sheet.getDataTable().size(); j++) {
+                DataTable table = sheet.getDataTable().get(j);
+                
+                for (int k = 0; k < table.getDataHeader().size(); k++) {
+                    DataHeader header = table.getDataHeader().get(k);
+                    header.setDataTable(table);
+                }
+                table.setDataSheet(sheet);
+            }
+            sheet.setDataTemplate(template);
+        }
+        return dataTemplateRepository.save(template);
     }
 
     @Override

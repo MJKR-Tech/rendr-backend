@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,11 +23,11 @@ public class DataSheet {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long sheetId;
 
-    @OneToMany(mappedBy = "dataSheet", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dataSheet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataTable> dataTable = new ArrayList<>();
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="templateId", nullable=false)
     private DataTemplate dataTemplate;
     

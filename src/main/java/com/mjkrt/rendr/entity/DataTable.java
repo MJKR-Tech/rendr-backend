@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,12 +24,12 @@ public class DataTable {
     private long tableId;
 
     //primary key
-    @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataHeader> dataHeader = new ArrayList<>();
 
     //foreign key
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="sheetId", nullable = false)
     private DataSheet dataSheet;
 
