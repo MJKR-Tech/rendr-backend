@@ -31,6 +31,7 @@ public class FileServiceImpl implements FileService {
     
     @PostConstruct
     public void init() {
+        LOG.info("Initialising directory '" + uploadPath + '\'');
         try {
             Files.createDirectories(Paths.get(uploadPath));
         } catch (IOException e) {
@@ -40,6 +41,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void save(MultipartFile file, String fileName) {
+        LOG.info("Saving file '" + uploadPath + '\'' + fileName);
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
@@ -53,6 +55,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource load(String filename) {
+        LOG.info("Loading file '" + uploadPath + '\'' + filename);
         try {
             Path file = Paths.get(uploadPath).resolve(filename);
             Resource resource = new UrlResource(file.toUri());
@@ -69,11 +72,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource loadSample() {
+        LOG.info("Loading sample resource");
         return load(sampleFile);
     }
 
     @Override
     public void delete(String filename) {
+        LOG.info("Deleting file '" + uploadPath + '\'' + filename);
         Path file = Paths.get(uploadPath).resolve(filename);
 
         try {

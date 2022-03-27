@@ -200,6 +200,7 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public ByteArrayInputStream getSampleTemplate() throws IOException {
+        LOG.info("Obtaining sample template");
         Resource sampleResource = fileService.loadSample();
         byte[] byteArray = IOUtils.toByteArray(sampleResource.getInputStream());
         return new ByteArrayInputStream(byteArray);
@@ -207,6 +208,7 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public ByteArrayInputStream getTemplate(long templateId) throws IOException {
+        LOG.info("Obtaining template with ID "+ templateId);
         Resource sampleResource = fileService.load(templateId + EXCEL_EXT);
         byte[] byteArray = IOUtils.toByteArray(sampleResource.getInputStream());
         return new ByteArrayInputStream(byteArray);
@@ -327,6 +329,7 @@ public class ExcelServiceImpl implements ExcelService {
             List<ColumnHeader> headers,
             List<JsonNode> rows) {
 
+        LOG.info("Obtaining json mappings");
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
         List<DataTable> dataTables = getDataTables(templateId);
 
@@ -380,6 +383,8 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private List<DataTable> getDataTables(long templateId) {
+        LOG.info("Obtaining tables from template ID " + templateId);
+        
         List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheet();
         dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
         List<DataTable> dataTables = new ArrayList<>();
