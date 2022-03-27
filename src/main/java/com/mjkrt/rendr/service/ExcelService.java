@@ -5,6 +5,7 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,15 @@ public interface ExcelService {
 
     boolean deleteTemplate(long templateId);
 
-    ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
+    ByteArrayInputStream getSampleTemplate() throws IOException;
 
-    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows);
+    ByteArrayInputStream getTemplate(long templateId) throws IOException;
+
+    ByteArrayInputStream generateExcel(String excelName,
+        List<ColumnHeader> headers,
+        List<JsonNode> rows);
+
+    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+        List<ColumnHeader> headers,
+        List<JsonNode> rows);
 }

@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -20,6 +19,8 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -33,21 +34,27 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-import javax.xml.crypto.Data;
-
+@Transactional
 @Service
 public class ExcelServiceImpl implements ExcelService {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
     
+    private static final String EXCEL_EXT = ".xlsx";
+    
     @Autowired
     private DataTemplateService dataTemplateService;
+    
+    @Autowired
+    private FileService fileService;
 
     @Override
     public List<DataTemplate> getTemplates() {
@@ -64,11 +71,18 @@ public class ExcelServiceImpl implements ExcelService {
         Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
                 .map(workbook -> processTemplate(workbook, file.getOriginalFilename()))
                 .map(this::saveTemplate);
-        return optionalTemplate.isPresent();
+
+        try {
+            long templateId = optionalTemplate.map(DataTemplate::getTemplateId).orElseThrow();
+            fileService.save(file, templateId + EXCEL_EXT);
+            return true;
+            
+        } catch (Exception e) {
+            LOG.warning(e.getLocalizedMessage());
+            return false;
+        }
     }
 
-
-    
     private Workbook readAsWorkBook(MultipartFile file) {
         LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
         LOG.info("File content type: " + file.getContentType());
@@ -90,7 +104,6 @@ public class ExcelServiceImpl implements ExcelService {
             LOG.warning("Unable to read excel");
             return null;
         }
-
     }
 
     private DataTemplate processTemplate(Workbook workbook, String fileName) {
@@ -173,21 +186,6 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataTemplate saveTemplate(DataTemplate template) {
-        LOG.info("Linking template and recursive entities");
-        for (int i = 0; i < template.getDataSheet().size(); i++) {
-            DataSheet sheet = template.getDataSheet().get(i);
-            
-            for (int j = 0; j < sheet.getDataTable().size(); j++) {
-                DataTable table = sheet.getDataTable().get(j);
-                
-                for (int k = 0; k < table.getDataHeader().size(); k++) {
-                    DataHeader header = table.getDataHeader().get(k);
-                    header.setDataTable(table);
-                }
-                table.setDataSheet(sheet);
-            }
-            sheet.setDataTemplate(template);
-        }
         LOG.info("Saving template " + template);
         return dataTemplateService.save(template);
     }
@@ -196,15 +194,30 @@ public class ExcelServiceImpl implements ExcelService {
     public boolean deleteTemplate(long templateId) {
         LOG.info("Delete template with ID "+ templateId);
         dataTemplateService.deleteById(templateId);
+        fileService.delete(templateId + EXCEL_EXT);
         return true;
     }
 
     @Override
-    public ByteArrayInputStream generateExcel(Workbook workbook, String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
+    public ByteArrayInputStream getSampleTemplate() throws IOException {
+        Resource sampleResource = fileService.loadSample();
+        byte[] byteArray = IOUtils.toByteArray(sampleResource.getInputStream());
+        return new ByteArrayInputStream(byteArray);
+    }
+
+    @Override
+    public ByteArrayInputStream getTemplate(long templateId) throws IOException {
+        Resource sampleResource = fileService.load(templateId + EXCEL_EXT);
+        byte[] byteArray = IOUtils.toByteArray(sampleResource.getInputStream());
+        return new ByteArrayInputStream(byteArray);
+    }
+
+    @Override
+    public ByteArrayInputStream generateExcel(String excelName, 
+            List<ColumnHeader> headers,
+            List<JsonNode> rows) {
+        
         LOG.info("Generating excel");
-
-
-
 //        Workbook workbook = new XSSFWorkbook();
 //        Sheet sheet = workbook.createSheet(excelName);
 //
@@ -224,6 +237,7 @@ public class ExcelServiceImpl implements ExcelService {
 //                .forEach(sheet::autoSizeColumn);
 //
 //        return writeToStream(workbook);
+        return null;
     }
 
     private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
@@ -260,7 +274,6 @@ public class ExcelServiceImpl implements ExcelService {
 
     private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
         LOG.info("Generating for row " + node);
-
         int i = 0;
         for (ColumnHeader header : selectedHeaders) {
             String headerName = header.getName();
@@ -299,22 +312,13 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
-    public List<DataTable> getDataTables() {
-        // not sure how to change ID
-        long id = 1;
-        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
-        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
-        List<DataTable> dataTables = new ArrayList<>();
-        for (DataSheet ds : dataSheets) {
-            dataTables.addAll(ds.getDataTable());
-        }
-        return dataTables;
-    }
-
-    //Long = table ID
+    // Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows) {
+    @Override
+    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+            List<ColumnHeader> headers,
+            List<JsonNode> rows) {
 
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
         List<DataTable> dataTables = getDataTables();
@@ -347,7 +351,7 @@ public class ExcelServiceImpl implements ExcelService {
                 if (i == 0) {
                     for (JsonNode node : lstJsonNodes) {
                         String s = node.get(headerName).asText();
-                        strings.put(node.get(headerName).asText(), new ArrayList<>());
+                        strings.put(s, new ArrayList<>());
                     }
                     i++;
                 } else {
@@ -366,5 +370,17 @@ public class ExcelServiceImpl implements ExcelService {
             map.put(tableId, pair);
         }
         return map;
+    }
+    
+    private List<DataTable> getDataTables() {
+        // not sure how to change ID
+        long id = 1;
+        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
+        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
+        List<DataTable> dataTables = new ArrayList<>();
+        for (DataSheet ds : dataSheets) {
+            dataTables.addAll(ds.getDataTable());
+        }
+        return dataTables;
     }
 }

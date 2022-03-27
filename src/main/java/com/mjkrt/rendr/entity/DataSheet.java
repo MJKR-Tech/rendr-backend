@@ -76,8 +76,12 @@ public class DataSheet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataSheet dataSheet = (DataSheet) o;
         return sheetId == dataSheet.sheetId
                 && Objects.equals(dataTable, dataSheet.dataTable)

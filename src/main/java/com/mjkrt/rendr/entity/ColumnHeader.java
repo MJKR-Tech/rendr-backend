@@ -14,11 +14,16 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     }
 
     String name;
+    
     Types type;
+    
     String field;
-    @JsonProperty(value="isSelected") boolean isSelected;
+    
+    @JsonProperty(value="isSelected")
+    boolean isSelected;
 
-    public ColumnHeader() {}
+    public ColumnHeader() {
+    }
     
     public ColumnHeader(String headerName) {
         this.name = headerName;
@@ -63,10 +68,17 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ColumnHeader that = (ColumnHeader) o;
-        return isSelected == that.isSelected && Objects.equals(name, that.name) && type == that.type && Objects.equals(field, that.field);
+        return isSelected == that.isSelected
+                && Objects.equals(name, that.name)
+                && type == that.type
+                && Objects.equals(field, that.field);
     }
 
     @Override

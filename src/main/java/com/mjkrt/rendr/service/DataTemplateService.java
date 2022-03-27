@@ -25,6 +25,7 @@ public class DataTemplateService {
     }
     
     public DataTemplate findById(long id) {
+        LOG.info("Finding dataTemplate by id " + id);
         return dataTemplateRepository.getById(id);
     }
     

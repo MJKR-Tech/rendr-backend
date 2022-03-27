@@ -89,8 +89,12 @@ public class DataTable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataTable dataTable = (DataTable) o;
         return tableId == dataTable.tableId
                 && rowNum == dataTable.rowNum

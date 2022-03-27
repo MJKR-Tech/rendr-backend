@@ -29,7 +29,7 @@ import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-@CrossOrigin(origins = "http://localhost:3000") // TODO remove after merging services together
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 @RestController
 public class ExcelController {
@@ -45,25 +45,47 @@ public class ExcelController {
     @GetMapping("/hello")
     public String greet() {
         LOG.info("GET /hello called");
+        
         return "Hello World!";
     }
 
     @GetMapping("/getTemplates")
     public List<DataTemplate> getTemplates() {
         LOG.info("GET /getTemplates called");
+        
         return excelService.getTemplates();
     }
 
     @PostMapping("/uploadTemplate")
     public boolean uploadExcel(@RequestParam("file") MultipartFile file) {
         LOG.info("POST /uploadTemplate called");
+        
         return excelService.uploadTemplateFromFile(file);
     }
 
     @DeleteMapping("/deleteTemplate/{id}")
     public boolean deleteTemplate(@PathVariable("id") long templateId) {
         LOG.info("DELETE /deleteTemplate called");
+        
         return excelService.deleteTemplate(templateId);
+    }
+
+    @GetMapping("/downloadSampleTemplate")
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        LOG.info("POST /downloadTemplate called");
+        
+        String fileName = "Sample"; // todo add excel file name
+        ByteArrayInputStream stream = excelService.getSampleTemplate();
+        copyByteStreamToResponse(response, stream, fileName);
+    }
+
+    @PostMapping("/downloadTemplate")
+    public void downloadTemplate(HttpServletResponse response, @RequestBody long templateId) throws IOException {
+        LOG.info("POST /downloadTemplate called");
+        
+        String fileName = "Sample"; // todo add excel file name
+        ByteArrayInputStream stream = excelService.getTemplate(templateId);
+        copyByteStreamToResponse(response, stream, fileName);
     }
     
     @PostMapping("/generateData")
@@ -75,18 +97,27 @@ public class ExcelController {
                 fileName,
                 jsonService.getHeaders(json),
                 jsonService.getRows(json));
-        
+        copyByteStreamToResponse(response, stream, fileName);
+    }
+
+    private void copyByteStreamToResponse(HttpServletResponse response, 
+            ByteArrayInputStream stream,
+            String fileName) throws IOException {
+
+        LOG.info("Copying input stream to " + fileName + ".xlsx");
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
         LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
     }
 
+    // todo remove after integrating services
     @PostMapping("/testUploadMapping")
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
             @RequestBody JsonNode json) throws IOException {
-        
+
         LOG.info("POST /generateJsonMapping called");
-        return excelService.generateJsonMapping(jsonService.getHeaders(json) ,jsonService.getRows(json));
+
+        return excelService.generateJsonMapping(jsonService.getHeaders(json), jsonService.getRows(json));
     }
 }

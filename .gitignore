@@ -35,4 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
-src/main/resources/excel/~$Complex_Translated.xlsx
+
+### Excel uploads ###
+src/main/resources/sample/excel/~$*.xlsx
+uploads/~$*.xlsx
+uploads/*.xlsx
