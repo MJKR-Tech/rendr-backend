@@ -14,6 +14,7 @@ import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,9 @@ import com.mjkrt.rendr.utils.LogsCenter;
 public class ExcelController {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelController.class);
+
+    @Value("${upload.sample.file}")
+    private String sampleTemplateFileName;
     
     @Autowired
     private ExcelService excelService;
@@ -74,9 +78,8 @@ public class ExcelController {
     public void downloadTemplate(HttpServletResponse response) throws IOException {
         LOG.info("POST /downloadTemplate called");
         
-        String fileName = "Sample"; // todo add excel file name
         ByteArrayInputStream stream = excelService.getSampleTemplate();
-        copyByteStreamToResponse(response, stream, fileName);
+        copyByteStreamToResponse(response, stream, sampleTemplateFileName);
     }
 
     @PostMapping("/downloadTemplate")
@@ -92,11 +95,11 @@ public class ExcelController {
     public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateData called");
         
-        String fileName = "Sample"; // todo add excel file name in frontend/request
+        String fileName = json.get("fileName").textValue();
         ByteArrayInputStream stream = excelService.generateExcel(
-                fileName,
-                jsonService.getHeaders(json),
-                jsonService.getRows(json));
+                json.get("templateId").longValue(),
+                jsonService.getHeaders(json.get("jsonObjects")),
+                jsonService.getRows(json.get("jsonObjects")));
         copyByteStreamToResponse(response, stream, fileName);
     }
 
@@ -118,6 +121,9 @@ public class ExcelController {
 
         LOG.info("POST /generateJsonMapping called");
 
-        return excelService.generateJsonMapping(jsonService.getHeaders(json), jsonService.getRows(json));
+        return excelService.generateJsonMapping(
+                1L,
+                jsonService.getHeaders(json),
+                jsonService.getRows(json));
     }
 }

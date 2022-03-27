@@ -23,11 +23,12 @@ public interface ExcelService {
 
     ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
-    ByteArrayInputStream generateExcel(String excelName,
+    ByteArrayInputStream generateExcel(long templateId,
         List<ColumnHeader> headers,
-        List<JsonNode> rows);
+        List<JsonNode> rows) throws IOException;
 
     Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+        long templateId,
         List<ColumnHeader> headers,
         List<JsonNode> rows);
 }

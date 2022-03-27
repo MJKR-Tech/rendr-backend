@@ -213,12 +213,18 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ByteArrayInputStream generateExcel(String excelName, 
+    public ByteArrayInputStream generateExcel(long templateId, 
             List<ColumnHeader> headers,
-            List<JsonNode> rows) {
+            List<JsonNode> rows) throws IOException {
         
-        LOG.info("Generating excel");
-//        Workbook workbook = new XSSFWorkbook();
+        LOG.info("Loading template resource");
+        Resource templateResource = fileService.load(templateId + EXCEL_EXT);
+        Workbook workbook = new XSSFWorkbook(templateResource.getInputStream());
+        
+        LOG.info("Obtaining mappings");
+        Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map =
+                generateJsonMapping(templateId, headers, rows);
+        
 //        Sheet sheet = workbook.createSheet(excelName);
 //
 //        int rowCount = 0;
@@ -317,11 +323,12 @@ public class ExcelServiceImpl implements ExcelService {
     // value of pair --> Map of strings
     @Override
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+            long templateId,
             List<ColumnHeader> headers,
             List<JsonNode> rows) {
 
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
-        List<DataTable> dataTables = getDataTables();
+        List<DataTable> dataTables = getDataTables(templateId);
 
         for (DataTable dataTable : dataTables) {
             long tableId = dataTable.getTableId();
@@ -372,10 +379,8 @@ public class ExcelServiceImpl implements ExcelService {
         return map;
     }
     
-    private List<DataTable> getDataTables() {
-        // not sure how to change ID
-        long id = 1;
-        List<DataSheet> dataSheets = dataTemplateService.findById(id).getDataSheet();
+    private List<DataTable> getDataTables(long templateId) {
+        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheet();
         dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
         List<DataTable> dataTables = new ArrayList<>();
         for (DataSheet ds : dataSheets) {
