@@ -5,6 +5,7 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,9 @@ public interface ExcelService {
 
     boolean deleteTemplate(long templateId);
 
-    ByteArrayInputStream getSampleTemplate();
+    ByteArrayInputStream getSampleTemplate() throws IOException;
 
-    ByteArrayInputStream getTemplate(long templateId);
+    ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
     ByteArrayInputStream generateExcel(String excelName,
         List<ColumnHeader> headers,
