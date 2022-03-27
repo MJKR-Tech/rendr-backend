@@ -7,6 +7,7 @@ CREATE TABLE data_template (
     date_created DATE,
     PRIMARY KEY (template_id) 
 );
+ALTER TABLE data_template AUTO_INCREMENT = 1;
 
 CREATE TABLE data_sheet (
     sheet_id BIGINT AUTO_INCREMENT,
@@ -19,6 +20,7 @@ CREATE TABLE data_sheet (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE data_sheet AUTO_INCREMENT = 1;
 
 CREATE TABLE data_table (
     table_id BIGINT AUTO_INCREMENT,
@@ -31,6 +33,7 @@ CREATE TABLE data_table (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE data_table AUTO_INCREMENT = 1;
 
 CREATE TABLE data_header (
     header_id BIGINT AUTO_INCREMENT,
@@ -43,3 +46,4 @@ CREATE TABLE data_header (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE data_header AUTO_INCREMENT = 1;
