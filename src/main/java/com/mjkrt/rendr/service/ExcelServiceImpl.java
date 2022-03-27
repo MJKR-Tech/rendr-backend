@@ -60,7 +60,6 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info("Uploading file " + file.getOriginalFilename() + " as dataTemplate");
         Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
                 .map(workbook -> processTemplate(workbook, file.getOriginalFilename()))
-                .map(this::linkEntities)
                 .map(this::saveTemplate);
         return optionalTemplate.isPresent();
     }
@@ -165,25 +164,6 @@ public class ExcelServiceImpl implements ExcelService {
         return (headerName.isBlank() || cell.getCellType() != CellType.STRING)
             ? null
             : new DataHeader(headerName, headerOrder);
-    }
-    
-    private DataTemplate linkEntities(DataTemplate template) {
-        LOG.info("Linking template and recursive entities");
-        for (int i = 0; i < template.getDataSheet().size(); i++) {
-            DataSheet sheet = template.getDataSheet().get(i);
-
-            for (int j = 0; j < sheet.getDataTable().size(); j++) {
-                DataTable table = sheet.getDataTable().get(j);
-
-                for (int k = 0; k < table.getDataHeader().size(); k++) {
-                    DataHeader header = table.getDataHeader().get(k);
-                    header.setDataTable(table);
-                }
-                table.setDataSheet(sheet);
-            }
-            sheet.setDataTemplate(template);
-        }
-        return template;
     }
     
     private DataTemplate saveTemplate(DataTemplate template) {
@@ -320,7 +300,7 @@ public class ExcelServiceImpl implements ExcelService {
         return dataTables;
     }
 
-    //Long = table ID
+    // Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(

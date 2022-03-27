@@ -53,5 +53,8 @@ This document describes the set-up procedures to integrate MySQL to this applica
    ```
    - Afterwards, rerun the initialisation scripts in `resources/mysql/scripts/`.
 
-1. Why is there a 
+2. Why is there a 
    - Refer to this [StackExchange post](https://superuser.com/questions/1287992/mysqlinstaller-popping-up-unexpectedly) to turn off the scheduler.
+
+3. Why is my MySQL instance is not connecting to localhost?
+   - See this [StackOverflow post](https://stackoverflow.com/questions/32022580/failed-to-connect-to-mysql-at-localhost3306-with-user-roothttps://stackoverflow.com/questions/32022580/failed-to-connect-to-mysql-at-localhost3306-with-user-root) to start your SQL service.
