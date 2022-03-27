@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -39,8 +38,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-import javax.xml.crypto.Data;
-
 @Service
 public class ExcelServiceImpl implements ExcelService {
 
@@ -63,12 +60,11 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info("Uploading file " + file.getOriginalFilename() + " as dataTemplate");
         Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
                 .map(workbook -> processTemplate(workbook, file.getOriginalFilename()))
+                .map(this::linkEntities)
                 .map(this::saveTemplate);
         return optionalTemplate.isPresent();
     }
 
-
-    
     private Workbook readAsWorkBook(MultipartFile file) {
         LOG.info("Reading file " + file.getOriginalFilename() + " as " + file.getOriginalFilename());
         LOG.info("File content type: " + file.getContentType());
@@ -90,7 +86,6 @@ public class ExcelServiceImpl implements ExcelService {
             LOG.warning("Unable to read excel");
             return null;
         }
-
     }
 
     private DataTemplate processTemplate(Workbook workbook, String fileName) {
@@ -172,14 +167,14 @@ public class ExcelServiceImpl implements ExcelService {
             : new DataHeader(headerName, headerOrder);
     }
     
-    private DataTemplate saveTemplate(DataTemplate template) {
+    private DataTemplate linkEntities(DataTemplate template) {
         LOG.info("Linking template and recursive entities");
         for (int i = 0; i < template.getDataSheet().size(); i++) {
             DataSheet sheet = template.getDataSheet().get(i);
-            
+
             for (int j = 0; j < sheet.getDataTable().size(); j++) {
                 DataTable table = sheet.getDataTable().get(j);
-                
+
                 for (int k = 0; k < table.getDataHeader().size(); k++) {
                     DataHeader header = table.getDataHeader().get(k);
                     header.setDataTable(table);
@@ -188,6 +183,10 @@ public class ExcelServiceImpl implements ExcelService {
             }
             sheet.setDataTemplate(template);
         }
+        return template;
+    }
+    
+    private DataTemplate saveTemplate(DataTemplate template) {
         LOG.info("Saving template " + template);
         return dataTemplateService.save(template);
     }
@@ -200,11 +199,21 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ByteArrayInputStream generateExcel(Workbook workbook, String excelName, List<ColumnHeader> headers, List<JsonNode> rows) {
+    public ByteArrayInputStream getSampleTemplate() {
+        return null;
+    }
+
+    @Override
+    public ByteArrayInputStream getTemplate(long templateId) {
+        return null;
+    }
+
+    @Override
+    public ByteArrayInputStream generateExcel(String excelName, 
+            List<ColumnHeader> headers,
+            List<JsonNode> rows) {
+        
         LOG.info("Generating excel");
-
-
-
 //        Workbook workbook = new XSSFWorkbook();
 //        Sheet sheet = workbook.createSheet(excelName);
 //
@@ -224,6 +233,7 @@ public class ExcelServiceImpl implements ExcelService {
 //                .forEach(sheet::autoSizeColumn);
 //
 //        return writeToStream(workbook);
+        return null;
     }
 
     private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
@@ -260,7 +270,6 @@ public class ExcelServiceImpl implements ExcelService {
 
     private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
         LOG.info("Generating for row " + node);
-
         int i = 0;
         for (ColumnHeader header : selectedHeaders) {
             String headerName = header.getName();
@@ -314,7 +323,9 @@ public class ExcelServiceImpl implements ExcelService {
     //Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows) {
+    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+            List<ColumnHeader> headers,
+            List<JsonNode> rows) {
 
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
         List<DataTable> dataTables = getDataTables();
@@ -347,7 +358,7 @@ public class ExcelServiceImpl implements ExcelService {
                 if (i == 0) {
                     for (JsonNode node : lstJsonNodes) {
                         String s = node.get(headerName).asText();
-                        strings.put(node.get(headerName).asText(), new ArrayList<>());
+                        strings.put(s, new ArrayList<>());
                     }
                     i++;
                 } else {

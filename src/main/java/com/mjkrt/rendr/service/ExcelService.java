@@ -18,7 +18,15 @@ public interface ExcelService {
 
     boolean deleteTemplate(long templateId);
 
-    ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
+    ByteArrayInputStream getSampleTemplate();
 
-    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows);
+    ByteArrayInputStream getTemplate(long templateId);
+
+    ByteArrayInputStream generateExcel(String excelName,
+        List<ColumnHeader> headers,
+        List<JsonNode> rows);
+
+    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+        List<ColumnHeader> headers,
+        List<JsonNode> rows);
 }

@@ -71,8 +71,12 @@ public class DataHeader {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataHeader that = (DataHeader) o;
         return headerId == that.headerId
                 && headerOrder == that.headerOrder
