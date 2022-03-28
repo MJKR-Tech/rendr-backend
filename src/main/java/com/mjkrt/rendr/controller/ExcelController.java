@@ -13,6 +13,8 @@ import com.mjkrt.rendr.entity.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,6 +43,8 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    private Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> mappings;
     
     @GetMapping("/hello")
     public String greet() {
@@ -66,16 +70,34 @@ public class ExcelController {
         return excelService.deleteTemplate(templateId);
     }
     
+//    @PostMapping("/generateData")
+//    public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
+//        LOG.info("POST /generateData called");
+//
+//        String fileName = "Sample"; // todo add excel file name in frontend/request
+//        ByteArrayInputStream stream = excelService.generateExcel(
+//                fileName,
+//                jsonService.getHeaders(json),
+//                jsonService.getRows(json));
+//
+//        response.setContentType("application/octet-stream");
+//        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+//        IOUtils.copy(stream, response.getOutputStream());
+//        LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
+//    }
+
     @PostMapping("/generateData")
     public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateData called");
-        
-        String fileName = "Sample"; // todo add excel file name in frontend/request
+
+        Workbook wb = new XSSFWorkbook();
+
+        String fileName = "Sample";
         ByteArrayInputStream stream = excelService.generateExcel(
+                wb,
                 fileName,
-                jsonService.getHeaders(json),
-                jsonService.getRows(json));
-        
+                mappings);
+
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
@@ -87,6 +109,7 @@ public class ExcelController {
             @RequestBody JsonNode json) throws IOException {
         
         LOG.info("POST /generateJsonMapping called");
-        return excelService.generateJsonMapping(jsonService.getHeaders(json) ,jsonService.getRows(json));
+        mappings = excelService.generateJsonMapping(jsonService.getHeaders(json) ,jsonService.getRows(json));
+        return mappings;
     }
 }

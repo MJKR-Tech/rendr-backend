@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.util.Pair;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExcelService {
@@ -18,7 +19,9 @@ public interface ExcelService {
 
     boolean deleteTemplate(long templateId);
 
-    ByteArrayInputStream generateExcel(String excelName, List<ColumnHeader> headers, List<JsonNode> rows);
+    public ByteArrayInputStream generateExcel(Workbook workbook,
+                                  String excelName,
+                                  Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> mapThing);
 
     Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(List<ColumnHeader> headers, List<JsonNode> rows);
 }
