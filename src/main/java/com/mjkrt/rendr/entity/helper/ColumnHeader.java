@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.entity;
+package com.mjkrt.rendr.entity.helper;
 
 import java.util.Objects;
 

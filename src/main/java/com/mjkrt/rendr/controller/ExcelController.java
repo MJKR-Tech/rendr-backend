@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;

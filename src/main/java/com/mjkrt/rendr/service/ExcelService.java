@@ -1,7 +1,7 @@
 package com.mjkrt.rendr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 
 import java.io.ByteArrayInputStream;
