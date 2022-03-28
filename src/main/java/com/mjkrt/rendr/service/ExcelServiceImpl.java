@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -227,22 +226,22 @@ public class ExcelServiceImpl implements ExcelService {
         Workbook workbook = new XSSFWorkbook(templateResource.getInputStream());
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap =
                 generateJsonMapping(templateId, headers, rows);
-        mapDataToWorkbook(workbook, dataMap);        
+        mapDataToWorkbook(dataMap, workbook);        
         
         return writeToStream(workbook);
     }
     
-    private void mapDataToWorkbook(Workbook workbook,
-            Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap) {
+    private void mapDataToWorkbook(Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap,
+            Workbook workbook) {
 
         LOG.info("Mapping data to workbook");
-        // TODO
+        
         int sheetCount = workbook.getNumberOfSheets();
         ArrayList<Sheet> sheetList = new ArrayList<>();
-
         for (int i = 0; i < sheetCount; i++) {
             sheetList.add(workbook.getSheetAt(i));
         }
+        
         // Method eventually: List<DataSheet> dataSheets = getDataSheets();
         List<DataSheet> dataSheets = dataTemplateService.findById(1).getDataSheet();
 
@@ -257,7 +256,6 @@ public class ExcelServiceImpl implements ExcelService {
             }
 
             List<DataTable> dataTables = dataSheet.getDataTable();
-
             for (DataTable dt : dataTables) {
                 Long tableId = dt.getTableId();
                 long startRow = dt.getRowNum();
@@ -265,8 +263,7 @@ public class ExcelServiceImpl implements ExcelService {
 
                 Pair<List<ColumnHeader>, Map<String, List<String>>> mapThingData = dataMap.get(tableId);
                 Map<String, List<String>> mapThingValues = mapThingData.getValue();
-
-
+                
                 int col = (int) startCol;
                 for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
                     Row row = sheet.getRow((int) startRow + 1);
@@ -279,74 +276,10 @@ public class ExcelServiceImpl implements ExcelService {
                         cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                         cell.setCellValue(dataValue);
                     }
-
                 }
-
             }
-
         }
     }
-
-
-
-//    private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
-//        return headers.stream()
-//                .filter(ColumnHeader::isSelected)
-//                .collect(Collectors.toList());
-//    }
-//
-//    private void generateHeaders(Workbook workbook, Row headerRow, List<ColumnHeader> selectedHeaders) {
-//        LOG.info("Generating selected headers " + selectedHeaders);
-//        CellStyle headerCellStyle = generateHeaderStyle(workbook);
-//
-//        int i = 0;
-//        for (ColumnHeader header : selectedHeaders) {
-//            Cell cell = headerRow.createCell(i);
-//            String headerName = StringUtils.capitalize(
-//                    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(header.getName()), ' ')
-//            );
-//
-//            cell.setCellValue(headerName);
-//            cell.setCellStyle(headerCellStyle);
-//            i++;
-//        }
-//    }
-//
-//    private CellStyle generateHeaderStyle(Workbook workbook) {
-//        LOG.info("Generating header style");
-//        CellStyle headerCellStyle = workbook.createCellStyle();
-//        headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
-//        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-//
-//        return headerCellStyle;
-//    }
-//
-//    private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
-//        LOG.info("Generating for row " + node);
-//
-//        int i = 0;
-//        for (ColumnHeader header : selectedHeaders) {
-//            String headerName = header.getName();
-//            Optional<JsonNode> optField = Optional.ofNullable(node.get(headerName));
-//            dataRow.createCell(i);
-//
-//            if (optField.isPresent()) {
-//                JsonNode field = optField.get();
-//                switch (header.getType()) {
-//                    case DECIMAL:
-//                        dataRow.createCell(i).setCellValue(field.asInt());
-//                        break;
-//                    case DOUBLE:
-//                        dataRow.createCell(i).setCellValue(field.asDouble());
-//                        break;
-//                    default:
-//                        // DATE || STRING
-//                        dataRow.createCell(i).setCellValue(field.asText());
-//                }
-//            }
-//            i++;
-//        }
-//    }
 
     private ByteArrayInputStream writeToStream(Workbook workbook) {
         try {
@@ -435,81 +368,4 @@ public class ExcelServiceImpl implements ExcelService {
         }
         return dataTables;
     }
-    
-    /*
-//        // Old method
-//        Sheet sheet = workbook.createSheet(excelName);
-//
-//        int rowCount = 0;
-//        Row headerRow = sheet.createRow(rowCount++);
-//
-//        List<ColumnHeader> selectedHeaders = filterColumns(headers);
-//        generateHeaders(workbook, headerRow, selectedHeaders);
-//
-//        for (JsonNode node : rows) {
-//            Row dataRow = sheet.createRow(rowCount++);
-//            addDataToRow(dataRow, selectedHeaders, node);
-//        }
-//
-//        IntStream.range(0, headers.size())
-//                .forEach(sheet::autoSizeColumn);
-    
-    private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
-        return headers.stream()
-                .filter(ColumnHeader::isSelected)
-                .collect(Collectors.toList());
-    }
-
-    private void generateHeaders(Workbook workbook, Row headerRow, List<ColumnHeader> selectedHeaders) {
-        LOG.info("Generating selected headers " + selectedHeaders);
-        CellStyle headerCellStyle = generateHeaderStyle(workbook);
-
-        int i = 0;
-        for (ColumnHeader header : selectedHeaders) {
-            Cell cell = headerRow.createCell(i);
-            String headerName = StringUtils.capitalize(
-                    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(header.getName()), ' ')
-            );
-
-            cell.setCellValue(headerName);
-            cell.setCellStyle(headerCellStyle);
-            i++;
-        }
-    }
-
-    private CellStyle generateHeaderStyle(Workbook workbook) {
-        LOG.info("Generating header style");
-        CellStyle headerCellStyle = workbook.createCellStyle();
-        headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
-        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        return headerCellStyle;
-    }
-
-    private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
-        LOG.info("Generating for row " + node);
-        int i = 0;
-        for (ColumnHeader header : selectedHeaders) {
-            String headerName = header.getName();
-            Optional<JsonNode> optField = Optional.ofNullable(node.get(headerName));
-            dataRow.createCell(i);
-
-            if (optField.isPresent()) {
-                JsonNode field = optField.get();
-                switch (header.getType()) {
-                    case DECIMAL:
-                        dataRow.createCell(i).setCellValue(field.asInt());
-                        break;
-                    case DOUBLE:
-                        dataRow.createCell(i).setCellValue(field.asDouble());
-                        break;
-                    default:
-                        // DATE || STRING
-                        dataRow.createCell(i).setCellValue(field.asText());
-                }
-            }
-            i++;
-        }
-    }
-    */
 }
