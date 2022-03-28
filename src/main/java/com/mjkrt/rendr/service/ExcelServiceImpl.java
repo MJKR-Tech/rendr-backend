@@ -194,6 +194,12 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
+    public String getFileNameForTemplate(long templateId) {
+        DataTemplate template = dataTemplateService.findById(templateId);
+        return template.getTemplateName();
+    }
+
+    @Override
     public ByteArrayInputStream getSampleTemplate() throws IOException {
         LOG.info("Obtaining sample template");
         Resource sampleResource = fileService.loadSample();

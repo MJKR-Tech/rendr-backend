@@ -86,7 +86,7 @@ public class ExcelController {
     public void downloadTemplate(HttpServletResponse response, @RequestBody long templateId) throws IOException {
         LOG.info("POST /downloadTemplate called");
         
-        String fileName = "Sample"; // todo add excel file name
+        String fileName = excelService.getFileNameForTemplate(templateId);
         ByteArrayInputStream stream = excelService.getTemplate(templateId);
         copyByteStreamToResponse(response, stream, fileName);
     }

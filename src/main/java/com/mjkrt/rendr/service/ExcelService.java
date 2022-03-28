@@ -18,6 +18,8 @@ public interface ExcelService {
     boolean uploadTemplateFromFile(MultipartFile file);
 
     boolean deleteTemplate(long templateId);
+    
+    String getFileNameForTemplate(long templateId);
 
     ByteArrayInputStream getSampleTemplate() throws IOException;
 
