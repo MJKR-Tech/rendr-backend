@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -236,7 +237,116 @@ public class ExcelServiceImpl implements ExcelService {
 
         LOG.info("Mapping data to workbook");
         // TODO
+        int sheetCount = workbook.getNumberOfSheets();
+        ArrayList<Sheet> sheetList = new ArrayList<>();
+
+        for (int i = 0; i < sheetCount; i++) {
+            sheetList.add(workbook.getSheetAt(i));
+        }
+        // Method eventually: List<DataSheet> dataSheets = getDataSheets();
+        List<DataSheet> dataSheets = dataTemplateService.findById(1).getDataSheet();
+
+        for (Sheet sheet : sheetList) {
+            String sheetName = sheet.getSheetName();
+            DataSheet dataSheet = new DataSheet();
+            for (DataSheet ds : dataSheets) {
+                if (ds.getSheetName().equals(sheetName)) {
+                    dataSheet = ds;
+                    break;
+                }
+            }
+
+            List<DataTable> dataTables = dataSheet.getDataTable();
+
+            for (DataTable dt : dataTables) {
+                Long tableId = dt.getTableId();
+                long startRow = dt.getRowNum();
+                long startCol = dt.getColNum();
+
+                Pair<List<ColumnHeader>, Map<String, List<String>>> mapThingData = dataMap.get(tableId);
+                Map<String, List<String>> mapThingValues = mapThingData.getValue();
+
+
+                int col = (int) startCol;
+                for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
+                    Row row = sheet.getRow((int) startRow + 1);
+                    Cell cell = row.getCell(col, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+                    cell.setCellValue(entry.getKey());
+                    List<String> dataValues = entry.getValue();
+
+                    for (String dataValue : dataValues) {
+                        cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                        cell.setCellValue(dataValue);
+                    }
+
+                }
+
+            }
+
+        }
     }
+
+
+
+//    private List<ColumnHeader> filterColumns(List<ColumnHeader> headers) {
+//        return headers.stream()
+//                .filter(ColumnHeader::isSelected)
+//                .collect(Collectors.toList());
+//    }
+//
+//    private void generateHeaders(Workbook workbook, Row headerRow, List<ColumnHeader> selectedHeaders) {
+//        LOG.info("Generating selected headers " + selectedHeaders);
+//        CellStyle headerCellStyle = generateHeaderStyle(workbook);
+//
+//        int i = 0;
+//        for (ColumnHeader header : selectedHeaders) {
+//            Cell cell = headerRow.createCell(i);
+//            String headerName = StringUtils.capitalize(
+//                    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(header.getName()), ' ')
+//            );
+//
+//            cell.setCellValue(headerName);
+//            cell.setCellStyle(headerCellStyle);
+//            i++;
+//        }
+//    }
+//
+//    private CellStyle generateHeaderStyle(Workbook workbook) {
+//        LOG.info("Generating header style");
+//        CellStyle headerCellStyle = workbook.createCellStyle();
+//        headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+//        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//
+//        return headerCellStyle;
+//    }
+//
+//    private void addDataToRow(Row dataRow, List<ColumnHeader> selectedHeaders, JsonNode node) {
+//        LOG.info("Generating for row " + node);
+//
+//        int i = 0;
+//        for (ColumnHeader header : selectedHeaders) {
+//            String headerName = header.getName();
+//            Optional<JsonNode> optField = Optional.ofNullable(node.get(headerName));
+//            dataRow.createCell(i);
+//
+//            if (optField.isPresent()) {
+//                JsonNode field = optField.get();
+//                switch (header.getType()) {
+//                    case DECIMAL:
+//                        dataRow.createCell(i).setCellValue(field.asInt());
+//                        break;
+//                    case DOUBLE:
+//                        dataRow.createCell(i).setCellValue(field.asDouble());
+//                        break;
+//                    default:
+//                        // DATE || STRING
+//                        dataRow.createCell(i).setCellValue(field.asText());
+//                }
+//            }
+//            i++;
+//        }
+//    }
 
     private ByteArrayInputStream writeToStream(Workbook workbook) {
         try {

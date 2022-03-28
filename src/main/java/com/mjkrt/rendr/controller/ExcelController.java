@@ -13,6 +13,8 @@ import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -45,6 +47,8 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    private Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> mappings;
     
     @GetMapping("/hello")
     public String greet() {
@@ -91,9 +95,26 @@ public class ExcelController {
         copyByteStreamToResponse(response, stream, fileName);
     }
     
+//    @PostMapping("/generateData")
+//    public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
+//        LOG.info("POST /generateData called");
+//
+//        String fileName = "Sample"; // todo add excel file name in frontend/request
+//        ByteArrayInputStream stream = excelService.generateExcel(
+//                fileName,
+//                jsonService.getHeaders(json),
+//                jsonService.getRows(json));
+//
+//        response.setContentType("application/octet-stream");
+//        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+//        IOUtils.copy(stream, response.getOutputStream());
+//        LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
+//    }
+
     @PostMapping("/generateData")
     public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateData called");
+
         
         String fileName = json.get("fileName").textValue();
         ByteArrayInputStream stream = excelService.generateExcel(
@@ -108,6 +129,7 @@ public class ExcelController {
             String fileName) throws IOException {
 
         LOG.info("Copying input stream to " + fileName + ".xlsx");
+
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
         IOUtils.copy(stream, response.getOutputStream());
@@ -125,5 +147,6 @@ public class ExcelController {
                 1L,
                 jsonService.getHeaders(json),
                 jsonService.getRows(json));
+
     }
 }
