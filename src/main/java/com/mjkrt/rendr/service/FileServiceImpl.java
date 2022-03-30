@@ -55,7 +55,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource load(String filename) {
-        LOG.info("Loading file '" + uploadPath + '\'' + filename);
+        LOG.info("Loading file " + uploadPath + '/' + filename);
         try {
             Path file = Paths.get(uploadPath).resolve(filename);
             Resource resource = new UrlResource(file.toUri());
