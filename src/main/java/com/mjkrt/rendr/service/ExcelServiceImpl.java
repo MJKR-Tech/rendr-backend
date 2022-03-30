@@ -226,12 +226,13 @@ public class ExcelServiceImpl implements ExcelService {
         Workbook workbook = new XSSFWorkbook(templateResource.getInputStream());
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap =
                 generateJsonMapping(templateId, headers, rows);
-        mapDataToWorkbook(dataMap, workbook);        
+        mapDataToWorkbook(templateId, dataMap, workbook);
         
         return writeToStream(workbook);
     }
     
-    private void mapDataToWorkbook(Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap,
+    private void mapDataToWorkbook(long templateId,
+            Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap,
             Workbook workbook) {
 
         LOG.info("Mapping data to workbook");
@@ -241,9 +242,8 @@ public class ExcelServiceImpl implements ExcelService {
         for (int i = 0; i < sheetCount; i++) {
             sheetList.add(workbook.getSheetAt(i));
         }
-        
-        // Method eventually: List<DataSheet> dataSheets = getDataSheets();
-        List<DataSheet> dataSheets = dataTemplateService.findById(1).getDataSheet();
+
+        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheet();
 
         for (Sheet sheet : sheetList) {
             String sheetName = sheet.getSheetName();

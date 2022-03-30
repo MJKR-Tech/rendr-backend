@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    @Autowired
+    private DataTemplateRepository dataTemplateRepository;
     
     @GetMapping("/hello")
     public String greet() {
@@ -72,6 +76,12 @@ public class ExcelController {
         LOG.info("DELETE /deleteTemplate called");
         
         return excelService.deleteTemplate(templateId);
+    }
+
+    @DeleteMapping("/deleteAllTemplates")
+    public boolean deleteTemplate() {
+        dataTemplateRepository.deleteAll();;
+        return true;
     }
 
     @GetMapping("/downloadSampleTemplate")
