@@ -22,9 +22,11 @@ import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -266,17 +268,28 @@ public class ExcelServiceImpl implements ExcelService {
                 Pair<List<ColumnHeader>, Map<String, List<String>>> mapThingData = dataMap.get(tableId);
                 Map<String, List<String>> mapThingValues = mapThingData.getValue();
                 
-                int col = (int) startCol;
-                for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
-                    Row row = sheet.getRow((int) startRow + 1);
-                    Cell cell = row.getCell(col, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-                    cell.setCellValue(entry.getKey());
+                for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
+                    int col = (int) startCol;
+                    startRow += 1;
+                    Row row = sheet.getRow((int) startRow);
+                    Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+                    if (NumberUtils.isParsable(entry.getKey())) {
+                        cell.setCellValue(Integer.parseInt(entry.getKey()));
+                    } else {
+                        cell.setCellValue(entry.getKey());
+                    }
+
                     List<String> dataValues = entry.getValue();
 
                     for (String dataValue : dataValues) {
                         cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                        cell.setCellValue(dataValue);
+                        if (NumberUtils.isParsable(dataValue)) {
+                            cell.setCellValue(Integer.parseInt(dataValue));
+                        } else {
+                            cell.setCellValue(dataValue);
+                        }
                     }
                 }
             }
@@ -300,7 +313,6 @@ public class ExcelServiceImpl implements ExcelService {
     // Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
-    @Override
     public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
             long templateId,
             List<ColumnHeader> headers,
@@ -314,11 +326,17 @@ public class ExcelServiceImpl implements ExcelService {
             long tableId = dataTable.getTableId();
             List<DataHeader> dataHeaders = dataTable.getDataHeader();
             List<ColumnHeader> columnHeaders = new ArrayList<>();
+            int count = 0;
             for (DataHeader dataHeader : dataHeaders) {
                 for (ColumnHeader ch : headers) {
                     if (ch.getName().equals(dataHeader.getHeaderName())) {
                         columnHeaders.add(ch);
                     }
+                }
+                count++;
+                if (columnHeaders.size() != count) {
+                    ColumnHeader newCh = new ColumnHeader(dataHeader.getHeaderName());
+                    columnHeaders.add(newCh);
                 }
             }
 
@@ -340,7 +358,6 @@ public class ExcelServiceImpl implements ExcelService {
                         String s = node.get(headerName).asText();
                         strings.put(s, new ArrayList<>());
                     }
-                    i++;
                 } else {
                     for (JsonNode node : lstJsonNodes) {
                         for (String key : strings.keySet()) {
@@ -351,10 +368,17 @@ public class ExcelServiceImpl implements ExcelService {
                             }
                         }
                     }
+                    for (String key : strings.keySet()) {
+                        List<String> temp = strings.get(key);
+                        if (temp.size() != i) {
+                            temp.add("");
+                        }
+                    }
                 }
+                i++;
+                Pair<List<ColumnHeader>, Map<String, List<String>>> pair = new Pair<>(columnHeaders, strings);
+                map.put(tableId, pair);
             }
-            Pair<List<ColumnHeader>, Map<String, List<String>>> pair = new Pair<>(columnHeaders, strings);
-            map.put(tableId, pair);
         }
         return map;
     }
