@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
 import javax.xml.crypto.Data;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -461,6 +462,26 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
+    public ColumnHeader cloneColumnHeader(ColumnHeader columnHeader) {
+        ColumnHeader ch = new ColumnHeader();
+        ch.setDirection(columnHeader.getDirection());
+        ch.setField(columnHeader.getField());
+        ch.setSelected(columnHeader.isSelected());
+        ch.setName(columnHeader.getName());
+        ch.setType(columnHeader.getType());
+        return ch;
+    }
+
+    public ColumnHeader cloneColumnHeader(ColumnHeader columnHeader, DataDirection dirn) {
+        ColumnHeader ch = new ColumnHeader();
+        ch.setDirection(dirn);
+        ch.setField(columnHeader.getField());
+        ch.setSelected(columnHeader.isSelected());
+        ch.setName(columnHeader.getName());
+        ch.setType(columnHeader.getType());
+        return ch;
+    }
+
     // Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
@@ -484,7 +505,6 @@ public class ExcelServiceImpl implements ExcelService {
             for (DataHeader dataHeader : dataHeaders) {
                 direction = dataHeader.getDirection();
                 for (ColumnHeader ch : headers) {
-
                     if (ch.getName().equals(dataHeader.getHeaderName())) {
                         if (boo) {
                             for (ColumnHeader columnHeader : columnHeaders) {
@@ -492,8 +512,8 @@ public class ExcelServiceImpl implements ExcelService {
                             }
                             boo = false;
                         }
-                        ch.setDirection(direction);
-                        columnHeaders.add(ch);
+                        ColumnHeader newCh = cloneColumnHeader(ch, direction);
+                        columnHeaders.add(newCh);
                     }
                 }
                 count++;
