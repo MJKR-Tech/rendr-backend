@@ -1,0 +1,69 @@
+{
+    "header": {
+
+    },
+    "body": {
+      "Chunk_1": {
+        "columns": [
+          {
+            "name": "Code",
+            "type": "string",
+            "field": "Code"
+          },
+          {
+            "name": "Name",
+            "type": "string",
+            "field": "Name"
+          },
+          {
+            "name": "Price",
+            "type": "decimal",
+            "field": "Price"
+          },
+          {
+            "name": "Data",
+            "type": "decimal",
+            "field": "Data"
+          }
+        ],
+        "rows": [
+          {
+            "Code": 101,
+            "Name": "Client 1",
+            "Price": 123.1,
+            "Data": 8060568
+          },
+          {
+            "Code": 102,
+            "Name": "Client 2a",
+            "Price": 1623.1,
+            "Data": 8713923
+          },
+          {
+            "Code": 103,
+            "Name": "Client 2b",
+            "Price": 423.4,
+            "Data": 287849189
+          },
+          {
+            "Code": 104,
+            "Name": "Client 4",
+            "Price": 2131.4,
+            "Data": 382913902
+          },
+          {
+            "Code": 105,
+            "Name": "Client 5",
+            "Price": 123.1,
+            "Data": 73821791
+          },
+          {
+            "Code": 106,
+            "Name": "Client 6",
+            "Price": 123.1,
+            "Data": 8060568
+          }
+        ]
+      }
+    }
+  }
