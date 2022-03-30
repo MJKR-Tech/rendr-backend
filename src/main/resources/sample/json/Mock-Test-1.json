@@ -1,0 +1,59 @@
+{
+   "header": {
+
+   },
+   "body": {
+      "Chunk_1": {
+         "columns": [
+            {
+               "name":"assetCode",
+               "type":"string",
+               "field":"assetCode"
+            },
+            {
+               "name":"assetName",
+               "type":"string",
+               "field":"assetName"
+            },
+            {
+               "name":"compositionRate",
+               "type":"decimal",
+               "field":"compositionRate"
+            },
+            {
+               "name":"currentMonthNAV",
+               "type":"decimal",
+               "field":"currentMonthNAV"
+            },
+            {
+               "name":"test1",
+               "type":"decimal",
+               "field":"test1"
+            }
+         ],
+         "rows": [
+            {
+               "compositionRate":0,
+               "assetCode":"300",
+               "currentMontNav":30,
+               "assetName":"チョコレート(CHOC)",
+               "test1": 2
+            },
+            {
+               "compositionRate":2,
+               "assetCode":"400",
+               "currentMontNav":23,
+               "assetName":"コーヒー(COF)",
+               "test1": 3
+            },
+            {
+               "compositionRate":1,
+               "assetCode":"500",
+               "currentMontNav":440,
+               "assetName":"PA(パイナップル)",
+               "test1": 4
+            }
+         ]
+      }
+   }
+}
