@@ -99,7 +99,7 @@ public class DataSheet {
         return "DataSheet{" +
                 "sheetId=" + sheetId +
                 ", dataTable=" + dataTable +
-                ", dataTemplate=" + dataTemplate.getTemplateId() +
+                ", dataTemplate=" + ((dataTemplate == null) ? "" : dataTemplate.getTemplateId()) +
                 ", sheetName='" + sheetName + '\'' +
                 '}';
     }

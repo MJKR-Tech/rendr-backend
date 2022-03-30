@@ -3,7 +3,10 @@ package com.mjkrt.rendr.entity;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +27,10 @@ public class DataHeader {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="tableId", nullable = false)
     private DataTable dataTable;
+    
+    @Column(columnDefinition = "ENUM('HORIZONTAL', 'VERTICAL')")
+    @Enumerated(EnumType.STRING)
+    private DataDirection direction = DataDirection.HORIZONTAL;
 
     private String headerName;
     
@@ -69,6 +76,14 @@ public class DataHeader {
         this.headerOrder = headerOrder;
     }
 
+    public DataDirection getDirection() {
+        return direction;
+    }
+
+    public void setDirection(DataDirection direction) {
+        this.direction = direction;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -86,16 +101,17 @@ public class DataHeader {
 
     @Override
     public int hashCode() {
-        return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder);
+        return Objects.hash(headerId, dataTable.getTableId(), headerName, headerOrder, direction);
     }
 
     @Override
     public String toString() {
         return "DataHeader{" +
                 "headerId=" + headerId +
-                ", dataTable=" + dataTable.getTableId() +
+                ", dataTable=" + ((dataTable == null) ? "" : dataTable.getTableId()) +
                 ", headerName='" + headerName + '\'' +
                 ", headerOrder=" + headerOrder +
+                ", direction=" + direction +
                 '}';
     }
 }

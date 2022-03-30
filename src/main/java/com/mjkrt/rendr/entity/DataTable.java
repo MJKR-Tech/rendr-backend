@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +35,7 @@ public class DataTable {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="sheetId", nullable = false)
     private DataSheet dataSheet;
-
+    
     private long rowNum;
     
     private long colNum;
@@ -49,6 +52,13 @@ public class DataTable {
         this.dataHeader.clear();
         this.dataHeader.addAll(dataHeader);
         dataHeader.forEach(header -> header.setDataTable(this));
+    }
+    
+    public void addDataHeader(DataHeader dataHeader) {
+        if (this.dataHeader.contains(dataHeader)) {
+            return;   
+        }
+        this.dataHeader.add(dataHeader);
     }
 
     public DataSheet getDataSheet() {
@@ -113,7 +123,7 @@ public class DataTable {
         return "DataTable{" +
                 "tableId=" + tableId +
                 ", dataHeader=" + dataHeader +
-                ", sheet=" + dataSheet.getSheetId() +
+                ", sheet=" + ((dataSheet == null) ? "" : dataSheet.getSheetId()) +
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
                 '}';

@@ -14,8 +14,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.Data;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
+import com.mjkrt.rendr.entity.DataDirection;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
@@ -134,36 +137,98 @@ public class ExcelServiceImpl implements ExcelService {
         
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            DataTable table = processHorizontalTable(row);
+            List<DataTable> tables = processHorizontalTables(row);
+            if (tables.isEmpty()) {
+                continue;
+            }
+            dataTables.addAll(tables);
+        }
+        
+        List<DataTable> mergedTables = mergeTables(dataTables);
+        dataSheet.setDataTable(mergedTables);
+        return (mergedTables.isEmpty())
+                ? null
+                : dataSheet;
+    }
+    
+    private List<DataTable> mergeTables(List<DataTable> tables) {
+        List<DataTable> newTables = new ArrayList<>();
+        tables.sort(Comparator.comparing(DataTable::getColNum).thenComparing(DataTable::getRowNum));
+        
+        Iterator<DataTable> dataTableIterator = tables.iterator();
+        while (dataTableIterator.hasNext()) {
+            DataTable table = dataTableIterator.next();
+            long col = table.getColNum();
+            long row = table.getRowNum();
+            List<DataTable> groupedTables = new ArrayList<>();
+            
+            while (table.getColNum() == col) {
+                if (table.getRowNum() == row) {
+                    groupedTables.add(table);
+                } else {
+                    break;
+                }
+                row++;
+                if (!dataTableIterator.hasNext()) {
+                    break;
+                }
+                table = dataTableIterator.next();
+            }
+
+            DataTable newTable = groupedTables.get(0);
+            int ordering = 1;
+            for (int i = 1; i < groupedTables.size(); i++) {
+                DataTable toMergeTable = groupedTables.get(i);
+                assert toMergeTable.getDataHeader().size() == 1;
+                
+                DataHeader header = toMergeTable.getDataHeader().get(0);
+                header.setDataTable(newTable);
+                header.setDirection(DataDirection.VERTICAL);
+                header.setHeaderOrder(ordering);
+                newTable.addDataHeader(header);
+                ordering++;
+            }
+            newTables.add(newTable);
+        }
+        return newTables;
+    }
+    
+    private List<DataTable> processHorizontalTables(Row currentRow) {
+        LOG.info("Processing row " + currentRow.getRowNum());
+        
+        List<DataTable> dataTables = new ArrayList<>();
+        Iterator<Cell> cellIterator = currentRow.iterator();
+        while (cellIterator.hasNext()) {
+            DataTable table = processSingleHorizontal(cellIterator);
             if (table == null) {
                 continue;
             }
             dataTables.add(table);
         }
-        
-        dataSheet.setDataTable(dataTables);
-        return (dataTables.isEmpty())
-                ? null
-                : dataSheet;
+        return dataTables;
     }
-    
-    private DataTable processHorizontalTable(Row currentRow) {
-        LOG.info("Processing row " + currentRow.getRowNum());
+
+    private DataTable processSingleHorizontal(Iterator<Cell> cellIterator) {
         long orderNumber = 0;
-        int rowNum = currentRow.getRowNum();
+        int rowNum = -1;
         int colNum = -1;
         List<DataHeader> dataHeaders = new ArrayList<>();
-        
-        for (Cell currentCell : currentRow) {
+
+        while (cellIterator.hasNext()) {
+            Cell currentCell = cellIterator.next();
+            if (currentCell.getColumnIndex() == 6 && currentCell.getRowIndex() == 8) {
+                int a = 0;
+            }
             DataHeader header = processHeader(currentCell, orderNumber);
             if (header == null) {
-                continue;
+                break;
             }
-            colNum = (colNum < 0) ? currentCell.getColumnIndex(): colNum;
+            rowNum = (rowNum < 0) ? currentCell.getRowIndex() : rowNum;
+            colNum = (colNum < 0) ? currentCell.getColumnIndex() : colNum;
             dataHeaders.add(header);
             orderNumber++;
         }
-        
+
         DataTable table = new DataTable(rowNum, colNum);
         table.setDataHeader(dataHeaders);
         return (colNum < 0 || dataHeaders.isEmpty())
