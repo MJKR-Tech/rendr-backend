@@ -9,4 +9,5 @@ public interface DataTemplateService {
     DataTemplate findById(long id);
     DataTemplate save(DataTemplate dataTemplate);
     void deleteById(long id);
+    void deleteAll();
 }

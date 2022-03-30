@@ -42,4 +42,9 @@ public class DataTemplateServiceImpl implements DataTemplateService {
         LOG.info("Deleting dataTemplate by id " + id);
         dataTemplateRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        dataTemplateRepository.deleteAll();
+    }
 }

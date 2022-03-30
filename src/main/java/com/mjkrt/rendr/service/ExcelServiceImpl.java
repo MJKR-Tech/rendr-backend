@@ -1,5 +1,7 @@
 package com.mjkrt.rendr.service;
 
+import static org.apache.poi.ss.usermodel.CellType.STRING;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -42,8 +43,6 @@ import com.mjkrt.rendr.utils.LogsCenter;
 public class ExcelServiceImpl implements ExcelService {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelServiceImpl.class);
-    
-    private static final String EXCEL_EXT = ".xlsx";
     
     @Autowired
     private DataTemplateService dataTemplateService;
@@ -173,9 +172,12 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private DataHeader processHeader(Cell cell, long headerOrder) {
-        LOG.info("Processing header " + cell.getStringCellValue());
+        LOG.info("Processing header " + cell.toString());
+        if (cell.getCellType() != STRING) {
+            return null;
+        }
         String headerName = cell.getStringCellValue();
-        return (headerName.isBlank() || cell.getCellType() != CellType.STRING)
+        return (headerName.isBlank() || cell.getCellType() != STRING)
             ? null
             : new DataHeader(headerName, headerOrder);
     }
@@ -356,7 +358,7 @@ public class ExcelServiceImpl implements ExcelService {
         }
         return map;
     }
-    
+
     private List<DataTable> getDataTables(long templateId) {
         LOG.info("Obtaining tables from template ID " + templateId);
         
@@ -367,5 +369,10 @@ public class ExcelServiceImpl implements ExcelService {
             dataTables.addAll(ds.getDataTable());
         }
         return dataTables;
+    }
+
+    @Override
+    public void deleteAllTemplates() {
+        dataTemplateService.deleteAll();
     }
 }

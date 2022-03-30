@@ -1,5 +1,7 @@
 package com.mjkrt.rendr.controller;
 
+import static com.mjkrt.rendr.service.ExcelService.EXCEL_EXT;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -11,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
-import com.mjkrt.rendr.repository.DataTemplateRepository;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,6 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
-
-    @Autowired
-    private DataTemplateRepository dataTemplateRepository;
     
     @GetMapping("/hello")
     public String greet() {
@@ -76,12 +74,6 @@ public class ExcelController {
         LOG.info("DELETE /deleteTemplate called");
         
         return excelService.deleteTemplate(templateId);
-    }
-
-    @DeleteMapping("/deleteAllTemplates")
-    public boolean deleteTemplate() {
-        dataTemplateRepository.deleteAll();;
-        return true;
     }
 
     @GetMapping("/downloadSampleTemplate")
@@ -117,12 +109,23 @@ public class ExcelController {
             ByteArrayInputStream stream,
             String fileName) throws IOException {
 
-        LOG.info("Copying input stream to " + fileName + ".xlsx");
-
+        String formattedFileName = fileName.replaceAll("\\s+", "-"); // replace whitespaces
+        if (formattedFileName.contains(".")) {
+            formattedFileName = formattedFileName.substring(0, formattedFileName.lastIndexOf('.')); // remove ext
+        }
+        LOG.info("Copying input stream to " + fileName + EXCEL_EXT);
+        
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=" + formattedFileName + EXCEL_EXT);
         IOUtils.copy(stream, response.getOutputStream());
-        LOG.info("Excel '" + fileName + ".xlsx" + "' generated");
+        LOG.info("Excel '" + formattedFileName + ".xlsx" + "' generated");
+    }
+
+    // todo delete after testing fully
+    @DeleteMapping("/deleteAllTemplates")
+    public boolean deleteTemplate() {
+        excelService.deleteAllTemplates();
+        return true;
     }
 
     // todo remove after integrating services

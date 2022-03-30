@@ -13,6 +13,8 @@ import org.apache.commons.math3.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExcelService {
+    String EXCEL_EXT = ".xlsx"; // interface fields are set as public static final
+    
     List<DataTemplate> getTemplates();
 
     boolean uploadTemplateFromFile(MultipartFile file);
@@ -33,4 +35,6 @@ public interface ExcelService {
         long templateId,
         List<ColumnHeader> headers,
         List<JsonNode> rows);
+    
+    void deleteAllTemplates();
 }
