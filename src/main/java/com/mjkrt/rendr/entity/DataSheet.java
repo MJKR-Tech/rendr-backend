@@ -33,6 +33,21 @@ public class DataSheet {
     
     private String sheetName;
 
+    private long sheetOrder;
+
+    public long getSheetOrder() {
+        return sheetOrder;
+    }
+
+    public void setSheetOrder(long sheetOrder) {
+        this.sheetOrder = sheetOrder;
+    }
+
+    public DataSheet(String sheetName, long sheetOrder) {
+        this.sheetName = sheetName;
+        this.sheetOrder = sheetOrder;
+    }
+
     public DataSheet() {
     }
 
@@ -84,6 +99,7 @@ public class DataSheet {
         }
         DataSheet dataSheet = (DataSheet) o;
         return sheetId == dataSheet.sheetId
+                && sheetOrder == dataSheet.sheetOrder
                 && Objects.equals(dataTable, dataSheet.dataTable)
                 && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId())
                 && Objects.equals(sheetName, dataSheet.sheetName);
@@ -91,7 +107,7 @@ public class DataSheet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName);
+        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName, sheetOrder);
     }
 
     @Override
@@ -101,6 +117,7 @@ public class DataSheet {
                 ", dataTable=" + dataTable +
                 ", dataTemplate=" + ((dataTemplate == null) ? "" : dataTemplate.getTemplateId()) +
                 ", sheetName='" + sheetName + '\'' +
+                ", sheetOrder=" + sheetOrder +
                 '}';
     }
 }
