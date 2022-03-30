@@ -368,40 +368,83 @@ public class ExcelServiceImpl implements ExcelService {
                 long startCol = dt.getColNum();
 
                 Pair<List<ColumnHeader>, Map<String, List<String>>> mapThingData = dataMap.get(tableId);
+                List<ColumnHeader> columnHeaders = mapThingData.getKey();
+                DataDirection direction = columnHeaders.get(0).getDirection();
                 Map<String, List<String>> mapThingValues = mapThingData.getValue();
                 
+                if (direction == HORIZONTAL) {
+                    for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
+                        startRow += 1;
+                        writeHorizontalTable(startRow, startCol, entry, sheet);
 
-                for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
-                    int col = (int) startCol;
-                    startRow += 1;
-                    Row row = sheet.getRow((int) startRow);
-                    Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-
-                    if (NumberUtils.isParsable(entry.getKey())) {
-                        cell.setCellValue(Integer.parseInt(entry.getKey()));
-                    } else {
-                        cell.setCellValue(entry.getKey());
                     }
-
-                    List<String> dataValues = entry.getValue();
-
-                    for (String dataValue : dataValues) {
-                        cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                        if (NumberUtils.isParsable(dataValue)) {
-                            if (NumberUtils.isDigits(dataValue)) {
-                                cell.setCellValue(Integer.parseInt(dataValue));
-                            } else {
-                                cell.setCellValue(Double.parseDouble(dataValue));
-                            }
-                        } else {
-                            cell.setCellValue(dataValue);
-                        }
+                } else if (direction == VERTICAL){
+                    for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
+                        startCol += 1;
+                        writeVerticalTable(startRow, startCol, entry, sheet);
                     }
                 }
 
             }
         }
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+    }
+
+    private void writeVerticalTable(long startRowNum, long colNum, Map.Entry<String, List<String>> entry, Sheet sheet) {
+        Row startingRow = sheet.getRow((int) startRowNum);
+        startRowNum += 1;
+        Cell cell = startingRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+        if (NumberUtils.isParsable(entry.getKey())) {
+            cell.setCellValue(Integer.parseInt(entry.getKey()));
+        } else {
+            cell.setCellValue(entry.getKey());
+        }
+
+        List<String> dataValues = entry.getValue();
+
+        for (String dataValue : dataValues) {
+            Row nextRow = sheet.getRow((int) startRowNum);
+
+            cell = nextRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            if (NumberUtils.isParsable(dataValue)) {
+                if (NumberUtils.isDigits(dataValue)) {
+                    cell.setCellValue(Integer.parseInt(dataValue));
+                } else {
+                    cell.setCellValue(Double.parseDouble(dataValue));
+                }
+            } else {
+                cell.setCellValue(dataValue);
+            }
+            startRowNum += 1;
+        }
+    }
+
+    private void writeHorizontalTable(long startRow, long startCol, Map.Entry<String, List<String>> entry, Sheet sheet) {
+        int col = (int) startCol;
+        Row row = sheet.getRow((int) startRow);
+        Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+        if (NumberUtils.isParsable(entry.getKey())) {
+            cell.setCellValue(Integer.parseInt(entry.getKey()));
+        } else {
+            cell.setCellValue(entry.getKey());
+        }
+
+        List<String> dataValues = entry.getValue();
+
+        for (String dataValue : dataValues) {
+            cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            if (NumberUtils.isParsable(dataValue)) {
+                if (NumberUtils.isDigits(dataValue)) {
+                    cell.setCellValue(Integer.parseInt(dataValue));
+                } else {
+                    cell.setCellValue(Double.parseDouble(dataValue));
+                }
+            } else {
+                cell.setCellValue(dataValue);
+            }
+        }
     }
 
     private ByteArrayInputStream writeToStream(Workbook workbook) {
@@ -439,8 +482,9 @@ public class ExcelServiceImpl implements ExcelService {
 
             int count = 0;
             for (DataHeader dataHeader : dataHeaders) {
+                direction = dataHeader.getDirection();
                 for (ColumnHeader ch : headers) {
-                    direction = ch.getDirection();
+
                     if (ch.getName().equals(dataHeader.getHeaderName())) {
                         if (boo) {
                             for (ColumnHeader columnHeader : columnHeaders) {
@@ -448,6 +492,7 @@ public class ExcelServiceImpl implements ExcelService {
                             }
                             boo = false;
                         }
+                        ch.setDirection(direction);
                         columnHeaders.add(ch);
                     }
                 }
