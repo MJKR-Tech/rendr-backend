@@ -1,5 +1,6 @@
 package com.mjkrt.rendr.service;
 
+import static com.mjkrt.rendr.entity.DataDirection.HORIZONTAL;
 import static com.mjkrt.rendr.entity.DataDirection.VERTICAL;
 import static org.apache.poi.ss.usermodel.CellType.STRING;
 
@@ -196,7 +197,17 @@ public class ExcelServiceImpl implements ExcelService {
             }
         }
         if (newTables.get(0).getDataHeader().get(0).getDirection() == VERTICAL) {
+            for (DataTable dt : newTables) {
+                for (DataHeader dh : dt.getDataHeader()) {
+                    dh.setDirection(VERTICAL);
+                }
+            }
             return newTables;
+        }
+        for (DataTable dt : tables) {
+            for (DataHeader dh : dt.getDataHeader()) {
+                dh.setDirection(HORIZONTAL);
+            }
         }
         return tables;
     }
@@ -423,14 +434,25 @@ public class ExcelServiceImpl implements ExcelService {
             long tableId = dataTable.getTableId();
             List<DataHeader> dataHeaders = dataTable.getDataHeader();
             List<ColumnHeader> columnHeaders = new ArrayList<>();
+            DataDirection direction = HORIZONTAL;
+            boolean boo = true;
+
             int count = 0;
             for (DataHeader dataHeader : dataHeaders) {
                 for (ColumnHeader ch : headers) {
+                    direction = ch.getDirection();
                     if (ch.getName().equals(dataHeader.getHeaderName())) {
+                        if (boo) {
+                            for (ColumnHeader columnHeader : columnHeaders) {
+                                columnHeader.setDirection(direction);
+                            }
+                            boo = false;
+                        }
                         columnHeaders.add(ch);
                     }
                 }
                 count++;
+
                 if (columnHeaders.size() != count) {
                     ColumnHeader newCh = new ColumnHeader(dataHeader.getHeaderName());
                     columnHeaders.add(newCh);

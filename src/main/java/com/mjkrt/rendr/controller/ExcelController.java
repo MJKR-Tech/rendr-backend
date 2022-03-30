@@ -137,8 +137,8 @@ public class ExcelController {
 
         return excelService.generateJsonMapping(
                 1L,
-                jsonService.getHeaders(json),
-                jsonService.getRows(json));
+                jsonService.getHeaders(json.get("jsonObjects")),
+                jsonService.getRows(json.get("jsonObjects")));
 
     }
 }

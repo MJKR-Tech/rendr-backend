@@ -3,6 +3,7 @@ package com.mjkrt.rendr.entity.helper;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mjkrt.rendr.entity.DataDirection;
 
 public class ColumnHeader implements Comparable<ColumnHeader> {
 
@@ -18,6 +19,8 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     Types type;
     
     String field;
+
+    DataDirection direction = DataDirection.HORIZONTAL;
     
     @JsonProperty(value="isSelected")
     boolean isSelected;
@@ -27,6 +30,14 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     
     public ColumnHeader(String headerName) {
         this.name = headerName;
+    }
+
+    public DataDirection getDirection() {
+        return direction;
+    }
+
+    public void setDirection(DataDirection direction) {
+        this.direction = direction;
     }
 
     public boolean isSelected() {
