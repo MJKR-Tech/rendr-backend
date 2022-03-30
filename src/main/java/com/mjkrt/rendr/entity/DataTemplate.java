@@ -74,8 +74,12 @@ public class DataTemplate {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataTemplate dataTemplate = (DataTemplate) o;
         return templateId == dataTemplate.templateId
                 && Objects.equals(dataSheet, dataTemplate.dataSheet) 

@@ -91,15 +91,23 @@ public class DataSheet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataSheet dataSheet = (DataSheet) o;
-        return sheetId == dataSheet.sheetId && sheetOrder == dataSheet.sheetOrder && Objects.equals(dataTable, dataSheet.dataTable) && Objects.equals(dataTemplate, dataSheet.dataTemplate) && Objects.equals(sheetName, dataSheet.sheetName);
+        return sheetId == dataSheet.sheetId
+                && sheetOrder == dataSheet.sheetOrder
+                && Objects.equals(dataTable, dataSheet.dataTable)
+                && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId())
+                && Objects.equals(sheetName, dataSheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, dataTemplate, sheetName, sheetOrder);
+        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName, sheetOrder);
     }
 
     @Override
@@ -107,7 +115,7 @@ public class DataSheet {
         return "DataSheet{" +
                 "sheetId=" + sheetId +
                 ", dataTable=" + dataTable +
-                ", dataTemplate=" + dataTemplate +
+                ", dataTemplate=" + ((dataTemplate == null) ? "" : dataTemplate.getTemplateId()) +
                 ", sheetName='" + sheetName + '\'' +
                 ", sheetOrder=" + sheetOrder +
                 '}';

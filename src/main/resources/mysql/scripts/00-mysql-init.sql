@@ -40,6 +40,7 @@ CREATE TABLE data_header (
     table_id BIGINT NOT NULL,
     header_name VARCHAR(255) NOT NULL,
     header_order INT NOT NULL DEFAULT 0,
+    direction ENUM('HORIZONTAL', 'VERTICAL') NOT NULL,
     PRIMARY KEY (header_id),
     FOREIGN KEY (table_id)
         REFERENCES data_table(table_id)
