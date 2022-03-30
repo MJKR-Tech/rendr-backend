@@ -33,6 +33,21 @@ public class DataSheet {
     
     private String sheetName;
 
+    private long sheetOrder;
+
+    public long getSheetOrder() {
+        return sheetOrder;
+    }
+
+    public void setSheetOrder(long sheetOrder) {
+        this.sheetOrder = sheetOrder;
+    }
+
+    public DataSheet(String sheetName, long sheetOrder) {
+        this.sheetName = sheetName;
+        this.sheetOrder = sheetOrder;
+    }
+
     public DataSheet() {
     }
 
@@ -76,22 +91,15 @@ public class DataSheet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         DataSheet dataSheet = (DataSheet) o;
-        return sheetId == dataSheet.sheetId
-                && Objects.equals(dataTable, dataSheet.dataTable)
-                && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId())
-                && Objects.equals(sheetName, dataSheet.sheetName);
+        return sheetId == dataSheet.sheetId && sheetOrder == dataSheet.sheetOrder && Objects.equals(dataTable, dataSheet.dataTable) && Objects.equals(dataTemplate, dataSheet.dataTemplate) && Objects.equals(sheetName, dataSheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName);
+        return Objects.hash(sheetId, dataTable, dataTemplate, sheetName, sheetOrder);
     }
 
     @Override
@@ -99,8 +107,9 @@ public class DataSheet {
         return "DataSheet{" +
                 "sheetId=" + sheetId +
                 ", dataTable=" + dataTable +
-                ", dataTemplate=" + dataTemplate.getTemplateId() +
+                ", dataTemplate=" + dataTemplate +
                 ", sheetName='" + sheetName + '\'' +
+                ", sheetOrder=" + sheetOrder +
                 '}';
     }
 }
