@@ -30,6 +30,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -292,8 +293,10 @@ public class ExcelServiceImpl implements ExcelService {
                         }
                     }
                 }
+
             }
         }
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
     }
 
     private ByteArrayInputStream writeToStream(Workbook workbook) {
