@@ -1,18 +1,14 @@
 package com.mjkrt.rendr.service;
 
+import static com.mjkrt.rendr.entity.DataDirection.VERTICAL;
 import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.crypto.Data;
 
@@ -154,14 +150,14 @@ public class ExcelServiceImpl implements ExcelService {
     private List<DataTable> mergeTables(List<DataTable> tables) {
         List<DataTable> newTables = new ArrayList<>();
         tables.sort(Comparator.comparing(DataTable::getColNum).thenComparing(DataTable::getRowNum));
-        
+
         Iterator<DataTable> dataTableIterator = tables.iterator();
         while (dataTableIterator.hasNext()) {
             DataTable table = dataTableIterator.next();
             long col = table.getColNum();
             long row = table.getRowNum();
             List<DataTable> groupedTables = new ArrayList<>();
-            
+
             while (table.getColNum() == col) {
                 if (table.getRowNum() == row) {
                     groupedTables.add(table);
@@ -176,21 +172,30 @@ public class ExcelServiceImpl implements ExcelService {
             }
 
             DataTable newTable = groupedTables.get(0);
+            newTables.add(newTable);
+            if (groupedTables.size() == 1) {
+                continue;
+            }
+            if (newTable.getDataHeader().size() == 1) {
+                newTable.getDataHeader().get(0).setDirection(VERTICAL);
+            }
             int ordering = 1;
             for (int i = 1; i < groupedTables.size(); i++) {
                 DataTable toMergeTable = groupedTables.get(i);
                 assert toMergeTable.getDataHeader().size() == 1;
-                
+
                 DataHeader header = toMergeTable.getDataHeader().get(0);
                 header.setDataTable(newTable);
-                header.setDirection(DataDirection.VERTICAL);
+                header.setDirection(VERTICAL);
                 header.setHeaderOrder(ordering);
                 newTable.addDataHeader(header);
                 ordering++;
             }
-            newTables.add(newTable);
         }
-        return newTables;
+        if (newTables.get(0).getDataHeader().get(0).getDirection() == VERTICAL) {
+            return newTables;
+        }
+        return tables;
     }
     
     private List<DataTable> processHorizontalTables(Row currentRow) {
@@ -199,26 +204,45 @@ public class ExcelServiceImpl implements ExcelService {
         List<DataTable> dataTables = new ArrayList<>();
         Iterator<Cell> cellIterator = currentRow.iterator();
         while (cellIterator.hasNext()) {
-            DataTable table = processSingleHorizontal(cellIterator);
-            if (table == null) {
+            List<DataTable> tables = new ArrayList<>();
+            processSingleHorizontal(cellIterator, tables, null);
+            tables = tables.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            if (tables.isEmpty()) {
                 continue;
             }
-            dataTables.add(table);
+            dataTables.addAll(tables);
         }
         return dataTables;
     }
 
-    private DataTable processSingleHorizontal(Iterator<Cell> cellIterator) {
+    private void processSingleHorizontal(Iterator<Cell> cellIterator, List<DataTable> tables, Cell originalCurrentCell) {
         long orderNumber = 0;
         int rowNum = -1;
         int colNum = -1;
+        int previousCol = -1;
         List<DataHeader> dataHeaders = new ArrayList<>();
+
+        if (originalCurrentCell != null) {
+            DataHeader header = processHeader(originalCurrentCell, orderNumber);
+            if (header == null) {
+
+            } else {
+                rowNum = (rowNum < 0) ? originalCurrentCell.getRowIndex() : rowNum;
+                colNum = (colNum < 0) ? originalCurrentCell.getColumnIndex() : colNum;
+                dataHeaders.add(header);
+                orderNumber++;
+            }
+        }
 
         while (cellIterator.hasNext()) {
             Cell currentCell = cellIterator.next();
-            if (currentCell.getColumnIndex() == 6 && currentCell.getRowIndex() == 8) {
-                int a = 0;
+            int currentCol = currentCell.getColumnIndex();
+
+            if (previousCol != -1 && previousCol + 1 != currentCol) {
+                processSingleHorizontal(cellIterator, tables, currentCell);
+                break;
             }
+
             DataHeader header = processHeader(currentCell, orderNumber);
             if (header == null) {
                 break;
@@ -226,14 +250,15 @@ public class ExcelServiceImpl implements ExcelService {
             rowNum = (rowNum < 0) ? currentCell.getRowIndex() : rowNum;
             colNum = (colNum < 0) ? currentCell.getColumnIndex() : colNum;
             dataHeaders.add(header);
+            previousCol = currentCol;
             orderNumber++;
         }
 
         DataTable table = new DataTable(rowNum, colNum);
         table.setDataHeader(dataHeaders);
-        return (colNum < 0 || dataHeaders.isEmpty())
+        tables.add((colNum < 0 || dataHeaders.isEmpty())
                 ? null
-                : table;
+                : table);
     }
     
     private DataHeader processHeader(Cell cell, long headerOrder) {
