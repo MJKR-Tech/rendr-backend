@@ -12,7 +12,11 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
         @JsonProperty("decimal") DECIMAL,
         @JsonProperty("date") DATE,
         @JsonProperty("double") DOUBLE
+        //todo mockheader
     }
+
+    //todo create static type for dummy
+    //todo justin columnheader type for whether mock
 
     String name;
     
