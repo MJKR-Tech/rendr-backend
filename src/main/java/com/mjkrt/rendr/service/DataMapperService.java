@@ -13,5 +13,4 @@ public interface DataMapperService {
             long templateId,
             List<ColumnHeader> headers,
             List<JsonNode> rows);
-    
 }
