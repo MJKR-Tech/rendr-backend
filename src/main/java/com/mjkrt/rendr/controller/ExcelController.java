@@ -28,11 +28,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.service.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000") // todo remove after system test passes
 @RequestMapping("/api/v1")
 @RestController
 public class ExcelController {
@@ -47,13 +48,6 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
-    
-    @GetMapping("/hello")
-    public String greet() {
-        LOG.info("GET /hello called");
-        
-        return "Hello World!";
-    }
 
     @GetMapping("/getTemplates")
     public List<DataTemplate> getTemplates() {
@@ -71,7 +65,7 @@ public class ExcelController {
 
     @DeleteMapping("/deleteTemplate/{id}")
     public boolean deleteTemplate(@PathVariable("id") long templateId) {
-        LOG.info("DELETE /deleteTemplate called");
+        LOG.info("DELETE /deleteTemplate/" + templateId + " called");
         
         return excelService.deleteTemplate(templateId);
     }
@@ -123,10 +117,15 @@ public class ExcelController {
 
     // todo delete after testing fully
     @DeleteMapping("/deleteAllTemplates")
-    public boolean deleteTemplate() {
+    public boolean deleteAllTemplates() {
+        LOG.info("DELETE /deleteAllTemplates called");
         excelService.deleteAllTemplates();
         return true;
     }
+
+    // todo remove after unit testing
+    @Autowired
+    private DataMapperService dataMapperService;
 
     // todo remove after integrating services
     @PostMapping("/testUploadMapping")
@@ -135,7 +134,7 @@ public class ExcelController {
 
         LOG.info("POST /generateJsonMapping called");
 
-        return excelService.generateJsonMapping(
+        return dataMapperService.generateJsonMapping(
                 1L,
                 jsonService.getHeaders(json.get("jsonObjects")),
                 jsonService.getRows(json.get("jsonObjects")));
