@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Service
@@ -58,5 +59,12 @@ public class JsonServiceImpl implements JsonService {
         
         LOG.info(rows.size() + " rows obtained");
         return rows;
-    }    
+    }
+
+    @Override
+    public List<TableHolder> getTableHoldersFromRows(List<JsonNode> jsonNode) {
+        List<TableHolder> tableHolders = new ArrayList<>();
+        // todo
+        return tableHolders;
+    }
 }

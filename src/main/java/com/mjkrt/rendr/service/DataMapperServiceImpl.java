@@ -4,7 +4,9 @@ import static com.mjkrt.rendr.entity.DataDirection.HORIZONTAL;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ import com.mjkrt.rendr.entity.DataHeader;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Service
@@ -28,6 +31,12 @@ public class DataMapperServiceImpl implements DataMapperService {
 
     @Autowired
     private DataTemplateService dataTemplateService;
+    
+    @Autowired
+    private TableHolderService tableHolderService;
+
+    @Autowired
+    private JsonService jsonService;
     
     // Long = table ID
     // Pair<all the column headers with left most as pivot
@@ -135,5 +144,54 @@ public class DataMapperServiceImpl implements DataMapperService {
             dataTables.addAll(ds.getDataTable());
         }
         return dataTables;
+    }
+    
+    @Override
+    public Map<Long, TableHolder> generateTableToTableHolderMap(long templateId, List<JsonNode> rows) {
+        List<TableHolder> tableHolders = jsonService.getTableHoldersFromRows(rows);
+        List<TableHolder> compactTables = compactTableHolders(tableHolders);
+        List<DataTable> dataTables = getDataTables(templateId);
+        return mapDataTablesToTableHolders(dataTables, compactTables);
+    }
+    
+    private List<TableHolder> compactTableHolders(List<TableHolder> tableHolders) {
+        if (tableHolders.size() <= 1) {
+            return tableHolders;
+        }
+        Deque<TableHolder> deque = new LinkedList<>(tableHolders);
+        boolean hasChanges = true;
+        while (hasChanges) {
+            hasChanges = popTopAndCompactDeque(deque);
+        }
+        return new ArrayList<>(deque);
+    }
+    
+    private boolean popTopAndCompactDeque(Deque<TableHolder> deque) {
+        boolean hasChanges = false;
+        TableHolder intermediateTable = deque.pop(); // pop from top
+        for (int i = 0; i < deque.size(); i++) {
+            TableHolder nextTable = deque.pop(); // pop from top
+            if (tableHolderService.checkIfCanNaturalJoin(intermediateTable, nextTable)) {
+                hasChanges = true;
+                intermediateTable = tableHolderService.naturalJoin(intermediateTable, nextTable);
+                continue;
+            }
+            deque.add(nextTable); // add to bottom
+        }
+        deque.add(intermediateTable);
+        return hasChanges;
+    }
+    
+    private Map<Long, TableHolder> mapDataTablesToTableHolders(List<DataTable> dataTables,
+            List<TableHolder> tableHolders) {
+
+        Map<Long, TableHolder> tableIdToTableHolderMap = new HashMap<>();
+        for (DataTable dataTable: dataTables) {
+            // find table from compact tables to map
+            // generate headers required in subset
+            // generate subset
+            // insert <table_id, subset> into map
+        }
+        return tableIdToTableHolderMap;
     }
 }
