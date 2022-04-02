@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.service.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
@@ -44,7 +45,11 @@ public class ExcelController {
     
     @Autowired
     private ExcelService excelService;
-    
+
+    // todo remove after unit testing
+    @Autowired
+    private DataMapperService dataMapperService;
+
     @Autowired
     private JsonService jsonService;
     
@@ -135,7 +140,7 @@ public class ExcelController {
 
         LOG.info("POST /generateJsonMapping called");
 
-        return excelService.generateJsonMapping(
+        return dataMapperService.generateJsonMapping(
                 1L,
                 jsonService.getHeaders(json.get("jsonObjects")),
                 jsonService.getRows(json.get("jsonObjects")));

@@ -7,9 +7,7 @@ import com.mjkrt.rendr.entity.DataTemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.math3.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExcelService {
@@ -30,11 +28,6 @@ public interface ExcelService {
     ByteArrayInputStream generateExcel(long templateId,
         List<ColumnHeader> headers,
         List<JsonNode> rows) throws IOException;
-
-    Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-        long templateId,
-        List<ColumnHeader> headers,
-        List<JsonNode> rows);
     
     void deleteAllTemplates();
 }
