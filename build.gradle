@@ -2,7 +2,6 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-//	id "com.github.node-gradle.node" version "3.1.1"
 }
 
 group = 'com.mjkrt'
@@ -13,65 +12,6 @@ repositories {
 	mavenCentral()
 }
 
-//node {
-//	// Version of node to use.
-//	version = '10.16.2'
-//
-//	// Base URL for fetching node distributions (change if you have a mirror).
-////    distBaseUrl = 'https://nodejs.org/dist'
-//
-//	// If true, it will download node using above parameters.
-//	// If false, it will try to use globally installed node.
-//	download = true
-//
-//	// Set the work directory for unpacking node
-//	workDir = file("${project.projectDir}/src/main/rendr-frontend/nodejs")
-//
-//	// Set the work directory for NPM
-//	npmWorkDir = file("${project.projectDir}/src/main/rendr-frontend/npm")
-//
-//	// Set the work directory where node_modules should be located
-//	nodeModulesDir = file("${project.projectDir}/src/main/rendr-frontend")
-//}
-//
-//task npmInstallDependencies(type: NpmTask) {
-//	dependsOn 'npmSetup'
-//	execOverrides {
-//		it.ignoreExitValue = true
-//		it.workingDir = 'src/main/rendr-frontend'
-//	}
-//	args = ['install']
-//}
-//
-//task npmBuild(type: NpmTask) {
-//	dependsOn 'npmInstallDependencies'
-//	execOverrides {
-////        it.ignoreExitValue = true
-//		it.workingDir = 'src/main/rendr-frontend'
-//	}
-//	args = ['run', 'build']
-//}
-//
-//task copyFrontendToBuild(type: Copy) {
-//	dependsOn 'npmBuild'
-//	from "$projectDir/src/main/rendr-frontend/build/"
-////    include "*"
-//	into "$buildDir/resources/main/static"
-//}
-//
-//task npmShowVersion(type: NpmTask) {
-//	execOverrides {
-//		it.ignoreExitValue = true
-//		it.workingDir = 'src/main/rendr-frontend'
-//	}
-//	args = ['--version']
-//}
-//
-//
-//processResources{
-//	dependsOn 'copyFrontendToBuild'
-//}
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.4'
 	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.4'
@@ -81,8 +21,20 @@ dependencies {
 	runtimeOnly 'com.h2database:h2:2.1.210'
 	runtimeOnly 'mysql:mysql-connector-java:8.0.28'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.4'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+
+	testLogging {
+		events "passed", "skipped", "failed"
+
+		showExceptions true
+		exceptionFormat "full"
+		showCauses true
+		showStackTraces true
+		showStandardStreams = false
+	}
 }

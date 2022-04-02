@@ -28,14 +28,18 @@ public class DataTemplate {
 
     private String templateName;
     
-    private LocalDate dateCreated;
+    private LocalDate dateCreated = LocalDate.now();
 
     public DataTemplate() {
     }
 
     public DataTemplate(String templateName) {
         this.templateName = templateName;
-        this.dateCreated = LocalDate.now();
+    }
+
+    public DataTemplate(long templateId, String templateName) {
+        this.templateId = templateId;
+        this.templateName = templateName;
     }
 
     public List<DataSheet> getDataSheet() {

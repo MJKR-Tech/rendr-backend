@@ -44,6 +44,13 @@ public class DataHeader {
         this.headerOrder = headerOrder;
     }
 
+    public DataHeader(long headerId, DataDirection direction, String headerName, long headerOrder) {
+        this.headerId = headerId;
+        this.direction = direction;
+        this.headerName = headerName;
+        this.headerOrder = headerOrder;
+    }
+
     public DataTable getDataTable() {
         return dataTable;
     }

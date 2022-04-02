@@ -48,6 +48,12 @@ public class DataTable {
         this.colNum = colNum;
     }
 
+    public DataTable(long tableId, long rowNum, long colNum) {
+        this.tableId = tableId;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+    }
+
     public void setDataHeader(List<DataHeader> dataHeader) {
         this.dataHeader.clear();
         this.dataHeader.addAll(dataHeader);
@@ -59,6 +65,7 @@ public class DataTable {
             return;   
         }
         this.dataHeader.add(dataHeader);
+        dataHeader.setDataTable(this);
     }
 
     public DataSheet getDataSheet() {

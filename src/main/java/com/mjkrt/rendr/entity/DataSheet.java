@@ -35,12 +35,11 @@ public class DataSheet {
 
     private long sheetOrder;
 
-    public long getSheetOrder() {
-        return sheetOrder;
+    public DataSheet() {
     }
 
-    public void setSheetOrder(long sheetOrder) {
-        this.sheetOrder = sheetOrder;
+    public DataSheet(String sheetName) {
+        this.sheetName = sheetName;
     }
 
     public DataSheet(String sheetName, long sheetOrder) {
@@ -48,11 +47,18 @@ public class DataSheet {
         this.sheetOrder = sheetOrder;
     }
 
-    public DataSheet() {
+    public DataSheet(long sheetId, String sheetName, long sheetOrder) {
+        this.sheetId = sheetId;
+        this.sheetName = sheetName;
+        this.sheetOrder = sheetOrder;
     }
 
-    public DataSheet(String sheetName) {
-        this.sheetName = sheetName;
+    public long getSheetOrder() {
+        return sheetOrder;
+    }
+
+    public void setSheetOrder(long sheetOrder) {
+        this.sheetOrder = sheetOrder;
     }
 
     public List<DataTable> getDataTable() {
