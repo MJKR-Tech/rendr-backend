@@ -17,7 +17,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -31,8 +32,11 @@ import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.JsonService;
 import com.mjkrt.rendr.tools.MockDataTemplate;
 
-@WebMvcTest(ExcelControllerTest.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class ExcelControllerTest {
+    
+    private static final String PREFIX = "/api/v1";
     
     @Autowired
     MockMvc mockMvc;
@@ -74,7 +78,7 @@ public class ExcelControllerTest {
                 .thenReturn(records);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/getTemplates")
+                        .get(PREFIX + "/getTemplates")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
@@ -89,7 +93,7 @@ public class ExcelControllerTest {
                 .thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .multipart("/uploadTemplate")
+                        .multipart(PREFIX + "/uploadTemplate")
                         .file(file))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
@@ -104,25 +108,10 @@ public class ExcelControllerTest {
                 .thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .multipart("/uploadTemplate")
+                        .multipart(PREFIX + "/uploadTemplate")
                         .file(file))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
-    }
-
-    // test POST internal server error response
-    @Test
-    public void uploadTemplate_indicatesError() throws Exception {
-        MockMultipartFile file = generateMockExcel();
-
-        Mockito.doThrow(new RuntimeException())
-                .when(excelService)
-                .uploadTemplateFromFile(file);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .multipart("/uploadTemplate")
-                        .file(file))
-                .andExpect(status().isInternalServerError());
     }
 
     // test excel download response
@@ -134,7 +123,7 @@ public class ExcelControllerTest {
                 .thenReturn(resourceByteArray);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/downloadSampleTemplate"))
+                        .get(PREFIX + "/downloadSampleTemplate"))
                 .andExpect(status().isOk())
                 .andExpect(content().bytes(loadMockSampleExcel()));
     }

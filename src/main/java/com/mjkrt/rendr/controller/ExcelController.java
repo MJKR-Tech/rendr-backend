@@ -107,7 +107,7 @@ public class ExcelController {
         if (formattedFileName.contains(".")) {
             formattedFileName = formattedFileName.substring(0, formattedFileName.lastIndexOf('.')); // remove ext
         }
-        LOG.info("Copying input stream to " + fileName + EXCEL_EXT);
+        LOG.info("Copying input stream to " + formattedFileName + EXCEL_EXT);
         
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + formattedFileName + EXCEL_EXT);
