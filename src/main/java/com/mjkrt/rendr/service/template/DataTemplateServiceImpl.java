@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.template;
 
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.repository.DataTemplateRepository;

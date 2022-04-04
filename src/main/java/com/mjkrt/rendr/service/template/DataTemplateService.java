@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.template;
 
 import java.util.List;
 

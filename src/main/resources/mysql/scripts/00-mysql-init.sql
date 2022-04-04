@@ -1,5 +1,5 @@
 -- init table
-DROP TABLE IF EXISTS data_header, data_table, data_sheet, data_template;
+DROP TABLE IF EXISTS data_cell, data_container, data_table, data_sheet, data_template CASCADE;
 
 CREATE TABLE data_template (
     template_id BIGINT AUTO_INCREMENT,
@@ -25,8 +25,6 @@ ALTER TABLE data_sheet AUTO_INCREMENT = 1;
 CREATE TABLE data_table (
     table_id BIGINT AUTO_INCREMENT,
     sheet_id BIGINT NOT NULL,
-    row_num INT NOT NULL DEFAULT 0,
-    col_num INT NOT NULL DEFAULT 0,
     PRIMARY KEY (table_id),
     FOREIGN KEY (sheet_id)
         REFERENCES data_sheet(sheet_id)
@@ -35,16 +33,31 @@ CREATE TABLE data_table (
 );
 ALTER TABLE data_table AUTO_INCREMENT = 1;
 
-CREATE TABLE data_header (
-    header_id BIGINT AUTO_INCREMENT,
+CREATE TABLE data_container (
+    container_id BIGINT AUTO_INCREMENT,
     table_id BIGINT NOT NULL,
-    header_name VARCHAR(255) NOT NULL,
-    header_order INT NOT NULL DEFAULT 0,
+    row_num INT NOT NULL DEFAULT 0,
+    col_num INT NOT NULL DEFAULT 0,
     direction ENUM('HORIZONTAL', 'VERTICAL') NOT NULL,
-    PRIMARY KEY (header_id),
+    alias VARCHAR(255) NOT NULL,
+    PRIMARY KEY (container_id),
     FOREIGN KEY (table_id)
         REFERENCES data_table(table_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
-ALTER TABLE data_header AUTO_INCREMENT = 1;
+ALTER TABLE data_container AUTO_INCREMENT = 1;
+
+CREATE TABLE data_cell (
+    cell_id BIGINT AUTO_INCREMENT,
+    sheet_id BIGINT NOT NULL,
+    field VARCHAR(255) NOT NULL,
+    row_num INT NOT NULL DEFAULT 0,
+    col_num INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (cell_id),
+    FOREIGN KEY (sheet_id)
+        REFERENCES data_sheet(sheet_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+ALTER TABLE data_cell AUTO_INCREMENT = 1;

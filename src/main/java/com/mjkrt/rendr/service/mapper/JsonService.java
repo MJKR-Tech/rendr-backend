@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.mapper;
 
 import java.io.IOException;
 import java.util.List;

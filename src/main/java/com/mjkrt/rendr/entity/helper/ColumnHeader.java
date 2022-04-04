@@ -3,7 +3,6 @@ package com.mjkrt.rendr.entity.helper;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mjkrt.rendr.entity.DataDirection;
 
 public class ColumnHeader implements Comparable<ColumnHeader> {
 

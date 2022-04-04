@@ -1,11 +1,14 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.file;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -41,7 +44,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void save(MultipartFile file, String fileName) {
-        LOG.info("Saving file '" + uploadPath + '\'' + fileName);
+        LOG.info("Saving file " + uploadPath + '/' + fileName);
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
@@ -78,9 +81,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void delete(String filename) {
-        LOG.info("Deleting file '" + uploadPath + '\'' + filename);
+        LOG.info("Deleting file " + uploadPath + '/' + filename);
         Path file = Paths.get(uploadPath).resolve(filename);
-
         try {
             Resource resource = new UrlResource(file.toUri());
             if (!resource.exists()) {
@@ -89,6 +91,19 @@ public class FileServiceImpl implements FileService {
             FileSystemUtils.deleteRecursively(file.toFile());
         } catch (MalformedURLException e) {
             LOG.warning(e.getLocalizedMessage());
+        }
+    }
+    
+    @Override
+    public List<String> listAll() {
+        try {
+            return Files.list(Paths.get(uploadPath))
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+        } catch (IOException io) {
+            LOG.warning(io.getLocalizedMessage());
+            return new ArrayList<>();
         }
     }
 }

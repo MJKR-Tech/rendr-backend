@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.mapper;
 
 import java.util.ArrayList;
 import java.util.HashSet;

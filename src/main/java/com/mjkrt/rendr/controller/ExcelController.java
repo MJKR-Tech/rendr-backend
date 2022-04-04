@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mjkrt.rendr.service.DataMapperService;
+import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
-import com.mjkrt.rendr.service.JsonService;
+import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @CrossOrigin(origins = "http://localhost:3000") // todo remove after system test passes

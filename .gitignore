@@ -37,6 +37,6 @@ out/
 .vscode/
 
 ### Excel uploads ###
-src/main/resources/sample/excel/~$*.xlsx
+/sample/excel/~$*.xlsx
 uploads/~$*.xlsx
 uploads/*.xlsx

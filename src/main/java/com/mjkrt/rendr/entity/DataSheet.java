@@ -24,11 +24,14 @@ public class DataSheet {
     private long sheetId;
 
     @OneToMany(mappedBy = "dataSheet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<DataTable> dataTable = new ArrayList<>();
+    private List<DataTable> dataTables = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dataSheet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<DataCell> dataCells = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="templateId", nullable=false)
+    @JoinColumn(name = "templateId", nullable = false)
     private DataTemplate dataTemplate;
     
     private String sheetName;
@@ -38,13 +41,32 @@ public class DataSheet {
     public DataSheet() {
     }
 
-    public DataSheet(String sheetName) {
-        this.sheetName = sheetName;
-    }
-
-    public DataSheet(String sheetName, long sheetOrder) {
+    public DataSheet(long sheetId,
+            List<DataTable> dataTables,
+            List<DataCell> dataCells,
+            DataTemplate dataTemplate,
+            String sheetName,
+            long sheetOrder) {
+        
+        this.sheetId = sheetId;
+        this.dataTables = dataTables;
+        this.dataCells = dataCells;
+        this.dataTemplate = dataTemplate;
         this.sheetName = sheetName;
         this.sheetOrder = sheetOrder;
+
+        dataTables.forEach(table -> table.setDataSheet(this));
+        dataCells.forEach(cell -> cell.setDataSheet(this));
+    }
+
+    public DataSheet(List<DataTable> dataTables, List<DataCell> dataCells, String sheetName, long sheetOrder) {
+        this.dataTables = dataTables;
+        this.dataCells = dataCells;
+        this.sheetName = sheetName;
+        this.sheetOrder = sheetOrder;
+
+        dataTables.forEach(table -> table.setDataSheet(this));
+        dataCells.forEach(cell -> cell.setDataSheet(this));
     }
 
     public DataSheet(long sheetId, String sheetName, long sheetOrder) {
@@ -53,22 +75,32 @@ public class DataSheet {
         this.sheetOrder = sheetOrder;
     }
 
-    public long getSheetOrder() {
-        return sheetOrder;
+    public long getSheetId() {
+        return sheetId;
     }
 
-    public void setSheetOrder(long sheetOrder) {
-        this.sheetOrder = sheetOrder;
+    public void setSheetId(long sheetId) {
+        this.sheetId = sheetId;
     }
 
-    public List<DataTable> getDataTable() {
-        return dataTable;
+    public List<DataTable> getDataTables() {
+        return dataTables;
     }
 
-    public void setDataTable(List<DataTable> dataTable) {
-        this.dataTable.clear();
-        this.dataTable.addAll(dataTable);
-        dataTable.forEach(table -> table.setDataSheet(this));
+    public void setDataTables(List<DataTable> dataTables) {
+        this.dataTables.clear();
+        this.dataTables.addAll(dataTables);
+        dataTables.forEach(container -> container.setDataSheet(this));
+    }
+
+    public List<DataCell> getDataCells() {
+        return dataCells;
+    }
+
+    public void setDataCells(List<DataCell> dataCells) {
+        this.dataCells.clear();
+        this.dataCells.addAll(dataCells);
+        dataCells.forEach(cell -> cell.setDataSheet(this));
     }
 
     public DataTemplate getDataTemplate() {
@@ -79,20 +111,20 @@ public class DataSheet {
         this.dataTemplate = dataTemplate;
     }
 
-    public void setSheetId(long sheetId) {
-        this.sheetId = sheetId;
+    public String getSheetName() {
+        return sheetName;
     }
 
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
     }
 
-    public long getSheetId() {
-        return sheetId;
+    public long getSheetOrder() {
+        return sheetOrder;
     }
 
-    public String getSheetName() {
-        return sheetName;
+    public void setSheetOrder(long sheetOrder) {
+        this.sheetOrder = sheetOrder;
     }
 
     @Override
@@ -106,21 +138,30 @@ public class DataSheet {
         DataSheet dataSheet = (DataSheet) o;
         return sheetId == dataSheet.sheetId
                 && sheetOrder == dataSheet.sheetOrder
-                && Objects.equals(dataTable, dataSheet.dataTable)
-                && Objects.equals(dataTemplate.getTemplateId(), dataSheet.dataTemplate.getTemplateId())
+                && Objects.equals(dataTables, dataSheet.dataTables)
+                && Objects.equals(dataCells, dataSheet.dataCells)
+                && Objects.equals(
+                        (dataTemplate == null) ? null : dataTemplate.getTemplateId(),
+                        (dataSheet.dataTemplate == null) ? null : dataSheet.dataTemplate.getTemplateId())
                 && Objects.equals(sheetName, dataSheet.sheetName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sheetId, dataTable, dataTemplate.getTemplateId(), sheetName, sheetOrder);
+        return Objects.hash(sheetId,
+                dataTables,
+                dataCells,
+                (dataTemplate == null) ? null : dataTemplate.getTemplateId(),
+                sheetName,
+                sheetOrder);
     }
 
     @Override
     public String toString() {
         return "DataSheet{" +
                 "sheetId=" + sheetId +
-                ", dataTable=" + dataTable +
+                ", dataTables=" + dataTables +
+                ", dataCells=" + dataCells +
                 ", dataTemplate=" + ((dataTemplate == null) ? "" : dataTemplate.getTemplateId()) +
                 ", sheetName='" + sheetName + '\'' +
                 ", sheetOrder=" + sheetOrder +

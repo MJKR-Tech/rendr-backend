@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.service.ExcelService;
-import com.mjkrt.rendr.service.JsonService;
+import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.tools.MockDataTemplate;
 
 @SpringBootTest
