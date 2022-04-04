@@ -8,6 +8,7 @@ import com.mjkrt.rendr.entity.DataTemplate;
 
 public interface DataTemplateService {
     List<DataTemplate> listAll();
+    List<Long> listAllIds();
     DataTemplate findById(long id);
     boolean isPresent(long id);
     DataTemplate save(DataTemplate dataTemplate);

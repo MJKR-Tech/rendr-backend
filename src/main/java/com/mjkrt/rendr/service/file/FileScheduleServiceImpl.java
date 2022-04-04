@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
@@ -37,8 +36,7 @@ public class FileScheduleServiceImpl implements FileScheduleService {
     @Override
     public void removeRedundantFiles() {
         LOG.info("Cleaning up files.");
-        Set<String> dataBaseIdsToFileNames = dataTemplateService.listAll().stream()
-                .map(DataTemplate::getTemplateId)
+        Set<String> dataBaseIdsToFileNames = dataTemplateService.listAllIds().stream()
                 .map(id -> id + EXCEL_EXT)
                 .collect(Collectors.toSet());
         List<String> redundantFileNames = fileService.listAll().stream()

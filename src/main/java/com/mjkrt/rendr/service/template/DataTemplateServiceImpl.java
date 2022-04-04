@@ -30,6 +30,15 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     @Override
+    public List<Long> listAllIds() {
+        LOG.info("Listing all dataTemplateIds");
+        Sort sortByTemplateIdAsc = Sort.by(Sort.Direction.ASC, "templateId");
+        return dataTemplateRepository.findAll(sortByTemplateIdAsc).stream()
+                .map(DataTemplate::getTemplateId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public DataTemplate findById(long id) {
         LOG.info("Finding dataTemplate by id " + id);
         return dataTemplateRepository.getById(id);

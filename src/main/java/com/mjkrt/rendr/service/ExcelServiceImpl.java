@@ -166,13 +166,15 @@ public class ExcelServiceImpl implements ExcelService {
         return new XSSFWorkbook(templateResource.getInputStream());
     }
     
+    // todo might need to update the column header class in table holder to hold more info?
     private Map<DataTable, TableHolder> getTableToHolderMap(long templateId, JsonNode node) throws IOException {
         List<TableHolder> baseHolders = jsonService.getTableHolders(node);
         List<TableHolder> compactHolders = tableHolderService.compact(baseHolders);
         List<DataTable> tables = dataTemplateService.findDataTablesWithTemplateId(templateId);
         return dataMapperService.generateTableToHolderMap(tables, compactHolders);
     }
-    
+
+    // todo might need a similar helper class like columnheader for single cell substitution?
     private Map<DataCell, String> getCellToDataMap(long templateId, JsonNode node) throws IOException {
         List<DataCell> cells = dataTemplateService.findDataCellsWithTemplateId(templateId);
         Map<DataCell, String> cellToDataMap = new HashMap<>();
