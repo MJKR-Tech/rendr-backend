@@ -157,7 +157,9 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private Workbook loadTemplateResourceFromId(long templateId) throws IOException {
-        // TODO verify if exists before loading
+        if (!dataTemplateService.isPresent(templateId)) {
+            throw new IllegalArgumentException("Template with given ID is not present");
+        }
         Resource templateResource = fileService.load(templateId + EXCEL_EXT);
         return new XSSFWorkbook(templateResource.getInputStream());
     }
@@ -168,6 +170,7 @@ public class ExcelServiceImpl implements ExcelService {
         Map<Long, TableHolder> idToHolderMap = new HashMap<>();
         // todo 
         //  get tableIds needed
+        //  map tableContainers to columnHeaders
         //  map from tableId to sub set compacted holders
         return idToHolderMap;
     }

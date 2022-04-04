@@ -7,6 +7,7 @@ import com.mjkrt.rendr.entity.DataTemplate;
 public interface DataTemplateService {
     List<DataTemplate> listAll();
     DataTemplate findById(long id);
+    boolean isPresent(long id);
     DataTemplate save(DataTemplate dataTemplate);
     void deleteById(long id);
     void deleteAll();

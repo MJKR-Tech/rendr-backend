@@ -30,7 +30,13 @@ public class DataTemplateServiceImpl implements DataTemplateService {
         LOG.info("Finding dataTemplate by id " + id);
         return dataTemplateRepository.getById(id);
     }
-
+    
+    @Override
+    public boolean isPresent(long id) {
+        LOG.info("Checking existence of dataTemplate by id " + id);
+        return dataTemplateRepository.existsById(id);    
+    }
+    
     @Override
     public DataTemplate save(DataTemplate dataTemplate) {
         LOG.info("Saving dataTemplate " + dataTemplate);
