@@ -1,15 +1,11 @@
 package com.mjkrt.rendr.service.writter;
 
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.TableHolder;
 
 public interface DataWriterService {
-    void mapDataToWorkbook(long templateId,
-            Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap,
-            Workbook workbook);
+    void mapDataToWorkbook(long templateId, Map<Long, TableHolder> dataMap, Workbook workbook);
 }

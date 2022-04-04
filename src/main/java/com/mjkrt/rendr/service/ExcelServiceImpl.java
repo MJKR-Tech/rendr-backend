@@ -3,6 +3,7 @@ package com.mjkrt.rendr.service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,10 +11,7 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -24,8 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.file.FileService;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
+import com.mjkrt.rendr.service.mapper.JsonService;
+import com.mjkrt.rendr.service.mapper.TableHolderService;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.service.template.TemplateExtractorService;
 import com.mjkrt.rendr.service.writter.DataWriterService;
@@ -51,6 +52,12 @@ public class ExcelServiceImpl implements ExcelService {
     
     @Autowired
     private FileService fileService;
+    
+    @Autowired
+    private JsonService jsonService;
+    
+    @Autowired
+    private TableHolderService tableHolderService;
 
     @Override
     public List<DataTemplate> getTemplates() {
@@ -138,19 +145,31 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ByteArrayInputStream generateExcel(long templateId, 
-            List<ColumnHeader> headers,
-            List<JsonNode> rows) throws IOException {
-        
+    public ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException {
+        long templateId = dataNode.get("templateId").longValue();
         LOG.info("Generating excel for template ID " + templateId);
         
-        Resource templateResource = fileService.load(templateId + EXCEL_EXT);
-        Workbook workbook = new XSSFWorkbook(templateResource.getInputStream());
-        Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap = dataMapperService
-                .generateJsonMapping(templateId, headers, rows);
-        dataWriterService.mapDataToWorkbook(templateId, dataMap, workbook);
+        Workbook workbook = loadTemplateResourceFromId(templateId);
+        Map<Long, TableHolder> tableHolders = getTableIdToTableHolderMap(dataNode.get("jsonObjects"));
+        dataWriterService.mapDataToWorkbook(templateId, tableHolders, workbook);
         
         return writeToStream(workbook);
+    }
+    
+    private Workbook loadTemplateResourceFromId(long templateId) throws IOException {
+        // TODO verify if exists before loading
+        Resource templateResource = fileService.load(templateId + EXCEL_EXT);
+        return new XSSFWorkbook(templateResource.getInputStream());
+    }
+    
+    private Map<Long, TableHolder> getTableIdToTableHolderMap(JsonNode node) throws IOException {
+        List<TableHolder> baseHolders = jsonService.getTableHolders(node);
+        List<TableHolder> compactedHolders = tableHolderService.compact(baseHolders);
+        Map<Long, TableHolder> idToHolderMap = new HashMap<>();
+        // todo 
+        //  get tableIds needed
+        //  map from tableId to sub set compacted holders
+        return idToHolderMap;
     }
 
     private ByteArrayInputStream writeToStream(Workbook workbook) {

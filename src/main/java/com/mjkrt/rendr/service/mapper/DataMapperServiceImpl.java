@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.helper.DataDirection;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
@@ -119,15 +118,15 @@ public class DataMapperServiceImpl implements DataMapperService {
         return map;
     }
 
-    private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader, DataDirection dirn) {
-        ColumnHeader ch = new ColumnHeader();
-        ch.setDirection(dirn);
-        ch.setField(columnHeader.getField());
-        ch.setSelected(columnHeader.isSelected());
-        ch.setName(columnHeader.getName());
-        ch.setType(columnHeader.getType());
-        return ch;
-    }
+//    private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader, DataDirection dirn) {
+//        ColumnHeader ch = new ColumnHeader();
+//        ch.setDirection(dirn);
+//        ch.setField(columnHeader.getField());
+//        ch.setSelected(columnHeader.isSelected());
+//        ch.setName(columnHeader.getName());
+//        ch.setType(columnHeader.getType());
+//        return ch;
+//    }
 
 //    private List<DataTable> getDataTables(long templateId) {
 //        LOG.info("Obtaining tables from template ID " + templateId);

@@ -21,7 +21,7 @@ public class FileScheduleServiceImpl implements FileScheduleService {
 
     private static final Logger LOG = LogsCenter.getLogger(FileScheduleServiceImpl.class);
 
-    @Value("${upload.sample.file}")
+    @Value("${upload.sample-file}")
     private String sampleFile;
     
     @Value("${upload.path}")
@@ -33,7 +33,7 @@ public class FileScheduleServiceImpl implements FileScheduleService {
     @Autowired
     DataTemplateService dataTemplateService;
 
-    @Scheduled(fixedDelayString = "${fixedDelay.in.milliseconds}")
+    @Scheduled(fixedDelayString = "${upload.frequency.milliseconds.clean-up}")
     @Override
     public void removeRedundantFiles() {
         LOG.info("Cleaning up files.");

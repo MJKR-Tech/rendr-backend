@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.mapper.JsonService;
+import com.mjkrt.rendr.service.mapper.TableHolderService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @CrossOrigin(origins = "http://localhost:3000") // todo remove after system test passes
@@ -40,7 +42,7 @@ public class ExcelController {
 
     private static final Logger LOG = LogsCenter.getLogger(ExcelController.class);
 
-    @Value("${upload.sample.file}")
+    @Value("${upload.sample-file}")
     private String sampleTemplateFileName;
     
     @Autowired
@@ -48,6 +50,9 @@ public class ExcelController {
     
     @Autowired
     private JsonService jsonService;
+
+    @Autowired
+    private TableHolderService tableHolderService;
 
     @GetMapping("/getTemplates")
     public List<DataTemplate> getTemplates() {
@@ -92,10 +97,7 @@ public class ExcelController {
         LOG.info("POST /generateData called");
         
         String fileName = json.get("fileName").textValue();
-        ByteArrayInputStream stream = excelService.generateExcel(
-                json.get("templateId").longValue(),
-                jsonService.getHeaders(json.get("jsonObjects")),
-                jsonService.getRows(json.get("jsonObjects")));
+        ByteArrayInputStream stream = excelService.generateExcel(json);
         copyByteStreamToResponse(response, stream, fileName);
     }
 
@@ -119,6 +121,7 @@ public class ExcelController {
     @DeleteMapping("/deleteAllTemplates")
     public boolean deleteAllTemplates() {
         LOG.info("DELETE /deleteAllTemplates called");
+        
         excelService.deleteAllTemplates();
         return true;
     }
@@ -129,15 +132,10 @@ public class ExcelController {
 
     // todo remove after integrating services
     @PostMapping("/testUploadMapping")
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-            @RequestBody JsonNode json) throws IOException {
-
+    public TableHolder generateJsonMapping(@RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateJsonMapping called");
-
-        return dataMapperService.generateJsonMapping(
-                1L,
-                jsonService.getHeaders(json.get("jsonObjects")),
-                jsonService.getRows(json.get("jsonObjects")));
-
+        
+        List<TableHolder> intermediates = jsonService.getTableHolders(json.get("jsonObjects")); // assume 2 items
+        return tableHolderService.naturalJoin(intermediates.get(0), intermediates.get(1));
     }
 }

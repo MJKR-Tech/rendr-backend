@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -62,9 +63,34 @@ public class JsonServiceImpl implements JsonService {
     }
 
     @Override
-    public List<TableHolder> getTableHoldersFromRows(List<JsonNode> jsonNode) {
+    public List<TableHolder> getTableHolders(JsonNode jsonNode) throws IOException {
+        LOG.info("Mapping JsonNode to TableHolders");
         List<TableHolder> tableHolders = new ArrayList<>();
-        // todo
+        for (JsonNode childNode : jsonNode) {
+            TableHolder tableHolder = mapSingleTableHolder(childNode);
+            tableHolders.add(tableHolder);
+        }
         return tableHolders;
+    }
+    
+    private TableHolder mapSingleTableHolder(JsonNode node) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<ColumnHeader>>(){});
+        
+        List<ColumnHeader> headers = reader.readValue(node.path("headers"));
+        List<String> headerLabels = headers.stream()
+                .map(ColumnHeader::getField)
+                .collect(Collectors.toList());
+        
+        Set<List<String>> matrix = new HashSet<>();
+        for (JsonNode rowData : node.path("rows")) {
+            List<String> currentRow = new ArrayList<>();
+            for (String headerLabel : headerLabels) {
+                String associatedData = rowData.path(headerLabel).asText();
+                currentRow.add(associatedData);
+            }
+            matrix.add(currentRow);
+        }
+        return new TableHolder(headers, matrix);
     }
 }

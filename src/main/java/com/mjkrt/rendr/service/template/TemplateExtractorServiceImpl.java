@@ -37,17 +37,19 @@ overall: (## | !!(> | v)) a
 !! deals with where to start exploring for a table
 > | v deals with direction substitution
 ## helps with substitution
+
+TODO See Demo_3.xlsx as an example
 */
 @Service
 public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
     private static final Logger LOG = LogsCenter.getLogger(TemplateExtractorServiceImpl.class);
 
-    private static final String TABLE_FLAG = "!!";
+    private static final String CONTAINER_FLAG = "!!";
     
-    private static final String HORIZONTAL_TABLE_FLAG = "!!>";
+    private static final String HORIZONTAL_CONTAINER_FLAG = "!!>";
 
-    private static final String VERTICAL_TABLE_FLAG = "!!v";
+    private static final String VERTICAL_CONTAINER_FLAG = "!!v";
 
     private static final String REPLACE_FLAG = "##";
 
@@ -131,7 +133,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
                 if (cell == null || cell.getCellType() != STRING) {
                     continue;
                 }
-                if (cell.getStringCellValue().startsWith(TABLE_FLAG)) {
+                if (cell.getStringCellValue().startsWith(CONTAINER_FLAG)) {
                     containers.add(processSingleContainer(cell));
                 }
             }
@@ -141,12 +143,12 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
     private DataContainer processSingleContainer(Cell cell) {
         String header = cell.getStringCellValue();
-        DataDirection direction = (header.startsWith(HORIZONTAL_TABLE_FLAG))
+        DataDirection direction = (header.startsWith(HORIZONTAL_CONTAINER_FLAG))
                 ? HORIZONTAL
                 : VERTICAL;
         header = (direction == HORIZONTAL)
-                ? header.substring(HORIZONTAL_TABLE_FLAG.length())
-                : header.substring(VERTICAL_TABLE_FLAG.length());
+                ? header.substring(HORIZONTAL_CONTAINER_FLAG.length())
+                : header.substring(VERTICAL_CONTAINER_FLAG.length());
         return new DataContainer(direction,
                 header.trim(),
                 cell.getRowIndex(),
@@ -160,7 +162,6 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         return tables;
     }
     
-    // assumption made here, tables are split by at least an empty cell in their respective directions
     private List<DataTable> groupContainersByDirection(List<DataContainer> containers,
             DataDirection direction) {
         
@@ -168,12 +169,23 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         if (trimmedContainers.isEmpty()) {
             return new ArrayList<>();
         }
-        
         List<List<DataContainer>> groupsOfContainers = new ArrayList<>();
+        extractGroupsOfContainers(groupsOfContainers, trimmedContainers, direction);
+        return groupsOfContainers.stream()
+                .filter(list -> !list.isEmpty())
+                .map(DataTable::new)
+                .collect(Collectors.toList());
+    }
+
+    // assumption made here, tables are split by at least an empty cell in their respective directions
+    private void extractGroupsOfContainers(List<List<DataContainer>> groupsOfContainers,
+            List<DataContainer> trimmedContainers,
+            DataDirection direction) {
+        
         List<DataContainer> currentGroup = new ArrayList<>();
         long prevRow = Long.MIN_VALUE;
         long prevCol = Long.MIN_VALUE;
-        
+
         for (DataContainer container : trimmedContainers) {
             long currRow = container.getRowNum();
             long currCol = container.getColNum();
@@ -192,12 +204,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
             prevRow = currRow;
             prevCol = currCol;
         }
-        
-        groupsOfContainers.add(currentGroup);        
-        return groupsOfContainers.stream()
-                .filter(list -> !list.isEmpty())
-                .map(DataTable::new)
-                .collect(Collectors.toList());
+        groupsOfContainers.add(currentGroup);
     }
     
     private List<DataContainer> filterContainersByDirection(List<DataContainer> containers,

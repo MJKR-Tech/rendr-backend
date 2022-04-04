@@ -25,9 +25,7 @@ public interface ExcelService {
 
     ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
-    ByteArrayInputStream generateExcel(long templateId,
-        List<ColumnHeader> headers,
-        List<JsonNode> rows) throws IOException;
+    ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException;
     
     void deleteAllTemplates();
 }

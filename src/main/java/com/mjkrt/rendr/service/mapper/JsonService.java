@@ -8,7 +8,7 @@ import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 
 public interface JsonService {
+    List<TableHolder> getTableHolders(JsonNode jsonNode) throws IOException;
     List<ColumnHeader> getHeaders(JsonNode jsonNode) throws IOException;
     List<JsonNode> getRows(JsonNode jsonNode);
-    List<TableHolder> getTableHoldersFromRows(List<JsonNode> jsonNode);
 }

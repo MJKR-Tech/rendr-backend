@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,7 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
@@ -26,10 +25,7 @@ public class DataWriterServiceImpl implements DataWriterService {
     private DataTemplateService dataTemplateService;
 
     @Override
-    public void mapDataToWorkbook(long templateId,
-            Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> dataMap,
-            Workbook workbook) {
-
+    public void mapDataToWorkbook(long templateId, Map<Long, TableHolder> dataMap, Workbook workbook) {
         LOG.info("Mapping data to workbook");
 //
 //        int sheetCount = workbook.getNumberOfSheets();

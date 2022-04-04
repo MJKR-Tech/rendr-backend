@@ -26,7 +26,7 @@ public class FileServiceImpl implements FileService {
 
     private static final Logger LOG = LogsCenter.getLogger(FileServiceImpl.class);
 
-    @Value("${upload.sample.file}")
+    @Value("${upload.sample-file}")
     private String sampleFile;
     
     @Value("${upload.path}")

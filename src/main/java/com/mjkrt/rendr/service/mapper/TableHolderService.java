@@ -9,4 +9,5 @@ public interface TableHolderService {
     boolean checkIfCanNaturalJoin(TableHolder t1, TableHolder t2);
     TableHolder naturalJoin(TableHolder t1, TableHolder t2);
     TableHolder generateSubset(TableHolder t, List<ColumnHeader> desiredColumns);
+    List<TableHolder> compact(List<TableHolder> tableHolders);
 }
