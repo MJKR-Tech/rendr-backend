@@ -5,16 +5,13 @@ import static com.mjkrt.rendr.service.ExcelService.EXCEL_EXT;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,12 +44,6 @@ public class ExcelController {
     
     @Autowired
     private ExcelService excelService;
-    
-    @Autowired
-    private JsonService jsonService;
-
-    @Autowired
-    private TableHolderService tableHolderService;
 
     @GetMapping("/getTemplates")
     public List<DataTemplate> getTemplates() {
@@ -115,27 +106,5 @@ public class ExcelController {
         response.setHeader("Content-Disposition", "attachment; filename=" + formattedFileName + EXCEL_EXT);
         IOUtils.copy(stream, response.getOutputStream());
         LOG.info("Excel '" + formattedFileName + ".xlsx" + "' generated");
-    }
-
-    // todo delete after testing fully
-    @DeleteMapping("/deleteAllTemplates")
-    public boolean deleteAllTemplates() {
-        LOG.info("DELETE /deleteAllTemplates called");
-        
-        excelService.deleteAllTemplates();
-        return true;
-    }
-
-    // todo remove after unit testing
-    @Autowired
-    private DataMapperService dataMapperService;
-
-    // todo remove after integrating services
-    @PostMapping("/testUploadMapping")
-    public TableHolder generateJsonMapping(@RequestBody JsonNode json) throws IOException {
-        LOG.info("POST /generateJsonMapping called");
-        
-        List<TableHolder> intermediates = jsonService.getTableHolders(json.get("jsonObjects")); // assume 2 items
-        return tableHolderService.naturalJoin(intermediates.get(0), intermediates.get(1));
     }
 }

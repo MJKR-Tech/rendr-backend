@@ -1,7 +1,6 @@
 package com.mjkrt.rendr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 
 import java.io.ByteArrayInputStream;
@@ -26,6 +25,4 @@ public interface ExcelService {
     ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
     ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException;
-    
-    void deleteAllTemplates();
 }

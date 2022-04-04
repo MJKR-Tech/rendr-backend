@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.entity.DataSheet;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.file.FileService;
@@ -93,12 +96,10 @@ public class ExcelServiceImpl implements ExcelService {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
                 "application/vnd.ms-excel" // xls
         );
-        
         if (file.getContentType() == null || !excelTypes.contains(file.getContentType())) {
             LOG.warning("Invalid file type fed");
             return null;
         }
-        
         try {
             return (excelTypes.get(0).equals(file.getContentType()))
                     ? new XSSFWorkbook(file.getInputStream())
@@ -150,10 +151,12 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info("Generating excel for template ID " + templateId);
         
         Workbook workbook = loadTemplateResourceFromId(templateId);
-        Map<Long, TableHolder> tableHolders = getTableIdToTableHolderMap(dataNode.get("jsonObjects"));
-        dataWriterService.mapDataToWorkbook(templateId, tableHolders, workbook);
+        Map<DataTable, TableHolder> tableHolders = getTableToHolderMap(templateId, dataNode.get("jsonObjects"));
         
-        return writeToStream(workbook);
+        // todo add method to map single cell replacements
+        dataWriterService.mapDataToWorkbook(tableHolders, workbook);
+        
+        return dataWriterService.writeToStream(workbook);
     }
     
     private Workbook loadTemplateResourceFromId(long templateId) throws IOException {
@@ -164,37 +167,15 @@ public class ExcelServiceImpl implements ExcelService {
         return new XSSFWorkbook(templateResource.getInputStream());
     }
     
-    private Map<Long, TableHolder> getTableIdToTableHolderMap(JsonNode node) throws IOException {
+    private Map<DataTable, TableHolder> getTableToHolderMap(long templateId, JsonNode node) throws IOException {
         List<TableHolder> baseHolders = jsonService.getTableHolders(node);
-        List<TableHolder> compactedHolders = tableHolderService.compact(baseHolders);
-        Map<Long, TableHolder> idToHolderMap = new HashMap<>();
-        // todo 
-        //  get tableIds needed
-        //  map tableContainers to columnHeaders
-        //  map from tableId to sub set compacted holders
-        return idToHolderMap;
-    }
-
-    private ByteArrayInputStream writeToStream(Workbook workbook) {
-        try {
-            LOG.info("Writing to output stream");
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            return new ByteArrayInputStream(outputStream.toByteArray());
-
-        } catch (IOException ex) {
-            LOG.warning("IOException faced.");
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    // todo delete after full system testing
-    @Override
-    public void deleteAllTemplates() {
-        dataTemplateService.listAll().stream()
-                .map(DataTemplate::getTemplateId)
-                .forEach(id -> fileService.delete(id + EXCEL_EXT));
-        dataTemplateService.deleteAll();
+        List<TableHolder> compactHolders = tableHolderService.compact(baseHolders);
+        List<DataTable> tables = dataTemplateService.findById(templateId)
+                .getDataSheets()
+                .stream()
+                .map(DataSheet::getDataTables)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        return dataMapperService.generateTableToHolderMap(tables, compactHolders);
     }
 }

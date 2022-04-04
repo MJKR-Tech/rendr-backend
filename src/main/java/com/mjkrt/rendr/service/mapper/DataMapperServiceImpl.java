@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
-import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Service
@@ -24,23 +24,15 @@ public class DataMapperServiceImpl implements DataMapperService {
     private static final Logger LOG = LogsCenter.getLogger(DataMapperServiceImpl.class);
 
     @Autowired
-    private DataTemplateService dataTemplateService;
-    
-    @Autowired
     private TableHolderService tableHolderService;
-
-    @Autowired
-    private JsonService jsonService;
     
     // Long = table ID
     // Pair<all the column headers with left most as pivot
     // value of pair --> Map of strings
     @Override
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-            long templateId,
-            List<ColumnHeader> headers,
-            List<JsonNode> rows) {
-
+    public Map<DataTable, TableHolder> generateTableToHolderMap(List<DataTable> tables,
+            List<TableHolder> tableHolders) {
+        
         LOG.info("Obtaining json mappings");
         Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> map = new HashMap<>();
 //        List<DataTable> dataTables = getDataTables(templateId);
@@ -115,7 +107,7 @@ public class DataMapperServiceImpl implements DataMapperService {
 //                map.put(tableId, pair);
 //            }
 //        }
-        return map;
+        return new HashMap<>();
     }
 
 //    private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader, DataDirection dirn) {
@@ -127,20 +119,7 @@ public class DataMapperServiceImpl implements DataMapperService {
 //        ch.setType(columnHeader.getType());
 //        return ch;
 //    }
-
-//    private List<DataTable> getDataTables(long templateId) {
-//        LOG.info("Obtaining tables from template ID " + templateId);
-//
-//        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheets();
-//        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
-//        List<DataTable> dataTables = new ArrayList<>();
-//        for (DataSheet ds : dataSheets) {
-//            dataTables.addAll(ds.getDataTables());
-//        }
-//        return dataTables;
-//    }
     
-    @Override
     public Map<Long, TableHolder> generateTableToTableHolderMap(long templateId, List<JsonNode> rows) {
 //        List<TableHolder> tableHolders = jsonService.getTableHoldersFromRows(rows);
 //        List<TableHolder> compactTables = compactTableHolders(tableHolders);
@@ -149,44 +128,14 @@ public class DataMapperServiceImpl implements DataMapperService {
         return new HashMap<>();
     }
     
-    private List<TableHolder> compactTableHolders(List<TableHolder> tableHolders) {
-        if (tableHolders.size() <= 1) {
-            return tableHolders;
+    private Map<DataTable, TableHolder> mapTablesToHolders(List<DataTable> tables, List<TableHolder> holders) {
+
+        Map<DataTable, TableHolder> tableIdToTableHolderMap = new HashMap<>();
+        for (DataTable dataTable: tables) {
+            // find map DataContainers in dataTable to ColumnHeaders
+            // generate subset of TableHolder
+            // insert <dataTable, tableHolderSubset> into map
         }
-        Deque<TableHolder> deque = new LinkedList<>(tableHolders);
-        boolean hasChanges = true;
-        while (hasChanges) {
-            hasChanges = popTopAndCompactDeque(deque);
-        }
-        return new ArrayList<>(deque);
+        return tableIdToTableHolderMap;
     }
-    
-    private boolean popTopAndCompactDeque(Deque<TableHolder> deque) {
-        boolean hasChanges = false;
-        TableHolder intermediateTable = deque.pop(); // pop from top
-        for (int i = 0; i < deque.size(); i++) {
-            TableHolder nextTable = deque.pop(); // pop from top
-            if (tableHolderService.checkIfCanNaturalJoin(intermediateTable, nextTable)) {
-                hasChanges = true;
-                intermediateTable = tableHolderService.naturalJoin(intermediateTable, nextTable);
-                continue;
-            }
-            deque.add(nextTable); // add to bottom
-        }
-        deque.add(intermediateTable);
-        return hasChanges;
-    }
-    
-//    private Map<Long, TableHolder> mapDataTablesToTableHolders(List<DataTable> dataTables,
-//            List<TableHolder> tableHolders) {
-//
-//        Map<Long, TableHolder> tableIdToTableHolderMap = new HashMap<>();
-//        for (DataTable dataTable: dataTables) {
-//            // find table from compact tables to map
-//            // generate headers required in subset
-//            // generate subset
-//            // insert <table_id, subset> into map
-//        }
-//        return tableIdToTableHolderMap;
-//    }
 }

@@ -1,5 +1,8 @@
 package com.mjkrt.rendr.service.writter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -12,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
@@ -24,8 +28,9 @@ public class DataWriterServiceImpl implements DataWriterService {
     @Autowired
     private DataTemplateService dataTemplateService;
 
+    // todo add one more field for single cell replacements
     @Override
-    public void mapDataToWorkbook(long templateId, Map<Long, TableHolder> dataMap, Workbook workbook) {
+    public void mapDataToWorkbook(Map<DataTable, TableHolder> dataMap, Workbook workbook) {
         LOG.info("Mapping data to workbook");
 //
 //        int sheetCount = workbook.getNumberOfSheets();
@@ -133,6 +138,21 @@ public class DataWriterServiceImpl implements DataWriterService {
             } else {
                 cell.setCellValue(dataValue);
             }
+        }
+    }
+
+    @Override
+    public ByteArrayInputStream writeToStream(Workbook workbook) {
+        try {
+            LOG.info("Writing to output stream");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+
+        } catch (IOException ex) {
+            LOG.warning("IOException faced.");
+            ex.printStackTrace();
+            return null;
         }
     }
 }

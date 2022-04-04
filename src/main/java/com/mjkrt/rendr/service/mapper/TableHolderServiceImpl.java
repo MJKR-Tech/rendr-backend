@@ -1,11 +1,12 @@
 package com.mjkrt.rendr.service.mapper;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -180,23 +181,23 @@ public class TableHolderServiceImpl implements TableHolderService {
         if (tableHolders.size() < 2) {
             return tableHolders;
         }
-        
-        Stack<TableHolder> holders = new Stack<>();
-        holders.addAll(tableHolders);
+
+        Deque<TableHolder> holders = new LinkedList<>(tableHolders);
         boolean hasChanged = true;
         
         while (hasChanged) {
             hasChanged = false;
-            TableHolder top = holders.pop();
+            TableHolder top = holders.pop(); // pop from top
             for (int i = 0; i < holders.size(); i++) {
-                TableHolder next = holders.pop();
+                TableHolder next = holders.pop(); // pop from top
                 if (checkIfCanNaturalJoin(top, next)) {
                     hasChanged = true;
                     top = naturalJoin(top, next);
                 } else {
-                    holders.add(next);
+                    holders.add(next); // add to bottom
                 }
             }
+            holders.add(top); // add to bottom
         }
         return new ArrayList<>(holders);
     }
