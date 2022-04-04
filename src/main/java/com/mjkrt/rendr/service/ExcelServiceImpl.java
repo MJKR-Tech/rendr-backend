@@ -1,14 +1,14 @@
 package com.mjkrt.rendr.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mjkrt.rendr.entity.DataSheet;
+import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.entity.helper.TableHolder;
@@ -152,10 +152,9 @@ public class ExcelServiceImpl implements ExcelService {
         
         Workbook workbook = loadTemplateResourceFromId(templateId);
         Map<DataTable, TableHolder> tableHolders = getTableToHolderMap(templateId, dataNode.get("jsonObjects"));
+        Map<DataCell, String> substitutionMap = getCellToDataMap(templateId, dataNode);
         
-        // todo add method to map single cell replacements
-        dataWriterService.mapDataToWorkbook(tableHolders, workbook);
-        
+        dataWriterService.mapDataToWorkbook(tableHolders, substitutionMap, workbook);
         return dataWriterService.writeToStream(workbook);
     }
     
@@ -170,12 +169,31 @@ public class ExcelServiceImpl implements ExcelService {
     private Map<DataTable, TableHolder> getTableToHolderMap(long templateId, JsonNode node) throws IOException {
         List<TableHolder> baseHolders = jsonService.getTableHolders(node);
         List<TableHolder> compactHolders = tableHolderService.compact(baseHolders);
-        List<DataTable> tables = dataTemplateService.findById(templateId)
-                .getDataSheets()
-                .stream()
-                .map(DataSheet::getDataTables)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        List<DataTable> tables = dataTemplateService.findDataTablesWithTemplateId(templateId);
         return dataMapperService.generateTableToHolderMap(tables, compactHolders);
+    }
+    
+    private Map<DataCell, String> getCellToDataMap(long templateId, JsonNode node) throws IOException {
+        List<DataCell> cells = dataTemplateService.findDataCellsWithTemplateId(templateId);
+        Map<DataCell, String> cellToDataMap = new HashMap<>();
+        // todo add logic
+        return cellToDataMap;
+    }
+
+    @Override
+    public void copyByteStreamToResponse(HttpServletResponse response,
+            ByteArrayInputStream stream,
+            String fileName) throws IOException {
+
+        String formattedFileName = fileName.replaceAll("\\s+", "-"); // replace whitespaces
+        if (formattedFileName.contains(".")) {
+            formattedFileName = formattedFileName.substring(0, formattedFileName.lastIndexOf('.')); // remove ext
+        }
+        LOG.info("Copying input stream to " + formattedFileName + EXCEL_EXT);
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + formattedFileName + EXCEL_EXT);
+        IOUtils.copy(stream, response.getOutputStream());
+        LOG.info("Excel '" + formattedFileName + ".xlsx" + "' generated");
     }
 }

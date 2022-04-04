@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
@@ -30,9 +31,11 @@ public class DataWriterServiceImpl implements DataWriterService {
 
     // todo add one more field for single cell replacements
     @Override
-    public void mapDataToWorkbook(Map<DataTable, TableHolder> dataMap, Workbook workbook) {
+    public void mapDataToWorkbook(Map<DataTable, TableHolder> dataMap,
+            Map<DataCell, String> cellSubstitutions,
+            Workbook workbook) {
+        
         LOG.info("Mapping data to workbook");
-//
 //        int sheetCount = workbook.getNumberOfSheets();
 //        ArrayList<Sheet> sheetList = new ArrayList<>();
 //        for (int i = 0; i < sheetCount; i++) {

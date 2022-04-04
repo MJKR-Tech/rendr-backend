@@ -1,7 +1,5 @@
 package com.mjkrt.rendr.controller;
 
-import static com.mjkrt.rendr.service.ExcelService.EXCEL_EXT;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -11,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.DataTemplate;
-import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,11 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mjkrt.rendr.entity.helper.TableHolder;
-import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
-import com.mjkrt.rendr.service.mapper.JsonService;
-import com.mjkrt.rendr.service.mapper.TableHolderService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @CrossOrigin(origins = "http://localhost:3000") // todo remove after system test passes
@@ -71,7 +64,7 @@ public class ExcelController {
         LOG.info("POST /downloadTemplate called");
         
         ByteArrayInputStream stream = excelService.getSampleTemplate();
-        copyByteStreamToResponse(response, stream, sampleTemplateFileName);
+        excelService.copyByteStreamToResponse(response, stream, sampleTemplateFileName);
     }
 
     @PostMapping("/downloadTemplate")
@@ -80,7 +73,7 @@ public class ExcelController {
         
         String fileName = excelService.getFileNameForTemplate(templateId);
         ByteArrayInputStream stream = excelService.getTemplate(templateId);
-        copyByteStreamToResponse(response, stream, fileName);
+        excelService.copyByteStreamToResponse(response, stream, fileName);
     }
 
     @PostMapping("/generateData")
@@ -89,22 +82,6 @@ public class ExcelController {
         
         String fileName = json.get("fileName").textValue();
         ByteArrayInputStream stream = excelService.generateExcel(json);
-        copyByteStreamToResponse(response, stream, fileName);
-    }
-
-    private void copyByteStreamToResponse(HttpServletResponse response, 
-            ByteArrayInputStream stream,
-            String fileName) throws IOException {
-
-        String formattedFileName = fileName.replaceAll("\\s+", "-"); // replace whitespaces
-        if (formattedFileName.contains(".")) {
-            formattedFileName = formattedFileName.substring(0, formattedFileName.lastIndexOf('.')); // remove ext
-        }
-        LOG.info("Copying input stream to " + formattedFileName + EXCEL_EXT);
-        
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + formattedFileName + EXCEL_EXT);
-        IOUtils.copy(stream, response.getOutputStream());
-        LOG.info("Excel '" + formattedFileName + ".xlsx" + "' generated");
+        excelService.copyByteStreamToResponse(response, stream, fileName);
     }
 }

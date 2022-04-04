@@ -1,5 +1,8 @@
 package com.mjkrt.rendr.service.template;
 
+import com.mjkrt.rendr.entity.DataCell;
+import com.mjkrt.rendr.entity.DataSheet;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.repository.DataTemplateRepository;
 import com.mjkrt.rendr.utils.LogsCenter;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class DataTemplateServiceImpl implements DataTemplateService {
@@ -50,7 +54,32 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     @Override
-    public void deleteAll() {
-        dataTemplateRepository.deleteAll();
+    public List<DataTable> findDataTablesWithTemplateId(long id) {
+        LOG.info("Obtaining dataTables with dataTemplateId " + id);
+        if (!isPresent(id)) {
+            throw new IllegalArgumentException("Template with given ID is not present");
+        }
+        
+        return dataTemplateRepository.getById(id)
+                .getDataSheets()
+                .stream()
+                .map(DataSheet::getDataTables)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DataCell> findDataCellsWithTemplateId(long id) {
+        LOG.info("Obtaining dataCells with dataTemplateId " + id);
+        if (!isPresent(id)) {
+            throw new IllegalArgumentException("Template with given ID is not present");
+        }
+        
+        return dataTemplateRepository.getById(id)
+                .getDataSheets()
+                .stream()
+                .map(DataSheet::getDataCells)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 }

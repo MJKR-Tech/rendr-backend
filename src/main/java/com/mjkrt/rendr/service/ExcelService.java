@@ -7,6 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExcelService {
@@ -25,4 +27,8 @@ public interface ExcelService {
     ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
     ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException;
+
+    void copyByteStreamToResponse(HttpServletResponse response,
+            ByteArrayInputStream stream,
+            String fileName) throws IOException;
 }
