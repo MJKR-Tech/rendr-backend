@@ -2,14 +2,20 @@ package com.mjkrt.rendr.service;
 
 import static com.mjkrt.rendr.entity.DataDirection.HORIZONTAL;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.persistence.Table;
 
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +129,134 @@ public class DataMapperServiceImpl implements DataMapperService {
         }
         return map;
     }
+
+    public ColumnHeader getColumnHeader(String key, List<ColumnHeader> headers) {
+        for (ColumnHeader ch : headers) {
+            if (key.contains(ch.getName())) {
+                ColumnHeader newCh = cloneColumnHeader(ch);
+                return newCh;
+            }
+        }
+        return null;
+    }
+
+    public TableHolder findTableHolder(List<TableHolder> tableHolders, List<ColumnHeader> columnHeaders) {
+        int size = columnHeaders.size();
+        for (TableHolder tableHolder : tableHolders) {
+            List<ColumnHeader> thColumnHeader = tableHolder.getColumnHeaders();
+            int count = 0;
+            for (ColumnHeader columnHeader : thColumnHeader) {
+                if (columnHeaders.contains(columnHeader)) {
+                    count++;
+                }
+            }
+            if (count == size) {
+                return tableHolder;
+            }
+        }
+        return null;
+    }
+
+    public Map<Long, TableHolder> generateMapping(long templateId, List<ColumnHeader> columnHeaders, List<JsonNode> rows) {
+        List<TableHolder> tableHolders = generateTableHolders(columnHeaders, rows);
+        List<TableHolder> linkedTableHolders = generateLinkedTableHolders(tableHolders);
+        return getMapping(templateId, linkedTableHolders, columnHeaders);
+    }
+    public Map<Long, TableHolder> getMapping(long templateId, List<TableHolder> linkedTableHolders, List<ColumnHeader> headers) {
+        Map<Long, TableHolder> map = new HashMap<>();
+        List<DataTable> dataTables = getDataTables(templateId);
+
+        for (DataTable dataTable : dataTables) {
+            long tableId = dataTable.getTableId();
+            TableHolder tableHolder = getTemplateTableData(templateId, tableId, linkedTableHolders, headers);
+            map.put(tableId, tableHolder);
+        }
+        return map;
+    }
+
+    public TableHolder getTemplateTableData(long templateId, long tableId, List<TableHolder> tableHolders,
+                              List<ColumnHeader> headers) {
+        List<DataTable> dataTables = getDataTables(templateId);
+        DataTable dataTable = dataTables.get((int) tableId);
+        List<DataHeader> dataHeaders = dataTable.getDataHeader();
+        List<ColumnHeader> columnHeaders = new ArrayList<>();
+        DataDirection direction = HORIZONTAL;
+        boolean boo = true;
+
+//        int count = 0;
+        for (DataHeader dataHeader : dataHeaders) {
+            direction = dataHeader.getDirection();
+            for (ColumnHeader ch : headers) {
+                if (ch.getName().equals(dataHeader.getHeaderName())) {
+                    ColumnHeader newCh = cloneColumnHeader(ch, direction);
+                    columnHeaders.add(newCh);
+                }
+            }
+//            count++;
+//            if (columnHeaders.size() != count) {
+//                ColumnHeader newCh = new ColumnHeader(dataHeader.getHeaderName(), ColumnHeader.Types.MOCK);
+//                columnHeaders.add(newCh);
+//            }
+        }
+        // may need to add empty strings at placeholder columns todo
+        return tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
+    }
+
+    public List<TableHolder> generateLinkedTableHolders(List<TableHolder> tableHolders) {
+        int count = 0;
+        List<TableHolder> newTableHolders = new ArrayList<>();
+        for (int i = 0; i < tableHolders.size(); i++) {
+            for (int j = i + 1; j < tableHolders.size(); j++) {
+                newTableHolders.add(tableHolderService.naturalJoin(tableHolders.get(i), tableHolders.get(j)));
+                count++;
+            }
+        }
+
+        if (count != 0) {
+            return generateLinkedTableHolders(newTableHolders);
+        }
+        return tableHolders;
+    }
+
+    public List<TableHolder> generateTableHolders(List<ColumnHeader> headers, List<JsonNode> rows) {
+        LOG.info("Obtaining TableHolders mappings");
+        Map<Long, TableHolder> map = new HashMap<>();
+        List<TableHolder> tableHolders = new ArrayList<>();
+//        TableHolder currentTableHolder = new TableHolder(new ArrayList<ColumnHeader>());
+        for (JsonNode node : rows) {
+            List<String> keys = new ArrayList<>();
+            Iterator<String> iterator = node.fieldNames();
+            iterator.forEachRemaining(keys::add);
+            List<ColumnHeader> columnHeaders = new ArrayList<>();
+            List<String> strings = new ArrayList<>();
+            for (String key : keys) {
+                columnHeaders.add(getColumnHeader(key, headers));
+                String value = node.get(key).asText();
+                strings.add(value);
+            }
+
+            for (TableHolder th : tableHolders) {
+                if (!th.getColumnHeaders().isEmpty() && th.getColumnHeaders().equals(columnHeaders)) {
+                    th.getDataRows().add(strings);
+                } else {
+                    TableHolder tableHolder = new TableHolder(columnHeaders);
+                    tableHolder.setDataRow(strings);
+                    tableHolders.add(tableHolder);
+                }
+            }
+        }
+        return tableHolders;
+    }
+
+    private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader) {
+        ColumnHeader ch = new ColumnHeader();
+        ch.setField(columnHeader.getField());
+        ch.setSelected(columnHeader.isSelected());
+        ch.setName(columnHeader.getName());
+        ch.setType(columnHeader.getType());
+        return ch;
+    }
+
 
     private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader, DataDirection dirn) {
         ColumnHeader ch = new ColumnHeader();

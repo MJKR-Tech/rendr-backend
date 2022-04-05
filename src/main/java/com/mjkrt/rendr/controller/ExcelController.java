@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.JsonService;
@@ -129,15 +130,23 @@ public class ExcelController {
 
     // todo remove after integrating services
     @PostMapping("/testUploadMapping")
-    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-            @RequestBody JsonNode json) throws IOException {
-
+//    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
+//            @RequestBody JsonNode json) throws IOException {
+//
+//        LOG.info("POST /generateJsonMapping called");
+//
+//        return dataMapperService.generateJsonMapping(
+//                1L,
+//                jsonService.getHeaders(json.get("jsonObjects")),
+//                jsonService.getRows(json.get("jsonObjects")));
+//
+//    }
+    public Map<Long, TableHolder> generateJsonMapping(@RequestBody JsonNode json)
+            throws IOException {
         LOG.info("POST /generateJsonMapping called");
-
-        return dataMapperService.generateJsonMapping(
+        return dataMapperService.generateMapping(
                 1L,
                 jsonService.getHeaders(json.get("jsonObjects")),
                 jsonService.getRows(json.get("jsonObjects")));
-
     }
 }

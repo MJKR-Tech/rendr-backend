@@ -11,8 +11,8 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
         @JsonProperty("string") STRING,
         @JsonProperty("decimal") DECIMAL,
         @JsonProperty("date") DATE,
-        @JsonProperty("double") DOUBLE
-        //todo mockheader
+        @JsonProperty("double") DOUBLE,
+        @JsonProperty("mock") MOCK
     }
 
     //todo create static type for dummy
@@ -31,7 +31,12 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
 
     public ColumnHeader() {
     }
-    
+
+    public ColumnHeader(String name, Types type) {
+        this.name = name;
+        this.type = type;
+    }
+
     public ColumnHeader(String headerName) {
         this.name = headerName;
     }

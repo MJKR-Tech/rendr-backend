@@ -1,5 +1,6 @@
 package com.mjkrt.rendr.entity.helper;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -8,13 +9,18 @@ public class TableHolder {
     
     private List<ColumnHeader> columnHeaders;
     
-    private Set<List<String>> dataRows;
+    private Set<List<String>> dataRows = new HashSet<>();
 
     public TableHolder(List<ColumnHeader> columnHeaders, Set<List<String>> dataRows) {
         verifyStructure(columnHeaders, dataRows);
         this.columnHeaders = columnHeaders;
         this.dataRows = dataRows;
     }
+
+    public TableHolder(List<ColumnHeader> columnHeaders) {
+        this.columnHeaders = columnHeaders;
+    }
+
 
     private static void verifyStructure(List<ColumnHeader> columnHeaders, Set<List<String>> dataRows) {
         int headerSize = columnHeaders.size();
@@ -40,6 +46,10 @@ public class TableHolder {
     
     public void setDataRows(Set<List<String>> dataRows) {
         this.dataRows = dataRows;
+    }
+
+    public void setDataRow(List<String> dataRow) {
+        this.dataRows.add(dataRow);
     }
     
     @Override

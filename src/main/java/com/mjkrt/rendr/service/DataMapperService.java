@@ -15,4 +15,6 @@ public interface DataMapperService {
             List<ColumnHeader> headers,
             List<JsonNode> rows);
     Map<Long, TableHolder> generateTableToTableHolderMap(long templateId, List<JsonNode> rows);
+
+    public Map<Long, TableHolder> generateMapping(long templateId, List<ColumnHeader> columnHeaders, List<JsonNode> rows)
 }
