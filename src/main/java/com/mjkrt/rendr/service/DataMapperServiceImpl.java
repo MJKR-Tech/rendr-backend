@@ -131,8 +131,10 @@ public class DataMapperServiceImpl implements DataMapperService {
     }
 
     public ColumnHeader getColumnHeader(String key, List<ColumnHeader> headers) {
+        key = key.toLowerCase();
         for (ColumnHeader ch : headers) {
-            if (key.contains(ch.getName())) {
+            String name = ch.getName().toLowerCase();
+            if (key.contains(name)) {
                 ColumnHeader newCh = cloneColumnHeader(ch);
                 return newCh;
             }
@@ -150,7 +152,7 @@ public class DataMapperServiceImpl implements DataMapperService {
                     count++;
                 }
             }
-            if (count == size) {
+            if (count == size && size != 0) {
                 return tableHolder;
             }
         }
@@ -177,13 +179,13 @@ public class DataMapperServiceImpl implements DataMapperService {
     public TableHolder getTemplateTableData(long templateId, long tableId, List<TableHolder> tableHolders,
                               List<ColumnHeader> headers) {
         List<DataTable> dataTables = getDataTables(templateId);
-        DataTable dataTable = dataTables.get((int) tableId);
+        DataTable dataTable = dataTables.get((int) tableId - 1);
         List<DataHeader> dataHeaders = dataTable.getDataHeader();
         List<ColumnHeader> columnHeaders = new ArrayList<>();
         DataDirection direction = HORIZONTAL;
-        boolean boo = true;
+        List<Pair<Integer, ColumnHeader>> correctColumnHeaders = new ArrayList<>();
 
-//        int count = 0;
+        int count = 0;
         for (DataHeader dataHeader : dataHeaders) {
             direction = dataHeader.getDirection();
             for (ColumnHeader ch : headers) {
@@ -192,27 +194,68 @@ public class DataMapperServiceImpl implements DataMapperService {
                     columnHeaders.add(newCh);
                 }
             }
-//            count++;
-//            if (columnHeaders.size() != count) {
-//                ColumnHeader newCh = new ColumnHeader(dataHeader.getHeaderName(), ColumnHeader.Types.MOCK);
-//                columnHeaders.add(newCh);
-//            }
+            count++;
+            if (columnHeaders.size() + correctColumnHeaders.size() != count) {
+                ColumnHeader newCh = new ColumnHeader(dataHeader.getHeaderName(), ColumnHeader.Types.MOCK);
+                correctColumnHeaders.add(new Pair<>(count, newCh));
+            }
         }
         // may need to add empty strings at placeholder columns todo
-        return tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
+        TableHolder th = tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
+
+        return fillTableHolderWithMock(th, correctColumnHeaders);
+    }
+
+    public TableHolder fillTableHolderWithMock(TableHolder th, List<Pair<Integer, ColumnHeader>> correctColumnHeaders) {
+        if (th == null) {
+            List<ColumnHeader> chs = new ArrayList<>();
+            for (Pair<Integer, ColumnHeader> p : correctColumnHeaders) {
+                chs.add(p.getSecond());
+            }
+            return new TableHolder(chs);
+        }
+
+        List<ColumnHeader> currentCHs = th.getColumnHeaders();
+        Set<List<String>> set = th.getDataRows();
+
+        for (Pair<Integer, ColumnHeader> p : correctColumnHeaders) {
+            int indx = p.getFirst();
+            ColumnHeader columnHeader = p.getSecond();
+            currentCHs.add(indx, columnHeader);
+            for (List<String> strings : set) {
+                strings.add(indx, "");
+            }
+        }
+        return th;
     }
 
     public List<TableHolder> generateLinkedTableHolders(List<TableHolder> tableHolders) {
-        int count = 0;
+        int[] lst = new int[tableHolders.size()];
+        for (int i = 0; i < tableHolders.size(); i++) {
+            lst[i] = 0;
+        }
+
         List<TableHolder> newTableHolders = new ArrayList<>();
         for (int i = 0; i < tableHolders.size(); i++) {
             for (int j = i + 1; j < tableHolders.size(); j++) {
-                newTableHolders.add(tableHolderService.naturalJoin(tableHolders.get(i), tableHolders.get(j)));
-                count++;
+                TableHolder tableHolder = tableHolderService.naturalJoin(tableHolders.get(i), tableHolders.get(j));
+                if (tableHolder != null) {
+                    lst[i] = 1;
+                    lst[j] = 1;
+                    newTableHolders.add(tableHolder);
+                }
             }
         }
 
-        if (count != 0) {
+        int count = 0;
+        for (int i = 0; i < lst.length; i++) {
+            if (lst[i] == 0) {
+                count++;
+                newTableHolders.add(tableHolders.get(i));
+            }
+        }
+
+        if (count != tableHolders.size()) {
             return generateLinkedTableHolders(newTableHolders);
         }
         return tableHolders;
@@ -220,7 +263,6 @@ public class DataMapperServiceImpl implements DataMapperService {
 
     public List<TableHolder> generateTableHolders(List<ColumnHeader> headers, List<JsonNode> rows) {
         LOG.info("Obtaining TableHolders mappings");
-        Map<Long, TableHolder> map = new HashMap<>();
         List<TableHolder> tableHolders = new ArrayList<>();
 //        TableHolder currentTableHolder = new TableHolder(new ArrayList<ColumnHeader>());
         for (JsonNode node : rows) {
@@ -230,19 +272,23 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<ColumnHeader> columnHeaders = new ArrayList<>();
             List<String> strings = new ArrayList<>();
             for (String key : keys) {
-                columnHeaders.add(getColumnHeader(key, headers));
+                ColumnHeader ch = getColumnHeader(key, headers);
+                columnHeaders.add(ch);
                 String value = node.get(key).asText();
                 strings.add(value);
             }
-
+            int count = 0;
             for (TableHolder th : tableHolders) {
-                if (!th.getColumnHeaders().isEmpty() && th.getColumnHeaders().equals(columnHeaders)) {
+                if(!th.getColumnHeaders().isEmpty() && th.getColumnHeaders().equals(columnHeaders)) {
                     th.getDataRows().add(strings);
-                } else {
-                    TableHolder tableHolder = new TableHolder(columnHeaders);
-                    tableHolder.setDataRow(strings);
-                    tableHolders.add(tableHolder);
+                    count++;
+                    break;
                 }
+            }
+            if (count == 0) {
+                TableHolder tableHolder = new TableHolder(columnHeaders);
+                tableHolder.setDataRow(strings);
+                tableHolders.add(tableHolder);
             }
         }
         return tableHolders;

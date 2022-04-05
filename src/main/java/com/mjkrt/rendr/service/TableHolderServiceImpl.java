@@ -52,7 +52,8 @@ public class TableHolderServiceImpl implements TableHolderService {
         
         List<Pair<Integer, Integer>> linkedPairs = getSameHeaderIndexPairs(headers1, headers2);
         if (linkedPairs.isEmpty()) {
-            throw new IllegalArgumentException("TableHolders are not able to natural join");
+//            throw new IllegalArgumentException("TableHolders are not able to natural join");
+            return null;
         }
         List<Integer> unrelatedOtherIndexes = getOtherExcessHeaderIndexes(headers2, linkedPairs);
         List<ColumnHeader> newHeaders = naturalJoinHeaders(headers1, headers2, unrelatedOtherIndexes);
@@ -129,6 +130,10 @@ public class TableHolderServiceImpl implements TableHolderService {
 
     @Override
     public TableHolder generateSubset(TableHolder t, List<ColumnHeader> desiredColumns) {
+        if (t == null) {
+            return null;
+        }
+
         List<ColumnHeader> currentHeaders = t.getColumnHeaders();
         List<Integer> indexMappings = getMappingOfHeaders(currentHeaders, desiredColumns);
         if (indexMappings.isEmpty()) {

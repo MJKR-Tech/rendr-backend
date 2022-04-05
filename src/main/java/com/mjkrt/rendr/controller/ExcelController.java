@@ -130,17 +130,6 @@ public class ExcelController {
 
     // todo remove after integrating services
     @PostMapping("/testUploadMapping")
-//    public Map<Long, Pair<List<ColumnHeader>, Map<String, List<String>>>> generateJsonMapping(
-//            @RequestBody JsonNode json) throws IOException {
-//
-//        LOG.info("POST /generateJsonMapping called");
-//
-//        return dataMapperService.generateJsonMapping(
-//                1L,
-//                jsonService.getHeaders(json.get("jsonObjects")),
-//                jsonService.getRows(json.get("jsonObjects")));
-//
-//    }
     public Map<Long, TableHolder> generateJsonMapping(@RequestBody JsonNode json)
             throws IOException {
         LOG.info("POST /generateJsonMapping called");
