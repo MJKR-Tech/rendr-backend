@@ -45,7 +45,7 @@ public class MockDataTemplate {
         DataTemplate newTemplate = new DataTemplate();
         newTemplate.setTemplateId(this.templateId);
         newTemplate.setTemplateName(this.templateName);
-        newTemplate.setDataSheet(this.dataSheet);
+        newTemplate.setDataSheets(this.dataSheet);
         newTemplate.setDateCreated(this.dateCreated);
         return newTemplate;
     }

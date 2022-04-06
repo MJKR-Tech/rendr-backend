@@ -35,21 +35,21 @@
              {
                 "compositionRate":0,
                 "assetCode":"300",
-                "currentMontNav":30,
+                "currentMonthNav":30,
                 "assetName":"チョコレート(CHOC)",
                 "test1": 2
              },
              {
                 "compositionRate":2,
                 "assetCode":"400",
-                "currentMontNav":23,
+                "currentMonthNav":23,
                 "assetName":"コーヒー(COF)",
                 "test1": 3
              },
              {
                 "compositionRate":1,
                 "assetCode":"500",
-                "currentMontNav":440,
+                "currentMonthNav":440,
                 "assetName":"PA(パイナップル)",
                 "test1": 4
              }
@@ -71,9 +71,9 @@
                 "field":"compositionRate"
              },
              {
-                "name":"currentMonthNAV",
+                "name":"currentMonthNav",
                 "type":"decimal",
-                "field":"currentMonthNAV"
+                "field":"currentMonthNav"
              },
              {
                 "name":"test1",

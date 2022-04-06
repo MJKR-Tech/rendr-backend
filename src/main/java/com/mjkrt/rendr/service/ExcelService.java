@@ -1,12 +1,13 @@
 package com.mjkrt.rendr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.DataTemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +19,8 @@ public interface ExcelService {
     boolean uploadTemplateFromFile(MultipartFile file);
 
     boolean deleteTemplate(long templateId);
+
+    void deleteAllTemplates();
     
     String getFileNameForTemplate(long templateId);
 
@@ -25,9 +28,9 @@ public interface ExcelService {
 
     ByteArrayInputStream getTemplate(long templateId) throws IOException;
 
-    ByteArrayInputStream generateExcel(long templateId,
-        List<ColumnHeader> headers,
-        List<JsonNode> rows) throws IOException;
-    
-    void deleteAllTemplates();
+    ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException;
+
+    void copyByteStreamToResponse(HttpServletResponse response,
+            ByteArrayInputStream stream,
+            String fileName) throws IOException;
 }

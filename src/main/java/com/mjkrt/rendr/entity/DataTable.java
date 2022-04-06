@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,51 +18,43 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class DataTable {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long tableId;
 
-    //primary key
-    @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<DataHeader> dataHeader = new ArrayList<>();
-
-    //foreign key
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="sheetId", nullable = false)
     private DataSheet dataSheet;
-    
-    private long rowNum;
-    
-    private long colNum;
+
+    @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<DataContainer> dataContainers = new ArrayList<>();
 
     public DataTable() {
     }
 
-    public DataTable(long rowNum, long colNum) {
-        this.rowNum = rowNum;
-        this.colNum = colNum;
-    }
-
-    public DataTable(long tableId, long rowNum, long colNum) {
+    public DataTable(long tableId, DataSheet dataSheet, List<DataContainer> dataContainers) {
         this.tableId = tableId;
-        this.rowNum = rowNum;
-        this.colNum = colNum;
+        this.dataSheet = dataSheet;
+        this.dataContainers = dataContainers;
     }
 
-    public void setDataHeader(List<DataHeader> dataHeader) {
-        this.dataHeader.clear();
-        this.dataHeader.addAll(dataHeader);
-        dataHeader.forEach(header -> header.setDataTable(this));
+    public DataTable(List<DataContainer> dataContainers) {
+        this.dataContainers = dataContainers;
+        dataContainers.forEach(container -> container.setDataTable(this));
     }
-    
-    public void addDataHeader(DataHeader dataHeader) {
-        if (this.dataHeader.contains(dataHeader)) {
-            return;   
-        }
-        this.dataHeader.add(dataHeader);
-        dataHeader.setDataTable(this);
+
+    public DataTable(long tableId) {
+        this.tableId = tableId;
+    }
+
+    public long getTableId() {
+        return tableId;
+    }
+
+    public void setTableId(long tableId) {
+        this.tableId = tableId;
     }
 
     public DataSheet getDataSheet() {
@@ -76,32 +65,14 @@ public class DataTable {
         this.dataSheet = dataSheet;
     }
 
-    public List<DataHeader> getDataHeader() {
-        return dataHeader;
+    public List<DataContainer> getDataContainers() {
+        return dataContainers;
     }
 
-    public long getTableId() {
-        return tableId;
-    }
-
-    public long getRowNum() {
-        return rowNum;
-    }
-
-    public long getColNum() {
-        return colNum;
-    }
-
-    public void setTableId(long tableId) {
-        this.tableId = tableId;
-    }
-
-    public void setRowNum(long rowNum) {
-        this.rowNum = rowNum;
-    }
-
-    public void setColNum(long colNum) {
-        this.colNum = colNum;
+    public void setDataContainers(List<DataContainer> dataContainers) {
+        this.dataContainers.clear();
+        this.dataContainers.addAll(dataContainers);
+        dataContainers.forEach(container -> container.setDataTable(this));
     }
 
     @Override
@@ -114,25 +85,25 @@ public class DataTable {
         }
         DataTable dataTable = (DataTable) o;
         return tableId == dataTable.tableId
-                && rowNum == dataTable.rowNum
-                && colNum == dataTable.colNum
-                && Objects.equals(dataHeader, dataTable.dataHeader)
-                && Objects.equals(dataSheet.getSheetId(), dataTable.dataSheet.getSheetId());
+                && Objects.equals(
+                        (dataSheet == null) ? null : dataSheet.getSheetId(),
+                        (dataTable.dataSheet == null) ? null : dataTable.dataSheet.getSheetId())
+                && Objects.equals(dataContainers, dataTable.dataContainers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableId, dataHeader, dataSheet.getSheetId(), rowNum, colNum);
+        return Objects.hash(tableId,
+                (dataSheet == null) ? null : dataSheet.getSheetId(),
+                dataContainers);
     }
 
     @Override
     public String toString() {
         return "DataTable{" +
                 "tableId=" + tableId +
-                ", dataHeader=" + dataHeader +
-                ", sheet=" + ((dataSheet == null) ? "" : dataSheet.getSheetId()) +
-                ", rowNum=" + rowNum +
-                ", colNum=" + colNum +
+                ", dataSheet=" + ((dataSheet == null) ? "" : dataSheet.getSheetId()) +
+                ", dataContainers=" + dataContainers +
                 '}';
     }
 }

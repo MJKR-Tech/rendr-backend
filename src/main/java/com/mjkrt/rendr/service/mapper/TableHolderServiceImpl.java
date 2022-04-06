@@ -1,7 +1,9 @@
-package com.mjkrt.rendr.service;
+package com.mjkrt.rendr.service.mapper;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -35,7 +37,7 @@ public class TableHolderServiceImpl implements TableHolderService {
         List<Pair<Integer, Integer>> linkedPairs = new ArrayList<>();
         for (int i = 0; i < headers1.size(); i++) {
             for (int j = 0; j < headers2.size(); j++) {
-                if (headers1.get(i) == headers2.get(j)) {
+                if (headers1.get(i).equals(headers2.get(j))) {
                     linkedPairs.add( new Pair<>(i, j) );
                 }
             }
@@ -177,5 +179,31 @@ public class TableHolderServiceImpl implements TableHolderService {
             newRows.add(newRow);
         }
         return newRows;
+    }
+
+    @Override
+    public List<TableHolder> compact(List<TableHolder> tableHolders) {
+        if (tableHolders.size() < 2) {
+            return tableHolders;
+        }
+
+        Deque<TableHolder> holders = new LinkedList<>(tableHolders);
+        boolean hasChanged = true;
+        
+        while (hasChanged) {
+            hasChanged = false;
+            TableHolder top = holders.pop(); // pop from top
+            for (int i = 0; i < holders.size(); i++) {
+                TableHolder next = holders.pop(); // pop from top
+                if (checkIfCanNaturalJoin(top, next)) {
+                    hasChanged = true;
+                    top = naturalJoin(top, next);
+                } else {
+                    holders.add(next); // add to bottom
+                }
+            }
+            holders.add(top); // add to bottom
+        }
+        return new ArrayList<>(holders);
     }
 }

@@ -3,58 +3,39 @@ package com.mjkrt.rendr.entity.helper;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mjkrt.rendr.entity.DataDirection;
 
 public class ColumnHeader implements Comparable<ColumnHeader> {
 
-    public enum Types {
+    public enum ColumnDataType {
         @JsonProperty("string") STRING,
         @JsonProperty("decimal") DECIMAL,
         @JsonProperty("date") DATE,
         @JsonProperty("double") DOUBLE,
         @JsonProperty("mock") MOCK
     }
-
-    //todo create static type for dummy
-    //todo justin columnheader type for whether mock
-
-    String name;
     
-    Types type;
+    private String name;
     
-    String field;
-
-    DataDirection direction = DataDirection.HORIZONTAL;
+    private ColumnDataType type = ColumnDataType.MOCK;
     
-    @JsonProperty(value="isSelected")
-    boolean isSelected;
+    private String field = "";
 
     public ColumnHeader() {
     }
 
-    public ColumnHeader(String name, Types type) {
+    public ColumnHeader(String name, ColumnDataType type, String field) {
+        this.name = name;
+        this.type = type;
+        this.field = field;
+    }
+
+    public ColumnHeader(String name, ColumnDataType type) {
         this.name = name;
         this.type = type;
     }
 
     public ColumnHeader(String headerName) {
         this.name = headerName;
-    }
-
-    public DataDirection getDirection() {
-        return direction;
-    }
-
-    public void setDirection(DataDirection direction) {
-        this.direction = direction;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
     }
 
     public String getName() {
@@ -65,11 +46,11 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
         this.name = name;
     }
 
-    public Types getType() {
+    public ColumnDataType getType() {
         return type;
     }
 
-    public void setType(Types type) {
+    public void setType(ColumnDataType type) {
         this.type = type;
     }
 
@@ -83,7 +64,8 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
 
     @Override
     public int compareTo(ColumnHeader that) {
-        return this.getName().compareTo(that.getName());
+        return this.getName()
+                .compareTo(that.getName());
     }
 
     @Override
@@ -95,15 +77,14 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
             return false;
         }
         ColumnHeader that = (ColumnHeader) o;
-        return isSelected == that.isSelected
-                && Objects.equals(name, that.name)
+        return Objects.equals(name, that.name)
                 && type == that.type
                 && Objects.equals(field, that.field);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, field, isSelected);
+        return Objects.hash(name, type, field);
     }
 
     @Override
@@ -112,7 +93,6 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", field='" + field + '\'' +
-                ", isSelected=" + isSelected +
                 '}';
     }
 }

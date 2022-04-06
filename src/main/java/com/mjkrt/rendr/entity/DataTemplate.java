@@ -22,9 +22,9 @@ public class DataTemplate {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long templateId;
 
-    @JsonIgnore
+    //@JsonIgnore
     @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<DataSheet> dataSheet = new ArrayList<>();
+    private List<DataSheet> dataSheets = new ArrayList<>();
 
     private String templateName;
     
@@ -33,8 +33,11 @@ public class DataTemplate {
     public DataTemplate() {
     }
 
-    public DataTemplate(String templateName) {
+    public DataTemplate(List<DataSheet> dataSheets, String templateName) {
+        this.dataSheets = dataSheets;
         this.templateName = templateName;
+
+        dataSheets.forEach(sheet -> sheet.setDataTemplate(this));
     }
 
     public DataTemplate(long templateId, String templateName) {
@@ -42,14 +45,18 @@ public class DataTemplate {
         this.templateName = templateName;
     }
 
-    public List<DataSheet> getDataSheet() {
-        return dataSheet;
+    public DataTemplate(String templateName) {
+        this.templateName = templateName;
     }
 
-    public void setDataSheet(List<DataSheet> dataSheet) {
-        this.dataSheet.clear();
-        this.dataSheet.addAll(dataSheet);
-        dataSheet.forEach(sheet -> sheet.setDataTemplate(this));
+    public List<DataSheet> getDataSheets() {
+        return dataSheets;
+    }
+
+    public void setDataSheets(List<DataSheet> dataSheets) {
+        this.dataSheets.clear();
+        this.dataSheets.addAll(dataSheets);
+        dataSheets.forEach(sheet -> sheet.setDataTemplate(this));
     }
 
     public long getTemplateId() {
@@ -86,21 +93,21 @@ public class DataTemplate {
         }
         DataTemplate dataTemplate = (DataTemplate) o;
         return templateId == dataTemplate.templateId
-                && Objects.equals(dataSheet, dataTemplate.dataSheet) 
+                && Objects.equals(dataSheets, dataTemplate.dataSheets) 
                 && Objects.equals(templateName, dataTemplate.templateName)
                 && Objects.equals(dateCreated, dataTemplate.dateCreated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(templateId, dataSheet, templateName, dateCreated);
+        return Objects.hash(templateId, dataSheets, templateName, dateCreated);
     }
 
     @Override
     public String toString() {
         return "DataTemplate{" +
                 "templateId=" + templateId +
-                ", sheet=" + dataSheet +
+                ", sheet=" + dataSheets +
                 ", templateName='" + templateName + '\'' +
                 ", dateCreated=" + dateCreated +
                 '}';
