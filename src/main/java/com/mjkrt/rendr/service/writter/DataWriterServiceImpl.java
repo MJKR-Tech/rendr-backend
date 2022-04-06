@@ -32,7 +32,7 @@ public class DataWriterServiceImpl implements DataWriterService {
     // todo add one more field for single cell replacements
     @Override
     public void mapDataToWorkbook(Map<Long, TableHolder> dataMap,
-            Map<DataCell, String> cellSubstitutions,
+            Map<Long, String> cellSubstitutions,
             Workbook workbook) {
         
         LOG.info("Mapping data to workbook");

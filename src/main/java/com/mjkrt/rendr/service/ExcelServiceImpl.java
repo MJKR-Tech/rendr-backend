@@ -160,7 +160,7 @@ public class ExcelServiceImpl implements ExcelService {
         
         Workbook workbook = loadTemplateResourceFromId(templateId);
         Map<Long, TableHolder> tableHolders = getTableToHolderMap(templateId, dataNode.get("jsonObjects"));
-        Map<DataCell, String> substitutionMap = getCellToDataMap(templateId, dataNode);
+        Map<Long, String> substitutionMap = getCellToDataMap(templateId, dataNode);
         
         dataWriterService.mapDataToWorkbook(tableHolders, substitutionMap, workbook);
         return dataWriterService.writeToStream(workbook);
@@ -183,9 +183,9 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     // todo might need a similar helper class like columnheader for single cell substitution?
-    private Map<DataCell, String> getCellToDataMap(long templateId, JsonNode node) throws IOException {
+    private Map<Long, String> getCellToDataMap(long templateId, JsonNode node) throws IOException {
         List<DataCell> cells = dataTemplateService.findDataCellsWithTemplateId(templateId);
-        Map<DataCell, String> cellToDataMap = new HashMap<>();
+        Map<Long, String> cellToDataMap = new HashMap<>();
         // todo add logic
         return cellToDataMap;
     }

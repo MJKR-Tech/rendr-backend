@@ -16,9 +16,11 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     
     private String name;
     
-    private ColumnDataType type = ColumnDataType.MOCK;
+    private ColumnDataType type = ColumnDataType.MOCK; // default
     
     private String field = "";
+    
+    private DataDirection appendDirection = DataDirection.VERTICAL; // default
 
     public ColumnHeader() {
     }
@@ -32,6 +34,11 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
     public ColumnHeader(String name, ColumnDataType type) {
         this.name = name;
         this.type = type;
+    }
+
+    public ColumnHeader(String name, DataDirection appendDirection) {
+        this.name = name;
+        this.appendDirection = appendDirection;
     }
 
     public ColumnHeader(String headerName) {
@@ -52,6 +59,14 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
 
     public void setType(ColumnDataType type) {
         this.type = type;
+    }
+
+    public DataDirection getAppendDirection() {
+        return appendDirection;
+    }
+
+    public void setAppendDirection(DataDirection appendDirection) {
+        this.appendDirection = appendDirection;
     }
 
     public String getField() {
@@ -79,12 +94,13 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
         ColumnHeader that = (ColumnHeader) o;
         return Objects.equals(name, that.name)
                 && type == that.type
-                && Objects.equals(field, that.field);
+                && Objects.equals(field, that.field)
+                && appendDirection == that.appendDirection;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, field);
+        return Objects.hash(name, type, field, appendDirection);
     }
 
     @Override
@@ -93,6 +109,7 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", field='" + field + '\'' +
+                ", appendDirection=" + appendDirection +
                 '}';
     }
 }
