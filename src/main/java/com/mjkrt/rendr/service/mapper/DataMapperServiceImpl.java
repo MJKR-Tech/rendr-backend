@@ -154,86 +154,26 @@ public class DataMapperServiceImpl implements DataMapperService {
 
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
-                if (dataHeader.equals(sortedDataContainer)) {
+                if (dataHeader.equals(sortedDataContainer) && ch.getName().equals(dataHeader.getAlias())) {
                     sortedColumnHeader = cloneColumnHeader(ch);
                     columnHeaders.add(sortedColumnHeader);
                     correctColumnHeaders.add(sortedColumnHeader);
-                }
-
-                if (ch.getName().equals(dataHeader.getAlias())) {
+                    break;
+                } else if (ch.getName().equals(dataHeader.getAlias())) {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                     correctColumnHeaders.add(newCh);
+                    break;
                 }
             }
              if (dataHeader.getAlias().isEmpty()) {
                 columnHeaders.add(ColumnHeader.getMockColumnHeader());
             }
         }
-        // may need to add empty strings at placeholder columns todo
+
         TableHolder th = tableHolderService.generateSubset(findTableHolder(tableHolders, correctColumnHeaders), columnHeaders);
         th.setSortColumnAndDirection(sortedColumnHeader, ascending);
         return th;
-    }
-
-    private TableHolder fillTableHolderWithMock(TableHolder th, List<Pair<Integer, ColumnHeader>> correctColumnHeaders) {
-        if (th == null) {
-            List<ColumnHeader> chs = new ArrayList<>();
-            for (Pair<Integer, ColumnHeader> p : correctColumnHeaders) {
-                chs.add(p.getSecond());
-            }
-            return new TableHolder(chs);
-        }
-
-        List<ColumnHeader> currentCHs = th.getColumnHeaders();
-        Set<List<String>> set = th.getDataRows();
-
-        for (Pair<Integer, ColumnHeader> p : correctColumnHeaders) {
-            int indx = p.getFirst();
-            ColumnHeader columnHeader = p.getSecond();
-            currentCHs.add(indx, columnHeader);
-            for (List<String> strings : set) {
-                strings.add(indx, "");
-            }
-        }
-        return th;
-    }
-
-    private List<TableHolder> generateLinkedTableHolders(List<TableHolder> tableHolders) {
-        LOG.info("Calling generateLinkedTableHolders");
-        int[] lst = new int[tableHolders.size()];
-        for (int i = 0; i < tableHolders.size(); i++) {
-            lst[i] = 0;
-        }
-
-        List<TableHolder> newTableHolders = new ArrayList<>();
-        for (int i = 0; i < tableHolders.size(); i++) {
-            LOG.info("Calling generateLinkedTableHolders 1.1 || size=" + tableHolders.size());
-            for (int j = i + 1; j < tableHolders.size(); j++) {
-                LOG.info("Calling generateLinkedTableHolders 1.2 || i=" + i + " j=" + j);
-                TableHolder tableHolder = tableHolderService.naturalJoin(tableHolders.get(i), tableHolders.get(j));
-                if (tableHolder != null) {
-                    lst[i] = 1;
-                    lst[j] = 1;
-                    newTableHolders.add(tableHolder);
-                }
-            }
-        }
-
-        int count = 0;
-        for (int i = 0; i < lst.length; i++) {
-            LOG.info("Calling generateLinkedTableHolders 2");
-            if (lst[i] == 0) {
-                count++;
-                newTableHolders.add(tableHolders.get(i));
-            }
-        }
-
-        if (count != tableHolders.size()) {
-            LOG.info("Calling generateLinkedTableHolders 3");
-            return generateLinkedTableHolders(newTableHolders);
-        }
-        return tableHolders;
     }
 
     private List<TableHolder> generateTableHolders(List<ColumnHeader> headers, List<JsonNode> rows) {

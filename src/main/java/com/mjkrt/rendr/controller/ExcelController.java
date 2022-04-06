@@ -117,6 +117,7 @@ public class ExcelController {
         List<ColumnHeader> columnHeaders = jsonService.getHeaders(json.get("jsonObjects"));
         List<JsonNode> rows = jsonService.getRows(json.get("jsonObjects"));
         List<TableHolder> linkedTable = dataMapperService.generateLinkedTableHolders(templateId, columnHeaders, rows);
-        return dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
+        Map<Long, TableHolder> map = dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
+        return map;
     }
 }
