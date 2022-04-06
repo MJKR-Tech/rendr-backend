@@ -78,14 +78,14 @@ public class DataWriterServiceImpl implements DataWriterService {
 
                 if (direction == VERTICAL) {
                     for (List<String> data : datas) {
-                        startRow += 1;
                         writeHorizontalTable(startRow, startCol, data, sheet);
+                        startRow += 1;
 
                     }
                 } else if (direction == HORIZONTAL){
                     for (List<String> data : datas) {
-                        startCol += 1;
                         writeVerticalTable(startRow, startCol, data, sheet);
+                        startCol += 1;
                     }
                 }
 
