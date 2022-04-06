@@ -23,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.entity.DataCell;
-import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.file.FileService;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
@@ -159,8 +159,19 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info("Generating excel for template ID " + templateId);
         
         Workbook workbook = loadTemplateResourceFromId(templateId);
-        Map<Long, TableHolder> tableHolders = getTableToHolderMap(templateId, dataNode.get("jsonObjects"));
-        Map<Long, String> substitutionMap = getCellToDataMap(templateId, dataNode);
+        
+        List<ColumnHeader> columnHeaders = jsonService.getHeaders(dataNode.get("jsonObjects"));
+        List<JsonNode> rows = jsonService.getRows(dataNode.get("jsonObjects"));
+        List<DataCell> dataCells = dataTemplateService.findDataCellsWithTemplateId(templateId);
+        List<TableHolder> linkedTables = dataMapperService.generateLinkedTableHolders(templateId,
+                columnHeaders,
+                rows);
+        
+        Map<Long, TableHolder> tableHolders = dataMapperService.generateTableMapping(templateId,
+                columnHeaders,
+                linkedTables);
+        Map<Long, String> substitutionMap = dataMapperService.generateCellMapping(dataCells,
+                linkedTables);
         
         dataWriterService.mapDataToWorkbook(tableHolders, substitutionMap, workbook, templateId);
         return dataWriterService.writeToStream(workbook);
@@ -172,22 +183,6 @@ public class ExcelServiceImpl implements ExcelService {
         }
         Resource templateResource = fileService.load(templateId + EXCEL_EXT);
         return new XSSFWorkbook(templateResource.getInputStream());
-    }
-    
-    // todo might need to update the column header class in table holder to hold more info?
-    private Map<Long, TableHolder> getTableToHolderMap(long templateId, JsonNode node) throws IOException {
-        List<TableHolder> baseHolders = jsonService.getTableHolders(node);
-        List<TableHolder> compactHolders = tableHolderService.compact(baseHolders);
-        List<DataTable> tables = dataTemplateService.findDataTablesWithTemplateId(templateId);
-        return dataMapperService.generateTableIdToTableHolderMap(tables, compactHolders);
-    }
-
-    // todo might need a similar helper class like columnheader for single cell substitution?
-    private Map<Long, String> getCellToDataMap(long templateId, JsonNode node) throws IOException {
-        List<DataCell> cells = dataTemplateService.findDataCellsWithTemplateId(templateId);
-        Map<Long, String> cellToDataMap = new HashMap<>();
-        // todo add logic
-        return cellToDataMap;
     }
 
     @Override
