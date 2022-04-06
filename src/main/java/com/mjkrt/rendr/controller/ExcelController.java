@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
@@ -110,9 +112,11 @@ public class ExcelController {
     @PostMapping("/testUploadMapping")
     public Map<Long, TableHolder> generateJsonMapping(@RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateJsonMapping called");
-        return dataMapperService.generateMapping(
-                json.path("templateId").longValue(),
-                jsonService.getHeaders(json.get("jsonObjects")),
-                jsonService.getRows(json.get("jsonObjects")));
+
+        long templateId = json.path("templateId").longValue();
+        List<ColumnHeader> columnHeaders = jsonService.getHeaders(json.get("jsonObjects"));
+        List<JsonNode> rows = jsonService.getRows(json.get("jsonObjects"));
+        List<TableHolder> linkedTable = dataMapperService.generateLinkedTableHolders(templateId, columnHeaders, rows);
+        return dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
     }
 }

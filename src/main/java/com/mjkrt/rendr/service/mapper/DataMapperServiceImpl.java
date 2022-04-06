@@ -13,14 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.mjkrt.rendr.entity.helper.DataDirection;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataContainer;
-import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
@@ -42,26 +41,33 @@ public class DataMapperServiceImpl implements DataMapperService {
     private JsonService jsonService;
 
     @Override
-    public Map<Long, TableHolder> generateTableIdToTableHolderMap(List<DataTable> tables, List<TableHolder> holders) {
+    public List<TableHolder> generateLinkedTableHolders(long templateId,
+            List<ColumnHeader> columnHeaders,
+            List<JsonNode> rows) {
+    
+        List<TableHolder> tableHolders = generateTableHolders(columnHeaders, rows);
+        return generateLinkedTableHolders(tableHolders);
+    }
+    
+    @Override
+    public Map<Long, TableHolder> generateTableMapping(long templateId,
+            List<ColumnHeader> headers,
+            List<TableHolder> linkedTableHolders) {
 
-        Map<Long, TableHolder> tableIdToTableHolderMap = new HashMap<>();
-        for (DataTable dataTable: tables) {
-            // find table from compact tables to map
-            // generate headers required in subset
-            // generate subset
-            // insert <table_id, subset> into map
+        Map<Long, TableHolder> map = new HashMap<>();
+        List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
+
+        for (DataTable dataTable : dataTables) {
+            long tableId = dataTable.getTableId();
+            TableHolder tableHolder = getTemplateTableData(templateId, tableId, linkedTableHolders, headers);
+            map.put(tableId, tableHolder);
         }
-        return tableIdToTableHolderMap;
+        return map;
     }
 
     @Override
-    public Map<Long, TableHolder> generateMapping(long templateId,
-            List<ColumnHeader> columnHeaders,
-            List<JsonNode> rows) {
-        
-        List<TableHolder> tableHolders = generateTableHolders(columnHeaders, rows);
-        List<TableHolder> linkedTableHolders = generateLinkedTableHolders(tableHolders);
-        return getMapping(templateId, linkedTableHolders, columnHeaders);
+    public Map<Long, String> generateCellMapping(List<DataCell> cells, List<TableHolder> linkedTables) {
+        return null;
     }
 
     private ColumnHeader getColumnHeader(String key, List<ColumnHeader> headers) {
@@ -73,21 +79,6 @@ public class DataMapperServiceImpl implements DataMapperService {
             }
         }
         return null;
-    }
-
-    private Map<Long, TableHolder> getMapping(long templateId,
-            List<TableHolder> linkedTableHolders,
-            List<ColumnHeader> headers) {
-
-        Map<Long, TableHolder> map = new HashMap<>();
-        List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
-
-        for (DataTable dataTable : dataTables) {
-            long tableId = dataTable.getTableId();
-            TableHolder tableHolder = getTemplateTableData(templateId, tableId, linkedTableHolders, headers);
-            map.put(tableId, tableHolder);
-        }
-        return map;
     }
 
     private TableHolder findTableHolder(List<TableHolder> tableHolders, List<ColumnHeader> columnHeaders) {
