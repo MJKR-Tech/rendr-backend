@@ -147,9 +147,18 @@ public class DataMapperServiceImpl implements DataMapperService {
         List<DataContainer> dataHeaders = dataTable.getDataContainers(); // to verify
         List<ColumnHeader> columnHeaders = new ArrayList<>();
         List<ColumnHeader> correctColumnHeaders = new ArrayList<>();
+        DataContainer sortedDataContainer = dataTable.getSortedContainer();
+        boolean ascending = dataTable.isAscending();
+        ColumnHeader sortedColumnHeader = new ColumnHeader();
 
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
+                if (dataHeader.equals(sortedDataContainer)) {
+                    sortedColumnHeader = cloneColumnHeader(ch);
+                    columnHeaders.add(sortedColumnHeader);
+                    correctColumnHeaders.add(sortedColumnHeader);
+                }
+
                 if (ch.getName().equals(dataHeader.getAlias())) {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
@@ -161,7 +170,9 @@ public class DataMapperServiceImpl implements DataMapperService {
             }
         }
         // may need to add empty strings at placeholder columns todo
-        return tableHolderService.generateSubset(findTableHolder(tableHolders, correctColumnHeaders), columnHeaders);
+        TableHolder th = tableHolderService.generateSubset(findTableHolder(tableHolders, correctColumnHeaders), columnHeaders);
+        th.setSortColumnAndDirection(sortedColumnHeader, ascending);
+        return th;
     }
 
     private TableHolder fillTableHolderWithMock(TableHolder th, List<Pair<Integer, ColumnHeader>> correctColumnHeaders) {
