@@ -67,7 +67,8 @@ public class DataMapperServiceImpl implements DataMapperService {
 
     @Override
     public Map<Long, String> generateCellMapping(List<DataCell> cells, List<TableHolder> linkedTables) {
-        return null;
+        Map<Long, String> map = new HashMap<>();
+        return map;
     }
 
     private ColumnHeader getColumnHeader(String key, List<ColumnHeader> headers) {
@@ -130,9 +131,8 @@ public class DataMapperServiceImpl implements DataMapperService {
             }
         }
         // may need to add empty strings at placeholder columns todo
-        TableHolder th = tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
-
-        return fillTableHolderWithMock(th, correctColumnHeaders);
+        return tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
+        //return fillTableHolderWithMock(th, correctColumnHeaders);
     }
 
     private TableHolder fillTableHolderWithMock(TableHolder th, List<Pair<Integer, ColumnHeader>> correctColumnHeaders) {

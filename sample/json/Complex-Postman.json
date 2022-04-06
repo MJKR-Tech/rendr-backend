@@ -1,0 +1,498 @@
+{
+  "templateId": 1,
+  "jsonObjects": {
+    "Account Inflow Details": {
+      "headers": [
+        {
+          "name": "checkInflow",
+          "type": "decimal",
+          "field": "checkInflow"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "reportDate_Day",
+          "type": "decimal",
+          "field": "reportDate_Day"
+        },
+        {
+          "name": "totalTransDaysInflow",
+          "type": "decimal",
+          "field": "totalTransDaysInflow"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "totalTransDaysInflow": 0,
+          "reportDate_Day": 30,
+          "checkInflow": 32560944
+        }
+      ]
+    },
+    "Account Outflow Details": {
+      "headers": [
+        {
+          "name": "checkOutflow",
+          "type": "decimal",
+          "field": "checkOutflow"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "totalTransDaysOutflow",
+          "type": "decimal",
+          "field": "totalTransDaysOutflow"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "checkOutflow": 40394838,
+          "totalTransDaysOutflow": 7833894
+        }
+      ]
+    },
+    "Client Details": {
+      "headers": [
+        {
+          "name": "DateMonth",
+          "type": "string",
+          "field": "DateMonth"
+        },
+        {
+          "name": "DateYear",
+          "type": "string",
+          "field": "DateYear"
+        },
+        {
+          "name": "TerminationDate",
+          "type": "string",
+          "field": "TerminationDate"
+        },
+        {
+          "name": "clientName",
+          "type": "string",
+          "field": "clientName"
+        },
+        {
+          "name": "clientCode1",
+          "type": "string",
+          "field": "clientCode1"
+        },
+        {
+          "name": "assetManagerCode1",
+          "type": "string",
+          "field": "assetManagerCode1"
+        },
+        {
+          "name": "assetManagerCode2",
+          "type": "string",
+          "field": "assetManagerCode2"
+        },
+        {
+          "name": "reportingMonth",
+          "type": "string",
+          "field": "reportingMonth"
+        }
+      ],
+      "rows": [
+        {
+          "clientCode1": "1010",
+          "clientName": "ABC株式会社",
+          "assetManagerCode1": "1011",
+          "TerminationDate": "",
+          "reportingMonth": "09/30/2021",
+          "assetManagerCode2": "1",
+          "DateYear": "2021",
+          "DateMonth": "9"
+        }
+      ]
+    },
+    "NAV Details": {
+      "headers": [
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "totalCompositionRate",
+          "type": "decimal",
+          "field": "totalCompositionRate"
+        },
+        {
+          "name": "clientContribution",
+          "type": "decimal",
+          "field": "clientContribution"
+        },
+        {
+          "name": "clientWithdrawal",
+          "type": "decimal",
+          "field": "clientWithdrawal"
+        },
+        {
+          "name": "managementFeeTrusteeFee",
+          "type": "decimal",
+          "field": "managementFeeTrusteeFee"
+        },
+        {
+          "name": "netIncreaseDecrease",
+          "type": "decimal",
+          "field": "netIncreaseDecrease"
+        },
+        {
+          "name": "totalCashInflow",
+          "type": "decimal",
+          "field": "totalCashInflow"
+        },
+        {
+          "name": "totalCashOutflow",
+          "type": "decimal",
+          "field": "totalCashOutflow"
+        },
+        {
+          "name": "totalCurrentMonthNAV",
+          "type": "decimal",
+          "field": "totalCurrentMonthNAV"
+        },
+        {
+          "name": "totalExposure",
+          "type": "decimal",
+          "field": "totalExposure"
+        },
+        {
+          "name": "totalPreviousMonthNAV",
+          "type": "decimal",
+          "field": "totalPreviousMonthNAV"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "managementFeeTrusteeFee": 7833894,
+          "totalPreviousMonthNAV": 3155645822,
+          "totalCompositionRate": 1,
+          "clientContribution": 0,
+          "clientWithdrawal": 0,
+          "totalCashOutflow": 7833894,
+          "netIncreaseDecrease": -7833894,
+          "totalCashInflow": 0,
+          "totalExposure": 3169984225,
+          "totalCurrentMonthNAV": 3169984225
+        }
+      ]
+    },
+    "Syntax Report": {
+      "headers": [
+        {
+          "name": "market_value_bs",
+          "type": "decimal",
+          "field": "market_value_bs"
+        },
+        {
+          "name": "securityDescription",
+          "type": "string",
+          "field": "securityDescription"
+        },
+        {
+          "name": "security_cd",
+          "type": "string",
+          "field": "security_cd"
+        },
+        {
+          "name": "trade_ccy_cd",
+          "type": "string",
+          "field": "trade_ccy_cd"
+        }
+      ],
+      "rows": [
+        {
+          "security_cd": "XY0000000001",
+          "trade_ccy_cd": "USD",
+          "securityDescription": "POLLPOLLOFFSHORE",
+          "market_value_bs": 131622258
+        },
+        {
+          "security_cd": "00ABC1111111111",
+          "trade_ccy_cd": "JPY",
+          "securityDescription": "ANEWCOMPANY1",
+          "market_value_bs": 1344762582
+        },
+        {
+          "security_cd": "1820MN444221",
+          "trade_ccy_cd": "USD",
+          "securityDescription": "APPLEPIE1010",
+          "market_value_bs": 1561662185
+        },
+        {
+          "security_cd": "LMB100100101",
+          "trade_ccy_cd": "USD",
+          "securityDescription": "OCEANWAVELP",
+          "market_value_bs": 55714753
+        },
+        {
+          "security_cd": "FG120012001",
+          "trade_ccy_cd": "USD",
+          "securityDescription": "JAMESANDCO1221",
+          "market_value_bs": 93126520
+        }
+      ]
+    },
+    "Asset OutflowDetails": {
+      "headers": [
+        {
+          "name": "assetCode",
+          "type": "string",
+          "field": "assetCode"
+        },
+        {
+          "name": "assetName",
+          "type": "string",
+          "field": "assetName"
+        },
+        {
+          "name": "daysOutflow",
+          "type": "decimal",
+          "field": "daysOutflow"
+        },
+        {
+          "name": "daysOutflowCalc",
+          "type": "decimal",
+          "field": "daysOutflowCalc"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "outflow",
+          "type": "decimal",
+          "field": "outflow"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "outflow": 23854338,
+          "assetCode": "100",
+          "assetName": "クッキー",
+          "daysOutflow": 10.40232405527246,
+          "daysOutflowCalc": 7833894
+        },
+        {
+          "groupAccount": "132132",
+          "outflow": 0,
+          "assetCode": "200",
+          "assetName": "MONDAY(MON)",
+          "daysOutflow": 0,
+          "daysOutflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "outflow": 16540500,
+          "assetCode": "300",
+          "assetName": "チョコレート(CHOC)",
+          "daysOutflow": 24,
+          "daysOutflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "outflow": 0,
+          "assetCode": "400",
+          "assetName": "コーヒー(COF)",
+          "daysOutflow": 0,
+          "daysOutflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "outflow": 0,
+          "assetCode": "500",
+          "assetName": "PA(パイナップル)",
+          "daysOutflow": 0,
+          "daysOutflowCalc": 0
+        }
+      ]
+    },
+    "Asset Inflow Details": {
+      "headers": [
+        {
+          "name": "assetCode",
+          "type": "string",
+          "field": "assetCode"
+        },
+        {
+          "name": "assetName",
+          "type": "string",
+          "field": "assetName"
+        },
+        {
+          "name": "daysInflow",
+          "type": "decimal",
+          "field": "daysInflow"
+        },
+        {
+          "name": "daysInflowCalc",
+          "type": "decimal",
+          "field": "daysInflowCalc"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "inflow",
+          "type": "decimal",
+          "field": "inflow"
+        },
+        {
+          "name": "reportDate_Day",
+          "type": "decimal",
+          "field": "reportDate_Day"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "daysInflow": 24,
+          "assetCode": "100",
+          "reportDate_Day": 30,
+          "assetName": "クッキー",
+          "inflow": 16540500,
+          "daysInflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "daysInflow": 15,
+          "assetCode": "200",
+          "reportDate_Day": 30,
+          "assetName": "MONDAY(MON)",
+          "inflow": 16020444,
+          "daysInflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "daysInflow": 0,
+          "assetCode": "300",
+          "reportDate_Day": 30,
+          "assetName": "チョコレート(CHOC)",
+          "inflow": 0,
+          "daysInflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "daysInflow": 0,
+          "assetCode": "400",
+          "reportDate_Day": 30,
+          "assetName": "コーヒー(COF)",
+          "inflow": 0,
+          "daysInflowCalc": 0
+        },
+        {
+          "groupAccount": "132132",
+          "daysInflow": 0,
+          "assetCode": "500",
+          "reportDate_Day": 30,
+          "assetName": "PA(パイナップル)",
+          "inflow": 0,
+          "daysInflowCalc": 0
+        }
+      ]
+    },
+    "Asset NAV Details": {
+      "headers": [
+        {
+          "name": "assetCode",
+          "type": "string",
+          "field": "assetCode"
+        },
+        {
+          "name": "assetName",
+          "type": "string",
+          "field": "assetName"
+        },
+        {
+          "name": "compositionRate",
+          "type": "decimal",
+          "field": "compositionRate"
+        },
+        {
+          "name": "currentMonthNAV",
+          "type": "decimal",
+          "field": "currentMonthNAV"
+        },
+        {
+          "name": "exposure",
+          "type": "decimal",
+          "field": "exposure"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "previousMonthNAV",
+          "type": "decimal",
+          "field": "previousMonthNAV"
+        }
+      ],
+      "rows": [
+        {
+          "currentMonthNAV": 8060568,
+          "groupAccount": "132132",
+          "assetCode": "100",
+          "exposure": 8060568,
+          "assetName": "クッキー",
+          "previousMonthNAV": 15386579,
+          "compositionRate": 0.002542778584331914
+        },
+        {
+          "currentMonthNAV": 1536697544,
+          "groupAccount": "132132",
+          "assetCode": "200",
+          "exposure": 1536697544,
+          "assetName": "MONDAY(MON)",
+          "previousMonthNAV": 1517092239,
+          "compositionRate": 0.4847650445326743
+        },
+        {
+          "currentMonthNAV": 131622258,
+          "groupAccount": "132132",
+          "assetCode": "300",
+          "exposure": 131622258,
+          "assetName": "チョコレート(CHOC)",
+          "previousMonthNAV": 146077741,
+          "compositionRate": 0.04152142365945055
+        },
+        {
+          "currentMonthNAV": 148841273,
+          "groupAccount": "132132",
+          "assetCode": "400",
+          "exposure": 148841273,
+          "assetName": "コーヒー(COF)",
+          "previousMonthNAV": 144401851,
+          "compositionRate": 0.0469533166209999
+        },
+        {
+          "currentMonthNAV": 1344762582,
+          "groupAccount": "132132",
+          "assetCode": "500",
+          "exposure": 1344762582,
+          "assetName": "PA(パイナップル)",
+          "previousMonthNAV": 1332687412,
+          "compositionRate": 0.4242174366025433
+        }
+      ]
+    }
+  },
+  "fileName": "d"
+}
