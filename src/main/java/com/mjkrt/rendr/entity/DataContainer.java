@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mjkrt.rendr.entity.helper.DataDirection;
+import com.mjkrt.rendr.entity.helper.SortedOrdering;
 
 @Entity
 public class DataContainer {
@@ -31,15 +32,19 @@ public class DataContainer {
     
     @Column(columnDefinition = "ENUM('HORIZONTAL', 'VERTICAL')")
     @Enumerated(EnumType.STRING)
-    private DataDirection direction = null;
-    
-    private String alias;
+    private DataDirection direction = DataDirection.HORIZONTAL;
 
-    private long rowNum;
-
-    private long colNum;
+    @Column(columnDefinition = "ENUM('ASC', 'DESC', 'NOT_USED')")
+    @Enumerated(EnumType.STRING)
+    private SortedOrdering sortBy = SortedOrdering.NOT_USED;
     
+    private String alias = "";
+
     private long ordering = 0;
+    
+    private long rowNum;
+    
+    private long colNum;
     
     public DataContainer() {
     }
@@ -47,6 +52,7 @@ public class DataContainer {
     public DataContainer(long containerId,
             DataTable dataTable,
             DataDirection direction,
+            SortedOrdering sortBy,
             String alias,
             long rowNum,
             long colNum,
@@ -55,6 +61,7 @@ public class DataContainer {
         this.containerId = containerId;
         this.dataTable = dataTable;
         this.direction = direction;
+        this.sortBy = sortBy;
         this.alias = alias;
         this.rowNum = rowNum;
         this.colNum = colNum;
@@ -82,6 +89,14 @@ public class DataContainer {
         this.alias = alias;
         this.rowNum = rowNum;
         this.colNum = colNum;
+    }
+
+    public DataContainer(DataDirection direction, String alias, long rowNum, long colNum, SortedOrdering sortBy) {
+        this.direction = direction;
+        this.alias = alias;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+        this.sortBy = sortBy;
     }
 
     public DataContainer(DataDirection direction, String alias, long rowNum, long colNum) {
@@ -147,6 +162,14 @@ public class DataContainer {
         this.ordering = ordering;
     }
 
+    public SortedOrdering getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(SortedOrdering sortBy) {
+        this.sortBy = sortBy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -164,7 +187,8 @@ public class DataContainer {
                         (that.dataTable == null) ? null : that.dataTable.getTableId())
                 && direction == that.direction
                 && Objects.equals(alias, that.alias)
-                && ordering == that.ordering;
+                && ordering == that.ordering
+                && sortBy == that.sortBy;
     }
 
     @Override
@@ -174,7 +198,8 @@ public class DataContainer {
                 direction,
                 alias,
                 rowNum,
-                colNum);
+                colNum,
+                sortBy);
     }
 
     @Override
@@ -186,7 +211,8 @@ public class DataContainer {
                 ", containerAlias='" + alias + '\'' +
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
-                ", ordering" + ordering +
+                ", ordering=" + ordering +
+                ", sortBy=" + sortBy +
                 '}';
     }
 }

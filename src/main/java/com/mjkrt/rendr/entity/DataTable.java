@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,9 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mjkrt.rendr.entity.helper.SortedOrdering;
 
 @Entity
 public class DataTable {
@@ -33,11 +34,6 @@ public class DataTable {
     @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataContainer> dataContainers = new ArrayList<>();
 
-    @OneToOne
-    private DataContainer sortedContainer;
-    
-    private boolean isAscending = true;
-    
     public DataTable() {
     }
 
@@ -45,6 +41,7 @@ public class DataTable {
         this.tableId = tableId;
         this.dataSheet = dataSheet;
         this.dataContainers = dataContainers;
+        dataContainers.forEach(container -> container.setDataTable(this));
     }
 
     public DataTable(List<DataContainer> dataContainers) {
@@ -77,26 +74,20 @@ public class DataTable {
         return dataContainers;
     }
 
+    public DataContainer getSortByContainer() {
+        if (dataContainers.isEmpty()) {
+            throw new IllegalStateException("A DataTable should have at least one DataContainer.");
+        }
+        Optional<DataContainer> dataContainerOptional = getDataContainers().stream()
+                .filter(container -> container.getSortBy() != SortedOrdering.NOT_USED)
+                .findFirst();
+        return dataContainerOptional.orElseGet(() -> getDataContainers().get(0));
+    }
+
     public void setDataContainers(List<DataContainer> dataContainers) {
         this.dataContainers.clear();
         this.dataContainers.addAll(dataContainers);
         dataContainers.forEach(container -> container.setDataTable(this));
-    }
-
-    public DataContainer getSortedContainer() {
-        return sortedContainer;
-    }
-
-    public void setSortedContainer(DataContainer sortedContainer) {
-        this.sortedContainer = sortedContainer;
-    }
-
-    public boolean isAscending() {
-        return isAscending;
-    }
-
-    public void setAscending(boolean ascending) {
-        isAscending = ascending;
     }
 
     @Override

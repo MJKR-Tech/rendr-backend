@@ -22,6 +22,7 @@ import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataContainer;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.SortedOrdering;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
@@ -147,8 +148,8 @@ public class DataMapperServiceImpl implements DataMapperService {
         List<DataContainer> dataHeaders = dataTable.getDataContainers(); // to verify
         List<ColumnHeader> columnHeaders = new ArrayList<>();
         List<ColumnHeader> correctColumnHeaders = new ArrayList<>();
-        DataContainer sortedDataContainer = dataTable.getSortedContainer();
-        boolean ascending = dataTable.isAscending();
+        DataContainer sortedDataContainer = dataTable.getSortByContainer();
+        boolean ascending = sortedDataContainer.getSortBy() == SortedOrdering.ASC;
         ColumnHeader sortedColumnHeader = new ColumnHeader();
 
         for (DataContainer dataHeader : dataHeaders) {

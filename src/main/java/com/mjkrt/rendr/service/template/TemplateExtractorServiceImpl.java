@@ -22,6 +22,7 @@ import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.DataDirection;
 import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.entity.helper.SortedOrdering;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 /*
@@ -155,10 +156,21 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         header = (direction == HORIZONTAL)
                 ? header.substring(HORIZONTAL_CONTAINER_FLAG.length())
                 : header.substring(VERTICAL_CONTAINER_FLAG.length());
+
+        SortedOrdering sortBy = SortedOrdering.NOT_USED;
+        if (header.endsWith(ASC_FLAG)) {
+            header = header.substring(0, header.length() - ASC_FLAG.length());
+            sortBy = SortedOrdering.ASC;
+        } else if (header.endsWith(DESC_FLAG)) {
+            header = header.substring(0, header.length() - DESC_FLAG.length());
+            sortBy = SortedOrdering.DESC;
+        }
+        
         return new DataContainer(direction,
                 header.trim(),
                 cell.getRowIndex(),
-                cell.getColumnIndex());
+                cell.getColumnIndex(),
+                sortBy);
     }
     
     private List<DataTable> groupContainers(List<DataContainer> containers) {
@@ -194,7 +206,6 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         long ordering = 0;
 
         for (DataContainer container : trimmedContainers) {
-            container.setOrdering(ordering);
             long currRow = container.getRowNum();
             long currCol = container.getColNum();
             boolean isNotInit = (prevRow > 0) && (prevCol > 0);
@@ -209,6 +220,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
                 ordering = 0;
                 currentGroup = new ArrayList<>();
             }
+            container.setOrdering(ordering);
             currentGroup.add(container);
             prevRow = currRow;
             prevCol = currCol;

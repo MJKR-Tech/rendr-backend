@@ -40,6 +40,7 @@ CREATE TABLE data_container (
     col_num INT NOT NULL DEFAULT 0,
     ordering INT NOT NULL DEFAULT 0,
     direction ENUM('HORIZONTAL', 'VERTICAL') NOT NULL,
+    sort_by ENUM('ASC', 'DESC', 'NOT_USED') NOT NULL, 
     alias VARCHAR(255) NOT NULL,
     PRIMARY KEY (container_id),
     FOREIGN KEY (table_id)
