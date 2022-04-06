@@ -128,7 +128,6 @@ public class DataMapperServiceImpl implements DataMapperService {
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
                 if (ch.getName().equals(dataHeader.getAlias())) {
-                    DataDirection direction = dataHeader.getDirection();
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                 }
@@ -239,18 +238,6 @@ public class DataMapperServiceImpl implements DataMapperService {
         ch.setName(columnHeader.getName());
         ch.setType(columnHeader.getType());
         return ch;
-    }
-
-    private List<DataTable> getDataTables(long templateId) {
-        LOG.info("Obtaining tables from template ID " + templateId);
-
-        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheets();
-        dataSheets.sort(Comparator.comparingLong(DataSheet::getSheetId));
-        List<DataTable> dataTables = new ArrayList<>();
-        for (DataSheet ds : dataSheets) {
-            dataTables.addAll(ds.getDataTables());
-        }
-        return dataTables;
     }
     
     private List<TableHolder> compactTableHolders(List<TableHolder> tableHolders) {
