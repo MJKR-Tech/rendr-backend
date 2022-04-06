@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class DataWriterServiceImpl implements DataWriterService {
 
                 TableHolder mapThingData = dataMap.get(tableId);
                 DataDirection direction = dtc.get(0).getDirection();
-                Set<List<String>> datas = mapThingData.getDataRows();
+                List<List<String>> datas = mapThingData.generateOrderedTable();
 
                 if (direction == VERTICAL) {
                     for (List<String> data : datas) {
@@ -91,7 +92,9 @@ public class DataWriterServiceImpl implements DataWriterService {
 
             }
         }
+
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+
     }
 
     private void writeVerticalTable(long startRowNum, long colNum, List<String> data, Sheet sheet) {

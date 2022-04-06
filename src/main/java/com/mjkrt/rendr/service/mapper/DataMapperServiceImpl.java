@@ -187,7 +187,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             for (String key : keys) {
                 ColumnHeader ch = getColumnHeader(key, headers);
                 columnHeaders.add(ch);
-                String value = node.get(key).asText();
+                String value = node.get(key).asText("");
                 strings.add(value);
             }
             int count = 0;
