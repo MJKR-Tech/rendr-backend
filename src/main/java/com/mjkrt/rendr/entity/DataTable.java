@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -32,6 +33,11 @@ public class DataTable {
     @OneToMany(mappedBy = "dataTable", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataContainer> dataContainers = new ArrayList<>();
 
+    @OneToOne
+    private DataContainer sortedContainer;
+    
+    private boolean isAscending = true;
+    
     public DataTable() {
     }
 
@@ -75,6 +81,22 @@ public class DataTable {
         this.dataContainers.clear();
         this.dataContainers.addAll(dataContainers);
         dataContainers.forEach(container -> container.setDataTable(this));
+    }
+
+    public DataContainer getSortedContainer() {
+        return sortedContainer;
+    }
+
+    public void setSortedContainer(DataContainer sortedContainer) {
+        this.sortedContainer = sortedContainer;
+    }
+
+    public boolean isAscending() {
+        return isAscending;
+    }
+
+    public void setAscending(boolean ascending) {
+        isAscending = ascending;
     }
 
     @Override

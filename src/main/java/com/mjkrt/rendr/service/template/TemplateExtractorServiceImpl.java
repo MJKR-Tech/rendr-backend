@@ -31,7 +31,7 @@ Syntax:
 ## a - single cell fill up, aka one-to-one replace
 !!(>|v) a - start of container to fill up with direction and alias name
 
-overall: (## | !!(> | v)) a
+overall: (## | !!(> | v)) a [(++|--)]
 
 # is used for single cell fill up (desc at top of excel files)
 !! deals with where to start exploring for a table
@@ -52,6 +52,10 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     private static final String VERTICAL_CONTAINER_FLAG = "!!v";
 
     private static final String REPLACE_FLAG = "##";
+
+    private static final String ASC_FLAG = "++";
+
+    private static final String DESC_FLAG = "--";
 
     @Override
     public DataTemplate extract(Workbook workbook, String fileName) {
