@@ -68,6 +68,26 @@ public class DataWriterServiceImpl implements DataWriterService {
                 }
             }
 
+            List<DataCell> dataCells = dataSheet.getDataCells();
+            for (DataCell dc : dataCells) {
+                long id = dc.getCellId();
+                int r = dc.getRowNum();
+                int c = dc.getColNum();
+                Row row = sheet.getRow(r);
+
+                Cell cell = row.getCell(c);
+                String dataValue = cellSubstitutions.get(id);
+                if (NumberUtils.isParsable(dataValue)) {
+                    if (NumberUtils.isDigits(dataValue)) {
+                        cell.setCellValue(new BigDecimal(dataValue).longValueExact());
+                    } else {
+                        cell.setCellValue(new BigDecimal(dataValue).doubleValue());
+                    }
+                } else {
+                    cell.setCellValue(dataValue);
+                }
+            }
+
             List<DataTable> dataTables = dataSheet.getDataTables();
             for (DataTable dt : dataTables) {
                 List<DataContainer> dtc = dt.getDataContainers();
