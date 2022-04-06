@@ -1,7 +1,5 @@
 package com.mjkrt.rendr.service.mapper;
 
-import static com.mjkrt.rendr.entity.helper.ColumnHeader.ColumnDataType.MOCK;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;

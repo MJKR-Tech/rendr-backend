@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.tools.MockDataTemplate;
@@ -90,28 +91,12 @@ public class ExcelControllerTest {
         MockMultipartFile file = generateMockExcel();
 
         Mockito.when(excelService.uploadTemplateFromFile(file))
-                .thenReturn(true);
+                .thenReturn(new TemplateIdHolder(1L));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .multipart(PREFIX + "/uploadTemplate")
                         .file(file))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
-    }
-
-    // test POST failure response
-    @Test
-    public void uploadTemplate_indicatesFailure() throws Exception {
-        MockMultipartFile file = generateMockExcel();
-        
-        Mockito.when(excelService.uploadTemplateFromFile(file))
-                .thenReturn(false);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .multipart(PREFIX + "/uploadTemplate")
-                        .file(file))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"));
+                .andExpect(status().isOk());
     }
 
     // test excel download response

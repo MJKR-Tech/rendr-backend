@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
+import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.mapper.JsonService;
@@ -52,17 +52,17 @@ public class ExcelController {
     }
 
     @PostMapping("/uploadTemplate")
-    public boolean uploadExcel(@RequestParam("file") MultipartFile file) {
+    public TemplateIdHolder uploadExcel(@RequestParam("file") MultipartFile file) {
         LOG.info("POST /uploadTemplate called");
         
         return excelService.uploadTemplateFromFile(file);
     }
 
-    @DeleteMapping("/deleteTemplate/{id}")
-    public boolean deleteTemplate(@PathVariable("id") long templateId) {
-        LOG.info("DELETE /deleteTemplate/" + templateId + " called");
+    @DeleteMapping("/deleteTemplate/{ids}")
+    public boolean deleteTemplate(@PathVariable("ids") List<Long> templateIds) {
+        LOG.info("DELETE /deleteTemplate/" + templateIds + " called");
         
-        return excelService.deleteTemplate(templateId);
+        return excelService.deleteTemplate(templateIds);
     }
 
     @GetMapping("/downloadSampleTemplate")
@@ -74,11 +74,13 @@ public class ExcelController {
     }
 
     @PostMapping("/downloadTemplate")
-    public void downloadTemplate(HttpServletResponse response, @RequestBody long templateId) throws IOException {
+    public void downloadTemplate(HttpServletResponse response, @RequestBody TemplateIdHolder templateIdHolder)
+            throws IOException {
+        
         LOG.info("POST /downloadTemplate called");
         
-        String fileName = excelService.getFileNameForTemplate(templateId);
-        ByteArrayInputStream stream = excelService.getTemplate(templateId);
+        String fileName = excelService.getFileNameForTemplate(templateIdHolder.getTemplateId());
+        ByteArrayInputStream stream = excelService.getTemplate(templateIdHolder.getTemplateId());
         excelService.copyByteStreamToResponse(response, stream, fileName);
     }
 
@@ -117,7 +119,6 @@ public class ExcelController {
         List<ColumnHeader> columnHeaders = jsonService.getHeaders(json.get("jsonObjects"));
         List<JsonNode> rows = jsonService.getRows(json.get("jsonObjects"));
         List<TableHolder> linkedTable = dataMapperService.generateLinkedTableHolders(templateId, columnHeaders, rows);
-        Map<Long, TableHolder> map = dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
-        return map;
+        return dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
     }
 }

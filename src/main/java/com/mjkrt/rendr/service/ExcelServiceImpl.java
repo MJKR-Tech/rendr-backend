@@ -26,6 +26,7 @@ import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
+import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
 import com.mjkrt.rendr.service.file.FileService;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.mapper.JsonService;
@@ -72,21 +73,16 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     @Override
-    public boolean uploadTemplateFromFile(MultipartFile file) {
+    public TemplateIdHolder uploadTemplateFromFile(MultipartFile file) {
         LOG.info("Uploading file " + file.getOriginalFilename() + " as dataTemplate");
         Optional<DataTemplate> optionalTemplate = Optional.ofNullable(readAsWorkBook(file))
                 .map(workbook -> templateExtractorService.extract(workbook, file.getOriginalFilename()))
                 .map(this::saveTemplate);
 
-        try {
-            long templateId = optionalTemplate.map(DataTemplate::getTemplateId).orElseThrow();
-            fileService.save(file, templateId + EXCEL_EXT);
-            return true;
-            
-        } catch (Exception e) {
-            LOG.warning(e.getLocalizedMessage());
-            return false;
-        }
+        long templateId = optionalTemplate.map(DataTemplate::getTemplateId).orElseThrow();
+        fileService.save(file, templateId + EXCEL_EXT);
+        return new TemplateIdHolder(templateId);
+
     }
 
     private Workbook readAsWorkBook(MultipartFile file) {
@@ -116,10 +112,13 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public boolean deleteTemplate(long templateId) {
-        LOG.info("Delete template with ID "+ templateId);
-        dataTemplateService.deleteById(templateId);
-        fileService.delete(templateId + EXCEL_EXT);
+    public boolean deleteTemplate(List<Long> templateIds) {
+        templateIds.stream()
+                .forEach(templateId -> {
+                    LOG.info("Delete template with ID "+ templateId);
+                    dataTemplateService.deleteById(templateId);
+                    fileService.delete(templateId + EXCEL_EXT);
+                });
         return true;
     }
 

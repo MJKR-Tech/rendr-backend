@@ -2,6 +2,7 @@ package com.mjkrt.rendr.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.DataTemplate;
+import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,9 +17,9 @@ public interface ExcelService {
     
     List<DataTemplate> getTemplates();
 
-    boolean uploadTemplateFromFile(MultipartFile file);
+    TemplateIdHolder uploadTemplateFromFile(MultipartFile file);
 
-    boolean deleteTemplate(long templateId);
+    boolean deleteTemplate(List<Long> templateIds);
 
     void deleteAllTemplates();
     
