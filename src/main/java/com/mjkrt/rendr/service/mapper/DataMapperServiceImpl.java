@@ -3,7 +3,6 @@ package com.mjkrt.rendr.service.mapper;
 import static com.mjkrt.rendr.entity.helper.ColumnHeader.ColumnDataType.MOCK;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,7 +43,8 @@ public class DataMapperServiceImpl implements DataMapperService {
     public List<TableHolder> generateLinkedTableHolders(long templateId,
             List<ColumnHeader> columnHeaders,
             List<JsonNode> rows) {
-    
+        
+        LOG.info("Calling generateLinkedTableHolders");
         List<TableHolder> tableHolders = generateTableHolders(columnHeaders, rows);
         return generateLinkedTableHolders(tableHolders);
     }
@@ -54,6 +54,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<ColumnHeader> headers,
             List<TableHolder> linkedTableHolders) {
 
+        LOG.info("Calling generateTableMapping");
         Map<Long, TableHolder> map = new HashMap<>();
         List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
 
@@ -67,11 +68,13 @@ public class DataMapperServiceImpl implements DataMapperService {
 
     @Override
     public Map<Long, String> generateCellMapping(List<DataCell> cells, List<TableHolder> linkedTables) {
+        LOG.info("Calling generateCellMapping");
         Map<Long, String> map = new HashMap<>();
         return map;
     }
 
     private ColumnHeader getColumnHeader(String key, List<ColumnHeader> headers) {
+        LOG.info("Calling getColumnHeader");
         key = key.toLowerCase();
         for (ColumnHeader ch : headers) {
             String name = ch.getName().toLowerCase();
@@ -83,6 +86,7 @@ public class DataMapperServiceImpl implements DataMapperService {
     }
 
     private TableHolder findTableHolder(List<TableHolder> tableHolders, List<ColumnHeader> columnHeaders) {
+        LOG.info("Calling findTableHolder");
         int size = columnHeaders.size();
         for (TableHolder tableHolder : tableHolders) {
             List<ColumnHeader> thColumnHeader = tableHolder.getColumnHeaders();
@@ -104,6 +108,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<TableHolder> tableHolders,
             List<ColumnHeader> headers) {
         
+        LOG.info("Calling getTemplateTableData");
         List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
         DataTable dataTable = null;
         for (DataTable dt : dataTables) {
@@ -159,6 +164,7 @@ public class DataMapperServiceImpl implements DataMapperService {
     }
 
     private List<TableHolder> generateLinkedTableHolders(List<TableHolder> tableHolders) {
+        LOG.info("Calling generateLinkedTableHolders");
         int[] lst = new int[tableHolders.size()];
         for (int i = 0; i < tableHolders.size(); i++) {
             lst[i] = 0;
@@ -166,7 +172,9 @@ public class DataMapperServiceImpl implements DataMapperService {
 
         List<TableHolder> newTableHolders = new ArrayList<>();
         for (int i = 0; i < tableHolders.size(); i++) {
+            LOG.info("Calling generateLinkedTableHolders 1.1 || size=" + tableHolders.size());
             for (int j = i + 1; j < tableHolders.size(); j++) {
+                LOG.info("Calling generateLinkedTableHolders 1.2 || i=" + i + " j=" + j);
                 TableHolder tableHolder = tableHolderService.naturalJoin(tableHolders.get(i), tableHolders.get(j));
                 if (tableHolder != null) {
                     lst[i] = 1;
@@ -178,6 +186,7 @@ public class DataMapperServiceImpl implements DataMapperService {
 
         int count = 0;
         for (int i = 0; i < lst.length; i++) {
+            LOG.info("Calling generateLinkedTableHolders 2");
             if (lst[i] == 0) {
                 count++;
                 newTableHolders.add(tableHolders.get(i));
@@ -185,6 +194,7 @@ public class DataMapperServiceImpl implements DataMapperService {
         }
 
         if (count != tableHolders.size()) {
+            LOG.info("Calling generateLinkedTableHolders 3");
             return generateLinkedTableHolders(newTableHolders);
         }
         return tableHolders;
@@ -224,6 +234,7 @@ public class DataMapperServiceImpl implements DataMapperService {
     }
 
     private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader) {
+        LOG.info("Calling cloneColumnHeader");
         ColumnHeader ch = new ColumnHeader();
         ch.setField(columnHeader.getField());
         ch.setName(columnHeader.getName());
@@ -244,6 +255,7 @@ public class DataMapperServiceImpl implements DataMapperService {
     }
     
     private boolean popTopAndCompactDeque(Deque<TableHolder> deque) {
+        LOG.info("Calling popTopAndCompactDeque");
         boolean hasChanges = false;
         TableHolder intermediateTable = deque.pop(); // pop from top
         for (int i = 0; i < deque.size(); i++) {
