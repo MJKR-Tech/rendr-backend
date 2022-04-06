@@ -3,6 +3,7 @@ package com.mjkrt.rendr.service.mapper;
 import static com.mjkrt.rendr.entity.helper.ColumnHeader.ColumnDataType.MOCK;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,6 +71,33 @@ public class DataMapperServiceImpl implements DataMapperService {
     public Map<Long, String> generateCellMapping(List<DataCell> cells, List<TableHolder> linkedTables) {
         LOG.info("Calling generateCellMapping");
         Map<Long, String> map = new HashMap<>();
+        
+        for (DataCell cell : cells) {
+            long cellId = cell.getCellId();
+            String field = cell.getField();
+            String data = "";
+            boolean isFound = false;
+            
+            for (TableHolder table : linkedTables) {
+                List<ColumnHeader> headers = table.getColumnHeaders();
+                int tableCols = headers.size();
+                List<String> topRow = (table.getDataRows().isEmpty())
+                        ? new ArrayList<>(Collections.nCopies(tableCols, ""))
+                        : table.getDataRows().iterator().next();
+                
+                for (int idx = 0; idx < headers.size(); idx++) {
+                    ColumnHeader header = headers.get(idx);
+                    if (field.equals(header.getName())) {
+                        data = topRow.get(idx);
+                        isFound = true;
+                    }
+                }
+                if (isFound) {
+                    break;
+                }
+            }
+            map.put(cellId, data);
+        }
         return map;
     }
 
@@ -126,9 +154,10 @@ public class DataMapperServiceImpl implements DataMapperService {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                     correctColumnHeaders.add(newCh);
-                } else if (ch.getName().isEmpty()) {
-                    columnHeaders.add(ColumnHeader.getMockColumnHeader());
                 }
+            }
+             if (dataHeader.getAlias().isEmpty()) {
+                columnHeaders.add(ColumnHeader.getMockColumnHeader());
             }
         }
         // may need to add empty strings at placeholder columns todo
