@@ -107,7 +107,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             long tableId,
             List<TableHolder> tableHolders,
             List<ColumnHeader> headers) {
-        
+
         LOG.info("Calling getTemplateTableData");
         List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
         DataTable dataTable = null;
@@ -116,28 +116,24 @@ public class DataMapperServiceImpl implements DataMapperService {
                 dataTable = dt;
             }
         }
-//        DataTable dataTable = dataTables.get((int) tableId);
-        List<DataContainer> dataHeaders = dataTable.getDataContainers();
+        List<DataContainer> dataHeaders = dataTable.getDataContainers(); // to verify
         List<ColumnHeader> columnHeaders = new ArrayList<>();
-        List<Pair<Integer, ColumnHeader>> correctColumnHeaders = new ArrayList<>();
+        List<ColumnHeader> correctColumnHeaders = new ArrayList<>();
 
-        int count = 0;
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
                 if (ch.getName().equals(dataHeader.getAlias())) {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
+                    correctColumnHeaders.add(newCh);
+                } else if (ch.getName().isEmpty()) {
+                    ColumnHeader newCh = new ColumnHeader("", MOCK);
+                    columnHeaders.add(newCh);
                 }
-            }
-            count++;
-            if (columnHeaders.size() + correctColumnHeaders.size() != count) {
-                ColumnHeader newCh = new ColumnHeader(dataHeader.getAlias(), MOCK);
-                correctColumnHeaders.add(new Pair<>(count, newCh));
             }
         }
         // may need to add empty strings at placeholder columns todo
-        return tableHolderService.generateSubset(findTableHolder(tableHolders, columnHeaders), columnHeaders);
-        //return fillTableHolderWithMock(th, correctColumnHeaders);
+        return tableHolderService.generateSubset(findTableHolder(tableHolders, correctColumnHeaders), columnHeaders);
     }
 
     private TableHolder fillTableHolderWithMock(TableHolder th, List<Pair<Integer, ColumnHeader>> correctColumnHeaders) {
