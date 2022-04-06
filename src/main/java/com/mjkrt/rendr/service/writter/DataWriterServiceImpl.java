@@ -3,6 +3,8 @@ package com.mjkrt.rendr.service.writter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,9 +94,7 @@ public class DataWriterServiceImpl implements DataWriterService {
 
             }
         }
-
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
-
     }
 
     private void writeVerticalTable(long startRowNum, long colNum, List<String> data, Sheet sheet) {
@@ -105,9 +105,9 @@ public class DataWriterServiceImpl implements DataWriterService {
             Cell cell = nextRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (NumberUtils.isParsable(dataValue)) {
                 if (NumberUtils.isDigits(dataValue)) {
-                    cell.setCellValue(Integer.parseInt(dataValue));
+                    cell.setCellValue(new BigDecimal(dataValue).longValueExact());
                 } else {
-                    cell.setCellValue(Double.parseDouble(dataValue));
+                    cell.setCellValue(new BigDecimal(dataValue).doubleValue());
                 }
             } else {
                 cell.setCellValue(dataValue);
@@ -124,9 +124,9 @@ public class DataWriterServiceImpl implements DataWriterService {
             Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (NumberUtils.isParsable(dataValue)) {
                 if (NumberUtils.isDigits(dataValue)) {
-                    cell.setCellValue(Integer.parseInt(dataValue));
+                    cell.setCellValue(new BigDecimal(dataValue).longValueExact());
                 } else {
-                    cell.setCellValue(Double.parseDouble(dataValue));
+                    cell.setCellValue(new BigDecimal(dataValue).doubleValue());
                 }
             } else {
                 cell.setCellValue(dataValue);

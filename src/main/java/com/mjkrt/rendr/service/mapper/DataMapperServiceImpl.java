@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -152,12 +153,12 @@ public class DataMapperServiceImpl implements DataMapperService {
 
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
-                if (dataHeader.equals(sortedDataContainer) && ch.getName().equals(dataHeader.getAlias())) {
+                if (dataHeader.equals(sortedDataContainer) && ch.getName().equalsIgnoreCase(dataHeader.getAlias())) {
                     sortedColumnHeader = cloneColumnHeader(ch);
                     columnHeaders.add(sortedColumnHeader);
                     correctColumnHeaders.add(sortedColumnHeader);
                     break;
-                } else if (ch.getName().equals(dataHeader.getAlias())) {
+                } else if (ch.getName().equalsIgnoreCase(dataHeader.getAlias())) {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                     correctColumnHeaders.add(newCh);
