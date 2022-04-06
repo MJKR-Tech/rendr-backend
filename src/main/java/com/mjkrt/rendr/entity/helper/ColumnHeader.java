@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import static com.mjkrt.rendr.entity.helper.ColumnHeader.ColumnDataType.MOCK;
+
 public class ColumnHeader implements Comparable<ColumnHeader> {
 
     public enum ColumnDataType {
@@ -12,6 +14,9 @@ public class ColumnHeader implements Comparable<ColumnHeader> {
         @JsonProperty("date") DATE,
         @JsonProperty("double") DOUBLE,
         @JsonProperty("mock") MOCK
+    }
+    public static ColumnHeader getMockColumnHeader(){
+        return new ColumnHeader("", MOCK);
     }
     
     private String name;

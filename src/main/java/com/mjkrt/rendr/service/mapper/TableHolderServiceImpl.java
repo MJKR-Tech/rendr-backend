@@ -138,13 +138,20 @@ public class TableHolderServiceImpl implements TableHolderService {
 
         List<ColumnHeader> currentHeaders = t.getColumnHeaders();
         List<Integer> indexMappings = getMappingOfHeaders(currentHeaders, desiredColumns);
-        if (indexMappings.isEmpty()) {
+        int count = 0;
+        for (int i : indexMappings) {
+            if (i >= 0) {
+                count++;
+                break;
+            }
+        }
+        if (indexMappings.isEmpty() || count == 0) {
             throw new IllegalArgumentException("Subset to generate cannot be empty");
         }
         
         List<ColumnHeader> newHeaders = getNewHeaders(currentHeaders, indexMappings);
         Set<List<String>> currentRows = t.getDataRows();
-        Set<List<String>> newRows = getNewRows(currentRows, indexMappings);
+        Set<List<String>> newRows = getNewRows(currentRows, indexMappings, newHeaders);
         return new TableHolder(newHeaders, newRows);
     }
 
@@ -155,7 +162,12 @@ public class TableHolderServiceImpl implements TableHolderService {
                 ColumnHeader currHeader = currentHeaders.get(i);
                 if (currHeader.equals(desiredHeader)) {
                     mappings.add(i);
+                } else if (desiredHeader.getName().isEmpty()) {
+                    mappings.add(i);
                 }
+            }
+            if (desiredHeader.getName().isEmpty()) {
+                mappings.add(-1);
             }
         }
         return mappings;
@@ -164,16 +176,24 @@ public class TableHolderServiceImpl implements TableHolderService {
     private List<ColumnHeader> getNewHeaders(List<ColumnHeader> currentHeaders, List<Integer> indexMappings) {
         List<ColumnHeader> newHeaders = new ArrayList<>();
         for (int idx : indexMappings) {
+            if (idx == -1) {
+                newHeaders.add(ColumnHeader.getMockColumnHeader());
+                continue;
+            }
             newHeaders.add(currentHeaders.get(idx));
         }
         return newHeaders;
     }
 
-    private Set<List<String>> getNewRows(Set<List<String>> currentRows, List<Integer> indexMappings) {
+    private Set<List<String>> getNewRows(Set<List<String>> currentRows, List<Integer> indexMappings, List<ColumnHeader> desiredCh) {
         Set<List<String>> newRows = new HashSet<>();
         for (List<String> row : currentRows) {
             List<String> newRow = new ArrayList<>();
             for (int idx : indexMappings) {
+                if (idx == -1) {
+                    newRow.add("");
+                    continue;
+                }
                 newRow.add(row.get(idx));
             }
             newRows.add(newRow);

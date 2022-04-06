@@ -127,8 +127,7 @@ public class DataMapperServiceImpl implements DataMapperService {
                     columnHeaders.add(newCh);
                     correctColumnHeaders.add(newCh);
                 } else if (ch.getName().isEmpty()) {
-                    ColumnHeader newCh = new ColumnHeader("", MOCK);
-                    columnHeaders.add(newCh);
+                    columnHeaders.add(ColumnHeader.getMockColumnHeader());
                 }
             }
         }
