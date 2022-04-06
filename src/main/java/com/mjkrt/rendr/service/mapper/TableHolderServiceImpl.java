@@ -162,8 +162,6 @@ public class TableHolderServiceImpl implements TableHolderService {
                 ColumnHeader currHeader = currentHeaders.get(i);
                 if (currHeader.equals(desiredHeader)) {
                     mappings.add(i);
-                } else if (desiredHeader.getName().isEmpty()) {
-                    mappings.add(i);
                 }
             }
             if (desiredHeader.getName().isEmpty()) {
