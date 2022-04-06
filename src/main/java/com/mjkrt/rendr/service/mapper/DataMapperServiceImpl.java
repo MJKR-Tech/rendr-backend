@@ -46,7 +46,7 @@ public class DataMapperServiceImpl implements DataMapperService {
         
         LOG.info("Calling generateLinkedTableHolders");
         List<TableHolder> tableHolders = generateTableHolders(columnHeaders, rows);
-        return generateLinkedTableHolders(tableHolders);
+        return compactTableHolders(tableHolders);
     }
     
     @Override
