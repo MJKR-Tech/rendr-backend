@@ -3,15 +3,23 @@ package com.mjkrt.rendr.service.writter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import com.mjkrt.rendr.entity.DataContainer;
+import com.mjkrt.rendr.entity.DataSheet;
+import com.mjkrt.rendr.entity.helper.ColumnHeader;
+import com.mjkrt.rendr.entity.helper.DataDirection;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +28,9 @@ import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
+
+import static com.mjkrt.rendr.entity.helper.DataDirection.HORIZONTAL;
+import static com.mjkrt.rendr.entity.helper.DataDirection.VERTICAL;
 
 @Service
 public class DataWriterServiceImpl implements DataWriterService {
@@ -33,73 +44,62 @@ public class DataWriterServiceImpl implements DataWriterService {
     @Override
     public void mapDataToWorkbook(Map<Long, TableHolder> dataMap,
             Map<Long, String> cellSubstitutions,
-            Workbook workbook) {
+            Workbook workbook, long templateId) {
         
         LOG.info("Mapping data to workbook");
-//        int sheetCount = workbook.getNumberOfSheets();
-//        ArrayList<Sheet> sheetList = new ArrayList<>();
-//        for (int i = 0; i < sheetCount; i++) {
-//            sheetList.add(workbook.getSheetAt(i));
-//        }
-//
-//        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheets();
-//
-//        for (Sheet sheet : sheetList) {
-//            String sheetName = sheet.getSheetName();
-//            DataSheet dataSheet = new DataSheet();
-//            for (DataSheet ds : dataSheets) {
-//                if (ds.getSheetName().equals(sheetName)) {
-//                    dataSheet = ds;
-//                    break;
-//                }
-//            }
-//
-//            List<DataTable> dataTables = dataSheet.getDataTables();
-//            for (DataTable dt : dataTables) {
-//                Long tableId = dt.getTableId();
-//                long startRow = dt.getRowNum();
-//                long startCol = dt.getColNum();
-//
-//                Pair<List<ColumnHeader>, Map<String, List<String>>> mapThingData = dataMap.get(tableId);
-//                List<ColumnHeader> columnHeaders = mapThingData.getKey();
-//                DataDirection direction = columnHeaders.get(0).getDirection();
-//                Map<String, List<String>> mapThingValues = mapThingData.getValue();
-//
-//                if (direction == HORIZONTAL) {
-//                    for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
-//                        startRow += 1;
-//                        writeHorizontalTable(startRow, startCol, entry, sheet);
-//
-//                    }
-//                } else if (direction == VERTICAL){
-//                    for (Map.Entry<String, List<String>> entry : mapThingValues.entrySet()) {
-//                        startCol += 1;
-//                        writeVerticalTable(startRow, startCol, entry, sheet);
-//                    }
-//                }
-//
-//            }
-//        }
-//        XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
-    }
-
-    private void writeVerticalTable(long startRowNum, long colNum, Map.Entry<String, List<String>> entry, Sheet sheet) {
-        Row startingRow = sheet.getRow((int) startRowNum);
-        startRowNum += 1;
-        Cell cell = startingRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-
-        if (NumberUtils.isParsable(entry.getKey())) {
-            cell.setCellValue(Integer.parseInt(entry.getKey()));
-        } else {
-            cell.setCellValue(entry.getKey());
+        int sheetCount = workbook.getNumberOfSheets();
+        ArrayList<Sheet> sheetList = new ArrayList<>();
+        for (int i = 0; i < sheetCount; i++) {
+            sheetList.add(workbook.getSheetAt(i));
         }
 
-        List<String> dataValues = entry.getValue();
+        List<DataSheet> dataSheets = dataTemplateService.findById(templateId).getDataSheets();
 
-        for (String dataValue : dataValues) {
+        for (Sheet sheet : sheetList) {
+            String sheetName = sheet.getSheetName();
+            DataSheet dataSheet = new DataSheet();
+            for (DataSheet ds : dataSheets) {
+                if (ds.getSheetName().equals(sheetName)) {
+                    dataSheet = ds;
+                    break;
+                }
+            }
+
+            List<DataTable> dataTables = dataSheet.getDataTables();
+            for (DataTable dt : dataTables) {
+                List<DataContainer> dtc = dt.getDataContainers();
+                Long tableId = dt.getTableId();
+                long startRow = dtc.get(0).getRowNum();
+                long startCol = dtc.get(0).getColNum();
+
+                TableHolder mapThingData = dataMap.get(tableId);
+                DataDirection direction = dtc.get(0).getDirection();
+                Set<List<String>> datas = mapThingData.getDataRows();
+
+                if (direction == VERTICAL) {
+                    for (List<String> data : datas) {
+                        startRow += 1;
+                        writeHorizontalTable(startRow, startCol, data, sheet);
+
+                    }
+                } else if (direction == HORIZONTAL){
+                    for (List<String> data : datas) {
+                        startCol += 1;
+                        writeVerticalTable(startRow, startCol, data, sheet);
+                    }
+                }
+
+            }
+        }
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+    }
+
+    private void writeVerticalTable(long startRowNum, long colNum, List<String> data, Sheet sheet) {
+
+        for (String dataValue : data) {
             Row nextRow = sheet.getRow((int) startRowNum);
 
-            cell = nextRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            Cell cell = nextRow.getCell((int)colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (NumberUtils.isParsable(dataValue)) {
                 if (NumberUtils.isDigits(dataValue)) {
                     cell.setCellValue(Integer.parseInt(dataValue));
@@ -113,25 +113,12 @@ public class DataWriterServiceImpl implements DataWriterService {
         }
     }
 
-    private void writeHorizontalTable(long startRow,
-            long startCol,
-            Map.Entry<String, List<String>> entry,
-            Sheet sheet) {
-        
+    private void writeHorizontalTable(long startRow, long startCol, List<String> data, Sheet sheet) {
         int col = (int) startCol;
         Row row = sheet.getRow((int) startRow);
-        Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-        if (NumberUtils.isParsable(entry.getKey())) {
-            cell.setCellValue(Integer.parseInt(entry.getKey()));
-        } else {
-            cell.setCellValue(entry.getKey());
-        }
-
-        List<String> dataValues = entry.getValue();
-
-        for (String dataValue : dataValues) {
-            cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+        for (String dataValue : data) {
+            Cell cell = row.getCell(col++, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (NumberUtils.isParsable(dataValue)) {
                 if (NumberUtils.isDigits(dataValue)) {
                     cell.setCellValue(Integer.parseInt(dataValue));

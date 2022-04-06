@@ -12,6 +12,6 @@ import com.mjkrt.rendr.entity.helper.TableHolder;
 public interface DataWriterService {
     void mapDataToWorkbook(Map<Long, TableHolder> dataMap,
             Map<Long, String> cellSubstitutions,
-            Workbook workbook);
+            Workbook workbook, long tableId);
     ByteArrayInputStream writeToStream(Workbook workbook);
 }

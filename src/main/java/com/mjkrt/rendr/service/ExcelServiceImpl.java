@@ -162,7 +162,7 @@ public class ExcelServiceImpl implements ExcelService {
         Map<Long, TableHolder> tableHolders = getTableToHolderMap(templateId, dataNode.get("jsonObjects"));
         Map<Long, String> substitutionMap = getCellToDataMap(templateId, dataNode);
         
-        dataWriterService.mapDataToWorkbook(tableHolders, substitutionMap, workbook);
+        dataWriterService.mapDataToWorkbook(tableHolders, substitutionMap, workbook, templateId);
         return dataWriterService.writeToStream(workbook);
     }
     
