@@ -78,7 +78,7 @@ public class DataMapperServiceImpl implements DataMapperService {
         key = key.toLowerCase();
         for (ColumnHeader ch : headers) {
             String name = ch.getName().toLowerCase();
-            if (key.contains(name)) {
+            if (key.equals(name)) {
                 return cloneColumnHeader(ch);
             }
         }
