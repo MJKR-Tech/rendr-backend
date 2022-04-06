@@ -38,6 +38,7 @@ CREATE TABLE data_container (
     table_id BIGINT NOT NULL,
     row_num INT NOT NULL DEFAULT 0,
     col_num INT NOT NULL DEFAULT 0,
+    ordering INT NOT NULL DEFAULT 0,
     direction ENUM('HORIZONTAL', 'VERTICAL') NOT NULL,
     alias VARCHAR(255) NOT NULL,
     PRIMARY KEY (container_id),

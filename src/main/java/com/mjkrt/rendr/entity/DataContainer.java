@@ -39,7 +39,26 @@ public class DataContainer {
 
     private long colNum;
     
+    private long ordering = 0;
+    
     public DataContainer() {
+    }
+
+    public DataContainer(long containerId,
+            DataTable dataTable,
+            DataDirection direction,
+            String alias,
+            long rowNum,
+            long colNum,
+            long ordering) {
+        
+        this.containerId = containerId;
+        this.dataTable = dataTable;
+        this.direction = direction;
+        this.alias = alias;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+        this.ordering = ordering;
     }
 
     public DataContainer(long containerId,
@@ -120,6 +139,14 @@ public class DataContainer {
         this.colNum = colNum;
     }
 
+    public long getOrdering() {
+        return ordering;
+    }
+
+    public void setOrdering(long ordering) {
+        this.ordering = ordering;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -136,7 +163,8 @@ public class DataContainer {
                         (dataTable == null) ? null : dataTable.getTableId(),
                         (that.dataTable == null) ? null : that.dataTable.getTableId())
                 && direction == that.direction
-                && Objects.equals(alias, that.alias);
+                && Objects.equals(alias, that.alias)
+                && ordering == that.ordering;
     }
 
     @Override
@@ -158,6 +186,7 @@ public class DataContainer {
                 ", containerAlias='" + alias + '\'' +
                 ", rowNum=" + rowNum +
                 ", colNum=" + colNum +
+                ", ordering" + ordering +
                 '}';
     }
 }
