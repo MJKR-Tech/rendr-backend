@@ -80,7 +80,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<ColumnHeader> headers) {
 
         Map<Long, TableHolder> map = new HashMap<>();
-        List<DataTable> dataTables = getDataTables(templateId);
+        List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
 
         for (DataTable dataTable : dataTables) {
             long tableId = dataTable.getTableId();
@@ -112,7 +112,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<TableHolder> tableHolders,
             List<ColumnHeader> headers) {
         
-        List<DataTable> dataTables = getDataTables(templateId);
+        List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
         DataTable dataTable = null;
         for (DataTable dt : dataTables) {
             if (dt.getTableId() == tableId) {
