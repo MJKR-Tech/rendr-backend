@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.mjkrt.rendr.entity.helper.DataDirection;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -112,7 +113,13 @@ public class DataMapperServiceImpl implements DataMapperService {
             List<ColumnHeader> headers) {
         
         List<DataTable> dataTables = getDataTables(templateId);
-        DataTable dataTable = dataTables.get((int) tableId - 1);
+        DataTable dataTable = null;
+        for (DataTable dt : dataTables) {
+            if (dt.getTableId() == tableId) {
+                dataTable = dt;
+            }
+        }
+//        DataTable dataTable = dataTables.get((int) tableId);
         List<DataContainer> dataHeaders = dataTable.getDataContainers();
         List<ColumnHeader> columnHeaders = new ArrayList<>();
         List<Pair<Integer, ColumnHeader>> correctColumnHeaders = new ArrayList<>();
@@ -121,6 +128,7 @@ public class DataMapperServiceImpl implements DataMapperService {
         for (DataContainer dataHeader : dataHeaders) {
             for (ColumnHeader ch : headers) {
                 if (ch.getName().equals(dataHeader.getAlias())) {
+                    DataDirection direction = dataHeader.getDirection();
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                 }
