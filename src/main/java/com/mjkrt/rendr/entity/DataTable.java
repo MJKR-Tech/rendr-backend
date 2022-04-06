@@ -1,6 +1,7 @@
 package com.mjkrt.rendr.entity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,6 +67,7 @@ public class DataTable {
     }
 
     public List<DataContainer> getDataContainers() {
+        dataContainers.sort(Comparator.comparing(DataContainer::getOrdering));
         return dataContainers;
     }
 

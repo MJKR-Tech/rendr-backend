@@ -67,11 +67,13 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         int sheetCount = workbook.getNumberOfSheets();
         for (int i = 0; i < sheetCount; i++) {
             Sheet sheet = workbook.getSheetAt(i);
-            if (sheet == null) {
+            DataSheet dataSheet = processSheet(sheet, i);
+            if (dataSheet == null) {
                 continue;
             }
-            dataSheets.add(processSheet(sheet, i));
+            dataSheets.add(dataSheet);
         }
+        
         dataTemplate.setDataSheets(dataSheets);
         return (dataSheets.isEmpty())
                 ? null
@@ -185,8 +187,10 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         List<DataContainer> currentGroup = new ArrayList<>();
         long prevRow = Long.MIN_VALUE;
         long prevCol = Long.MIN_VALUE;
+        long ordering = 0;
 
         for (DataContainer container : trimmedContainers) {
+            container.setOrdering(ordering);
             long currRow = container.getRowNum();
             long currCol = container.getColNum();
             boolean isNotInit = (prevRow > 0) && (prevCol > 0);
@@ -198,11 +202,13 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
                     && (currRow != prevRow || currCol > prevCol + 1);
             if (isHorizontalAndJumped || isVerticalAndJumped) {
                 groupsOfContainers.add(currentGroup);
+                ordering = 0;
                 currentGroup = new ArrayList<>();
             }
             currentGroup.add(container);
             prevRow = currRow;
             prevCol = currCol;
+            ordering++;
         }
         groupsOfContainers.add(currentGroup);
     }
