@@ -1,5 +1,7 @@
 package com.mjkrt.rendr.entity.helper;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +14,16 @@ import java.util.stream.Collectors;
 public class TableHolder {
 
     private static final BiFunction<Integer, Boolean, Comparator<List<String>>> comparatorGenerator = (idx, isAsc)
-            -> (list1, list2) -> list1.get(idx).compareTo(list2.get(idx)) * ((isAsc) ? 1 : -1);
+            -> (list1, list2) -> {
+
+        if (NumberUtils.isParsable(list1.get(idx))) {
+            Double i1 = Double.parseDouble(list1.get(idx));
+            Double i2 = Double.parseDouble(list2.get(idx));
+            return (i1 - i2) * ((isAsc) ? 1 : -1) > 0 ? 1 : -1;
+        }
+        return list1.get(idx).compareTo(list2.get(idx)) * ((isAsc) ? 1 : -1);
+
+    };
 
     private List<ColumnHeader> columnHeaders;
 
