@@ -5,14 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ColumnHeader implements Comparable<ColumnHeader> {
-
-    public enum ColumnDataType {
-        @JsonProperty("string") STRING,
-        @JsonProperty("decimal") DECIMAL,
-        @JsonProperty("date") DATE,
-        @JsonProperty("double") DOUBLE,
-        @JsonProperty("mock") MOCK
-    }
     
     public static ColumnHeader getMockColumnHeader() {
         return new ColumnHeader();

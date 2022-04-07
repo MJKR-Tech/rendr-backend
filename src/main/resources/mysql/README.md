@@ -27,7 +27,7 @@ This document describes the set-up procedures to integrate MySQL to this applica
    ```
    ``` sql
    CREATE USER 'rendrUser'@'localhost' IDENTIFIED BY 'PASSWORD';
-   GRANT PRIVILEGE ON rendr_db.table TO 'rendrUser'@'localhost';
+   GRANT ALL PRIVILEGES ON rendr_db.* TO 'rendrUser'@'localhost';
    ```
 
 1. Enter the database

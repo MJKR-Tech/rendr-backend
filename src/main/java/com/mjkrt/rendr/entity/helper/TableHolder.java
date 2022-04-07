@@ -1,7 +1,6 @@
 package com.mjkrt.rendr.entity.helper;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -11,19 +10,28 @@ import java.util.stream.Collectors;
 
 public class TableHolder {
 
-    private static Comparator<List<String>> generateComparator(int columnIdx, boolean isAsc) {
+    private static Comparator<List<String>> generateComparator(int columnIdx, boolean isAsc, ColumnDataType type) {
         int directionInt = ((isAsc) ? 1 : -1);
         return (list1, list2) -> {
-            if (NumberUtils.isParsable(list1.get(columnIdx))) {
-                double d1 = Double.parseDouble(list1.get(columnIdx));
-                double d2 = Double.parseDouble(list2.get(columnIdx));
-                return Double.compare(d1, d2) * directionInt;
+            String string1 = list1.get(columnIdx);
+            String string2 = list2.get(columnIdx);
+            if (string1.isEmpty() && string2.isEmpty()) {
+                return 0;
+            } else if (!string1.isEmpty() && string2.isEmpty()) {
+                return -1;
+            } else if (string1.isEmpty() && !string2.isEmpty()) {
+                return 1;
             }
-            return list1.get(columnIdx).compareTo(list2.get(columnIdx)) * directionInt;
+            if (type == ColumnDataType.DECIMAL || type == ColumnDataType.DOUBLE) {
+                BigDecimal d1 = new BigDecimal(string1);
+                BigDecimal d2 = new BigDecimal(string2);
+                return d1.compareTo(d2) * directionInt;
+            }
+            return string1.compareTo(string2) * directionInt;
         };
     }
 
-    private Comparator<List<String>> sortByComparator = generateComparator(0, true); // default
+    private Comparator<List<String>> sortByComparator;
 
     private List<ColumnHeader> columnHeaders;
 
@@ -33,6 +41,7 @@ public class TableHolder {
         verifyStructure(columnHeaders, dataRows);
         this.columnHeaders = columnHeaders;
         this.dataRows = dataRows;
+        this.sortByComparator = generateComparator(0, true, columnHeaders.get(0).getType());
     }
 
     public TableHolder(List<ColumnHeader> columnHeaders) {
@@ -40,6 +49,7 @@ public class TableHolder {
             throw new IllegalArgumentException("Headers cannot be empty");
         }
         this.columnHeaders = columnHeaders;
+        this.sortByComparator = generateComparator(0, true, columnHeaders.get(0).getType());
     }
 
     private static void verifyStructure(List<ColumnHeader> columnHeaders, Set<List<String>> dataRows) {
@@ -76,12 +86,12 @@ public class TableHolder {
     }
 
     public void setSortColumnAndDirection(ColumnHeader header, SortedOrdering ordering) {
-        int columnIdx = columnHeaders.indexOf(header);
+        int columnIdx = getColumnHeaders().indexOf(header);
         if (columnIdx < 0 || ordering == SortedOrdering.NOT_USED) {
-            return; // not found
+            return; //not found
         }
         boolean isAscending = (ordering == SortedOrdering.ASC);
-        sortByComparator = generateComparator(columnIdx, isAscending);
+        sortByComparator = generateComparator(columnIdx, isAscending, columnHeaders.get(columnIdx).getType());
     }
 
     public List<List<String>> generateOrderedTable() {
