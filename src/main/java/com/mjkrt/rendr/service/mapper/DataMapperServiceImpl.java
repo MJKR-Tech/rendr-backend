@@ -18,7 +18,6 @@ import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.DataContainer;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
-import com.mjkrt.rendr.entity.helper.SortedOrdering;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
