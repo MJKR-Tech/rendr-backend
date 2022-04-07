@@ -31,7 +31,7 @@ import com.mjkrt.rendr.service.ExcelService;
 import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-@CrossOrigin(origins = "http://localhost:3000") // todo remove after system test passes
+@CrossOrigin(origins = "${local.front.end.react.js.origin}")
 @RequestMapping("/api/v1")
 @RestController
 public class ExcelController {
@@ -102,6 +102,12 @@ public class ExcelController {
 
     @Autowired
     private DataMapperService dataMapperService;
+    
+    @GetMapping("/greet")
+    public String greet() {
+        LOG.info("GET /greet called");
+        return "Hello World";
+    }
 
     @DeleteMapping("/deleteAllTemplates")
     public boolean deleteAllTemplates() {

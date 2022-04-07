@@ -97,4 +97,14 @@ public class DataTemplateServiceImpl implements DataTemplateService {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<DataSheet> findDataSheetsWithTemplateId(long id) {
+        LOG.info("Obtaining dataSheets with dataTemplateId " + id);
+        if (!isPresent(id)) {
+            throw new IllegalArgumentException("Template with given ID is not present");
+        }
+        return dataTemplateRepository.getById(id)
+                .getDataSheets();
+    }
 }

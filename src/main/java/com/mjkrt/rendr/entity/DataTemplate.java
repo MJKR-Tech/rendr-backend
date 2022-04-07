@@ -22,7 +22,7 @@ public class DataTemplate {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long templateId;
 
-    //@JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "dataTemplate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DataSheet> dataSheets = new ArrayList<>();
 

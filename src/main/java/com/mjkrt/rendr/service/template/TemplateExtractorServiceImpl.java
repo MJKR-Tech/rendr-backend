@@ -38,8 +38,6 @@ overall: (## | !!(> | v)) a [(++|--)]
 !! deals with where to start exploring for a table
 > | v deals with direction substitution
 ## helps with substitution
-
-TODO See Demo_3.xlsx as an example
 */
 @Service
 public class TemplateExtractorServiceImpl implements TemplateExtractorService {
@@ -99,6 +97,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     }
     
     private List<DataCell> extractCellsFromSheet(Sheet sheet) {
+        LOG.info("Extracting cells from sheet " + sheet.getSheetName());
         List<DataCell> cells = new ArrayList<>();
         for (Row row : sheet) {
             List<DataCell> rowDataCells = extractCellsFromRow(row);
@@ -108,6 +107,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     }
 
     private List<DataCell> extractCellsFromRow(Row row) {
+        LOG.info("Extracting cells from rowNum " + row.getRowNum());
         List<DataCell> rowDataCells = new ArrayList<>();
         for (Cell cell : row) {
             DataCell dataCell = processAsDataCell(cell);
@@ -123,6 +123,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
         if (cell == null || cell.getCellType() != STRING) {
             return null;
         }
+        LOG.info("Processing cell at " + cell.getAddress());
         String cellValue = cell.getStringCellValue();
         if (!cellValue.startsWith(REPLACE_FLAG)) {
             return null;
@@ -134,6 +135,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     }
 
     private List<DataContainer> extractContainersFromSheet(Sheet sheet) {
+        LOG.info("Extracting containers from sheet " + sheet.getSheetName());
         List<DataContainer> containers = new ArrayList<>();
         for (Row row : sheet) {
             for (Cell cell : row) {
@@ -149,6 +151,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     }
 
     private DataContainer processSingleContainer(Cell cell) {
+        LOG.info("Processing container at " + cell.getAddress());
         String header = cell.getStringCellValue();
         DataDirection direction = (header.startsWith(HORIZONTAL_CONTAINER_FLAG))
                 ? HORIZONTAL
@@ -174,6 +177,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     }
     
     private List<DataTable> groupContainers(List<DataContainer> containers) {
+        LOG.info("Grouping containers together");
         List<DataTable> tables = new ArrayList<>();
         tables.addAll(groupContainersByDirection(containers, HORIZONTAL));
         tables.addAll(groupContainersByDirection(containers, VERTICAL));
@@ -182,7 +186,8 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     
     private List<DataTable> groupContainersByDirection(List<DataContainer> containers,
             DataDirection direction) {
-        
+
+        LOG.info("Grouping containers together by direction " + direction);
         List<DataContainer> trimmedContainers = filterContainersByDirection(containers, direction);
         if (trimmedContainers.isEmpty()) {
             return new ArrayList<>();
@@ -199,7 +204,8 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     private void extractGroupsOfContainers(List<List<DataContainer>> groupsOfContainers,
             List<DataContainer> trimmedContainers,
             DataDirection direction) {
-        
+
+        LOG.info("Extracting containers together by direction " + direction);
         List<DataContainer> currentGroup = new ArrayList<>();
         long prevRow = Long.MIN_VALUE;
         long prevCol = Long.MIN_VALUE;
@@ -231,7 +237,8 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     
     private List<DataContainer> filterContainersByDirection(List<DataContainer> containers,
             DataDirection direction) {
-        
+
+        LOG.info("Filtering containers together by direction " + direction);
         Comparator<DataContainer> comparator = (direction == HORIZONTAL)
                 ? Comparator.comparing(DataContainer::getRowNum)
                         .thenComparing(DataContainer::getColNum)

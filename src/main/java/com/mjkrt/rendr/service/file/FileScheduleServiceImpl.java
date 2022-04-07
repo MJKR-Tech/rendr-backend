@@ -30,7 +30,7 @@ public class FileScheduleServiceImpl implements FileScheduleService {
     private FileService fileService;
     
     @Autowired
-    DataTemplateService dataTemplateService;
+    private DataTemplateService dataTemplateService;
 
     @Scheduled(fixedDelayString = "${upload.frequency.milliseconds.clean-up}")
     @Override

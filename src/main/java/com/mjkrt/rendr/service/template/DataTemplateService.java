@@ -3,6 +3,7 @@ package com.mjkrt.rendr.service.template;
 import java.util.List;
 
 import com.mjkrt.rendr.entity.DataCell;
+import com.mjkrt.rendr.entity.DataSheet;
 import com.mjkrt.rendr.entity.DataTable;
 import com.mjkrt.rendr.entity.DataTemplate;
 
@@ -16,4 +17,5 @@ public interface DataTemplateService {
     void deleteAll();
     List<DataTable> findDataTablesWithTemplateId(long id);
     List<DataCell> findDataCellsWithTemplateId(long id);
+    List<DataSheet> findDataSheetsWithTemplateId(long id);
 }

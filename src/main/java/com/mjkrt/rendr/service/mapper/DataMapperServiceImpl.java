@@ -7,12 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -137,47 +134,49 @@ public class DataMapperServiceImpl implements DataMapperService {
 
         LOG.info("Calling getTemplateTableData");
         List<DataTable> dataTables = dataTemplateService.findDataTablesWithTemplateId(templateId);
-        DataTable dataTable = null;
-        for (DataTable dt : dataTables) {
-            if (dt.getTableId() == tableId) {
-                dataTable = dt;
-            }
-        }
-        List<DataContainer> dataHeaders = dataTable.getDataContainers(); // to verify
+        DataTable dataTable = dataTables.stream()
+                .filter(dt -> dt.getTableId() == tableId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("DataTable does not exist in template"));
+        
+        List<DataContainer> dataContainers = dataTable.getDataContainers();
         List<ColumnHeader> columnHeaders = new ArrayList<>();
         List<ColumnHeader> correctColumnHeaders = new ArrayList<>();
         DataContainer sortedDataContainer = dataTable.getSortByContainer();
-        boolean ascending = sortedDataContainer.getSortBy() == SortedOrdering.ASC;
         ColumnHeader sortedColumnHeader = new ColumnHeader();
 
-        for (DataContainer dataHeader : dataHeaders) {
+        for (DataContainer container : dataContainers) {
             for (ColumnHeader ch : headers) {
-                if (dataHeader.equals(sortedDataContainer) && ch.getName().equalsIgnoreCase(dataHeader.getAlias())) {
+                if (container.equals(sortedDataContainer)
+                        && ch.getName().equalsIgnoreCase(container.getAlias())) {
                     sortedColumnHeader = cloneColumnHeader(ch);
                     columnHeaders.add(sortedColumnHeader);
                     correctColumnHeaders.add(sortedColumnHeader);
                     break;
-                } else if (ch.getName().equalsIgnoreCase(dataHeader.getAlias())) {
+                    
+                } else if (ch.getName().equalsIgnoreCase(container.getAlias())) {
                     ColumnHeader newCh = cloneColumnHeader(ch);
                     columnHeaders.add(newCh);
                     correctColumnHeaders.add(newCh);
                     break;
                 }
             }
-             if (dataHeader.getAlias().isEmpty()) {
+            if (container.getAlias().isEmpty()) {
                 columnHeaders.add(ColumnHeader.getMockColumnHeader());
             }
         }
-
-        TableHolder th = tableHolderService.generateSubset(findTableHolder(tableHolders, correctColumnHeaders), columnHeaders);
-        th.setSortColumnAndDirection(sortedColumnHeader, ascending);
+        
+        TableHolder th = tableHolderService.generateSubset(
+                findTableHolder(tableHolders, correctColumnHeaders),
+                columnHeaders);
+        boolean isAscending = (sortedDataContainer.getSortBy() == SortedOrdering.ASC);
+        th.setSortColumnAndDirection(sortedColumnHeader, isAscending);
         return th;
     }
-
+    
     private List<TableHolder> generateTableHolders(List<ColumnHeader> headers, List<JsonNode> rows) {
         LOG.info("Obtaining TableHolders mappings");
         List<TableHolder> tableHolders = new ArrayList<>();
-//        TableHolder currentTableHolder = new TableHolder(new ArrayList<ColumnHeader>());
         for (JsonNode node : rows) {
             List<String> keys = new ArrayList<>();
             Iterator<String> iterator = node.fieldNames();
@@ -192,7 +191,7 @@ public class DataMapperServiceImpl implements DataMapperService {
             }
             int count = 0;
             for (TableHolder th : tableHolders) {
-                if(!th.getColumnHeaders().isEmpty() && th.getColumnHeaders().equals(columnHeaders)) {
+                if (!th.getColumnHeaders().isEmpty() && th.getColumnHeaders().equals(columnHeaders)) {
                     th.getDataRows().add(strings);
                     count++;
                     break;
@@ -209,14 +208,13 @@ public class DataMapperServiceImpl implements DataMapperService {
 
     private ColumnHeader cloneColumnHeader(ColumnHeader columnHeader) {
         LOG.info("Calling cloneColumnHeader");
-        ColumnHeader ch = new ColumnHeader();
-        ch.setField(columnHeader.getField());
-        ch.setName(columnHeader.getName());
-        ch.setType(columnHeader.getType());
-        return ch;
+        return new ColumnHeader(columnHeader.getName(),
+                columnHeader.getType(),
+                columnHeader.getField());
     }
     
     private List<TableHolder> compactTableHolders(List<TableHolder> tableHolders) {
+        LOG.info("Calling compactTableHolders");
         if (tableHolders.size() <= 1) {
             return tableHolders;
         }

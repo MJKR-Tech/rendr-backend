@@ -1,9 +1,7 @@
 package com.mjkrt.rendr.service.mapper;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,14 +24,17 @@ public class TableHolderServiceImpl implements TableHolderService {
 
     @Override
     public boolean checkIfCanNaturalJoin(TableHolder t1, TableHolder t2) {
-        List<Pair<Integer, Integer>> linkedPairs = getSameHeaderIndexPairs(t1.getColumnHeaders(),
+        LOG.info("Calling checkIfCanNaturalJoin");
+        List<Pair<Integer, Integer>> linkedPairs = getSameHeaderIndexPairs(
+                t1.getColumnHeaders(),
                 t2.getColumnHeaders());
         return !linkedPairs.isEmpty();
     }
 
     private List<Pair<Integer, Integer>> getSameHeaderIndexPairs(List<ColumnHeader> headers1,
             List<ColumnHeader> headers2) {
-        
+
+        LOG.info("Calling getSameHeaderIndexPairs");
         List<Pair<Integer, Integer>> linkedPairs = new ArrayList<>();
         for (int i = 0; i < headers1.size(); i++) {
             for (int j = 0; j < headers2.size(); j++) {
@@ -47,6 +48,8 @@ public class TableHolderServiceImpl implements TableHolderService {
 
     @Override
     public TableHolder naturalJoin(TableHolder t1, TableHolder t2) {
+        
+        LOG.info("Calling naturalJoin");
         List<ColumnHeader> headers1 = t1.getColumnHeaders();
         List<ColumnHeader> headers2 = t2.getColumnHeaders();
         Set<List<String>> rows1 = t1.getDataRows();
@@ -54,7 +57,6 @@ public class TableHolderServiceImpl implements TableHolderService {
         
         List<Pair<Integer, Integer>> linkedPairs = getSameHeaderIndexPairs(headers1, headers2);
         if (linkedPairs.isEmpty()) {
-//            throw new IllegalArgumentException("TableHolders are not able to natural join");
             return null;
         }
         List<Integer> unrelatedOtherIndexes = getOtherExcessHeaderIndexes(headers2, linkedPairs);
@@ -65,7 +67,8 @@ public class TableHolderServiceImpl implements TableHolderService {
 
     private List<Integer> getOtherExcessHeaderIndexes(List<ColumnHeader> otherHeaders,
             List<Pair<Integer, Integer>> linkedPairs) {
-        
+
+        LOG.info("Calling getOtherExcessHeaderIndexes");
         Set<Integer> otherLinkedIndexes = linkedPairs.stream()
                 .map(Pair::getSecond)
                 .collect(Collectors.toSet());
@@ -81,6 +84,7 @@ public class TableHolderServiceImpl implements TableHolderService {
             List<ColumnHeader> headers2,
             List<Integer> unrelatedOtherIndexes) {
 
+        LOG.info("Calling naturalJoinHeaders");
         List<ColumnHeader> newColumnHeaders = new ArrayList<>(headers1);
         for (int otherIdx : unrelatedOtherIndexes) {
             newColumnHeaders.add(headers2.get(otherIdx));
@@ -93,6 +97,7 @@ public class TableHolderServiceImpl implements TableHolderService {
             List<Pair<Integer, Integer>> linkedPairs,
             List<Integer> unrelatedOtherIndexes) {
 
+        LOG.info("Calling naturalJoinDataRows");
         Set<List<String>> newDataRows = new HashSet<>();
         for (List<String> thisRow : rows1) {
             for (List<String> otherRow : rows2) {
@@ -111,6 +116,7 @@ public class TableHolderServiceImpl implements TableHolderService {
             List<Pair<Integer, Integer>> linkedPairs,
             List<Integer> unrelatedOtherIndexes) {
 
+        LOG.info("Calling naturalJoinSingleRows");
         if (!doesRowsMatchByNaturalJoin(thisRow, otherRow, linkedPairs)) {
             throw new IllegalArgumentException("Rows are not able to natural join");
         }
@@ -124,7 +130,8 @@ public class TableHolderServiceImpl implements TableHolderService {
     private boolean doesRowsMatchByNaturalJoin(List<String> thisRow,
             List<String> otherRow,
             List<Pair<Integer, Integer>> linkedPairs) {
-        
+
+        LOG.info("Calling doesRowsMatchByNaturalJoin");
         Predicate<Pair<Integer, Integer>> matchByStringInRow = pair ->
                 Objects.equals(thisRow.get(pair.getFirst()), otherRow.get(pair.getSecond()));
         return linkedPairs.stream().allMatch(matchByStringInRow);
@@ -135,7 +142,8 @@ public class TableHolderServiceImpl implements TableHolderService {
         if (t == null) {
             return null;
         }
-
+        
+        LOG.info("Calling generateSubset");
         List<ColumnHeader> currentHeaders = t.getColumnHeaders();
         List<Integer> indexMappings = getMappingOfHeaders(currentHeaders, desiredColumns);
         int count = 0;
@@ -151,11 +159,14 @@ public class TableHolderServiceImpl implements TableHolderService {
         
         List<ColumnHeader> newHeaders = getNewHeaders(currentHeaders, indexMappings);
         Set<List<String>> currentRows = t.getDataRows();
-        Set<List<String>> newRows = getNewRows(currentRows, indexMappings, newHeaders);
+        Set<List<String>> newRows = getNewRows(currentRows, indexMappings);
         return new TableHolder(newHeaders, newRows);
     }
 
-    private List<Integer> getMappingOfHeaders(List<ColumnHeader> currentHeaders, List<ColumnHeader> desiredColumns) {
+    private List<Integer> getMappingOfHeaders(List<ColumnHeader> currentHeaders,
+            List<ColumnHeader> desiredColumns) {
+
+        LOG.info("Calling getMappingOfHeaders");
         List<Integer> mappings = new ArrayList<>();
         for (ColumnHeader desiredHeader : desiredColumns) {
             for (int i = 0; i < currentHeaders.size(); i++) {
@@ -172,6 +183,7 @@ public class TableHolderServiceImpl implements TableHolderService {
     }
 
     private List<ColumnHeader> getNewHeaders(List<ColumnHeader> currentHeaders, List<Integer> indexMappings) {
+        LOG.info("Calling getNewHeaders");
         List<ColumnHeader> newHeaders = new ArrayList<>();
         for (int idx : indexMappings) {
             if (idx == -1) {
@@ -183,7 +195,8 @@ public class TableHolderServiceImpl implements TableHolderService {
         return newHeaders;
     }
 
-    private Set<List<String>> getNewRows(Set<List<String>> currentRows, List<Integer> indexMappings, List<ColumnHeader> desiredCh) {
+    private Set<List<String>> getNewRows(Set<List<String>> currentRows, List<Integer> indexMappings) {
+        LOG.info("Calling getNewRows");
         Set<List<String>> newRows = new HashSet<>();
         for (List<String> row : currentRows) {
             List<String> newRow = new ArrayList<>();
@@ -197,31 +210,5 @@ public class TableHolderServiceImpl implements TableHolderService {
             newRows.add(newRow);
         }
         return newRows;
-    }
-
-    @Override
-    public List<TableHolder> compact(List<TableHolder> tableHolders) {
-        if (tableHolders.size() < 2) {
-            return tableHolders;
-        }
-
-        Deque<TableHolder> holders = new LinkedList<>(tableHolders);
-        boolean hasChanged = true;
-        
-        while (hasChanged) {
-            hasChanged = false;
-            TableHolder top = holders.pop(); // pop from top
-            for (int i = 0; i < holders.size(); i++) {
-                TableHolder next = holders.pop(); // pop from top
-                if (checkIfCanNaturalJoin(top, next)) {
-                    hasChanged = true;
-                    top = naturalJoin(top, next);
-                } else {
-                    holders.add(next); // add to bottom
-                }
-            }
-            holders.add(top); // add to bottom
-        }
-        return new ArrayList<>(holders);
     }
 }

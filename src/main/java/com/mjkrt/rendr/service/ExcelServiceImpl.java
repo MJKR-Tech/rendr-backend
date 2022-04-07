@@ -2,7 +2,6 @@ package com.mjkrt.rendr.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -113,8 +112,8 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public boolean deleteTemplate(List<Long> templateIds) {
-        templateIds.stream()
-                .forEach(templateId -> {
+        LOG.info("Deleting DataTemplates " + templateIds);
+        templateIds.forEach(templateId -> {
                     LOG.info("Delete template with ID "+ templateId);
                     dataTemplateService.deleteById(templateId);
                     fileService.delete(templateId + EXCEL_EXT);
@@ -124,14 +123,16 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public void deleteAllTemplates() {
+        LOG.info("Deleting all DataTemplates");
+        dataTemplateService.deleteAll();
         dataTemplateService.listAll().stream()
                 .map(DataTemplate::getTemplateId)
                 .forEach(id -> fileService.delete(id + EXCEL_EXT));
-        dataTemplateService.deleteAll();
     }
 
     @Override
     public String getFileNameForTemplate(long templateId) {
+        LOG.info("Deleting all DataTemplates");
         DataTemplate template = dataTemplateService.findById(templateId);
         return template.getTemplateName();
     }
@@ -177,6 +178,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
     
     private Workbook loadTemplateResourceFromId(long templateId) throws IOException {
+        LOG.info("Loading template resource from id " + templateId);
         if (!dataTemplateService.isPresent(templateId)) {
             throw new IllegalArgumentException("Template with given ID is not present");
         }

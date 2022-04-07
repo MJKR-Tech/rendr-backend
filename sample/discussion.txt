@@ -1,0 +1,36 @@
+user flow
+1. access website
+2. read up on the neccessary flags needed in template (to clean up)
+3. prepare excel template with desired flags
+4. upload (single) template excel 
+5. upload (mult) json files
+6. choose template to link json data with
+7. generate excel
+
+flags
+A - Table row/col fill up
+  indicators
+    !!> alias   - data moves to the right
+    !!v alias   - data moves downwards
+  sorting --> take first explored sorting in a given direction
+    alias ++    - ASC
+    alias --    - DESC
+  overall
+    !!(>|v) alias [++|--]
+
+B - Single cell substitution
+  ## alias      - single cell (if more than one such data exists, take first/any)
+
+limitations
+1. table must be separated by at least one empty cell spacing
+2. flags must be present for parsing
+3. for a single connected table, even if there are to be no data inputted, !!(v|>) flag is needed for correctness of data mapping
+4. template provided must consider maximum number of rows specific json data might provide, i.e. no dynamic table expansion
+
+discussion:
+- user flow
+- limitations
+- scalability
+- future works
+- performance metrics (threading)
+- code quality
