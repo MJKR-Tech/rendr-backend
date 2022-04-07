@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -144,13 +147,27 @@ public class DataWriterServiceImpl implements DataWriterService {
             startCol += 1;
         }
     }
+
+    private Date parseDate(String dataValue) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        format.setLenient(false);
+        try {
+            return format.parse(dataValue);
+        } catch (ParseException e) {
+            return null;
+        }
+
+    }
     
     private void writeToCell(Cell cell, String dataValue, Sheet sheet) {
-        LOG.info("Writing to cell " + cell.getAddress() + " with value "+ dataValue);
+        LOG.info("Writing to cell " + cell.getAddress() + " with value " + dataValue);
+
         if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
             cell.setCellValue(new BigDecimal(dataValue).longValueExact());
         } else if (NumberUtils.isParsable(dataValue)) {
             cell.setCellValue(new BigDecimal(dataValue).doubleValue());
+        } else if (isParsableAsDate(dataValue)) {
+            cell.setCellValue(parseDate(dataValue));
         } else {
             cell.setCellValue(dataValue);
         }
@@ -170,5 +187,16 @@ public class DataWriterServiceImpl implements DataWriterService {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    private boolean isParsableAsDate(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        format.setLenient(false);
+        try {
+            format.parse(date);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
     }
 }
