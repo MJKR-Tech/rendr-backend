@@ -32,7 +32,7 @@ import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.service.mapper.TableHolderService;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.service.template.TemplateExtractorService;
-import com.mjkrt.rendr.service.writter.DataWriterService;
+import com.mjkrt.rendr.service.writer.DataWriterService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 @Transactional

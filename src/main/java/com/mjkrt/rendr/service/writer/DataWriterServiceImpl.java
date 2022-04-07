@@ -1,4 +1,4 @@
-package com.mjkrt.rendr.service.writter;
+package com.mjkrt.rendr.service.writer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

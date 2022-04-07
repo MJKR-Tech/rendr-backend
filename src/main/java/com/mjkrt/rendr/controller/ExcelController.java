@@ -92,39 +92,4 @@ public class ExcelController {
         ByteArrayInputStream stream = excelService.generateExcel(json);
         excelService.copyByteStreamToResponse(response, stream, fileName);
     }
-
-    /*
-        TODO delete all below after testing fully
-    */
-    
-    @Autowired
-    private JsonService jsonService;
-
-    @Autowired
-    private DataMapperService dataMapperService;
-    
-    @GetMapping("/greet")
-    public String greet() {
-        LOG.info("GET /greet called");
-        return "Hello World";
-    }
-
-    @DeleteMapping("/deleteAllTemplates")
-    public boolean deleteAllTemplates() {
-        LOG.info("DELETE /deleteAllTemplates called");
-        excelService.deleteAllTemplates();
-        return true;
-    }
-
-    // todo remove after integrating services
-    @PostMapping("/testUploadMapping")
-    public Map<Long, TableHolder> generateJsonMapping(@RequestBody JsonNode json) throws IOException {
-        LOG.info("POST /generateJsonMapping called");
-
-        long templateId = json.path("templateId").longValue();
-        List<ColumnHeader> columnHeaders = jsonService.getHeaders(json.get("jsonObjects"));
-        List<JsonNode> rows = jsonService.getRows(json.get("jsonObjects"));
-        List<TableHolder> linkedTable = dataMapperService.generateLinkedTableHolders(templateId, columnHeaders, rows);
-        return dataMapperService.generateTableMapping(templateId, columnHeaders, linkedTable);
-    }
 }

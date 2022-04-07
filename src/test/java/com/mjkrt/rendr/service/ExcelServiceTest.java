@@ -18,7 +18,7 @@ import com.mjkrt.rendr.service.file.FileService;
 import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.service.template.TemplateExtractorService;
-import com.mjkrt.rendr.service.writter.DataWriterService;
+import com.mjkrt.rendr.service.writer.DataWriterService;
 import com.mjkrt.rendr.tools.MockDataTemplate;
 
 @ExtendWith(MockitoExtension.class)
