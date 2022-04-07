@@ -21,7 +21,7 @@ public class TableHolder {
             }
             return list1.get(columnIdx).compareTo(list2.get(columnIdx)) * directionInt;
         };
-    } 
+    }
 
     private Comparator<List<String>> sortByComparator = generateComparator(0, true); // default
 
@@ -36,6 +36,9 @@ public class TableHolder {
     }
 
     public TableHolder(List<ColumnHeader> columnHeaders) {
+        if (columnHeaders.isEmpty()) {
+            throw new IllegalArgumentException("Headers cannot be empty");
+        }
         this.columnHeaders = columnHeaders;
     }
 
@@ -72,12 +75,13 @@ public class TableHolder {
         this.dataRows.add(dataRow);
     }
 
-    public void setSortColumnAndDirection(ColumnHeader header, boolean isAscending) {
-        int idx = columnHeaders.indexOf(header);
-        if (idx < 0) {
+    public void setSortColumnAndDirection(ColumnHeader header, SortedOrdering ordering) {
+        int columnIdx = columnHeaders.indexOf(header);
+        if (columnIdx < 0 || ordering == SortedOrdering.NOT_USED) {
             return; // not found
         }
-        sortByComparator = generateComparator(idx, isAscending);
+        boolean isAscending = (ordering == SortedOrdering.ASC);
+        sortByComparator = generateComparator(columnIdx, isAscending);
     }
 
     public List<List<String>> generateOrderedTable() {

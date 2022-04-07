@@ -89,6 +89,7 @@ public class FileServiceImpl implements FileService {
                 return;
             }
             FileSystemUtils.deleteRecursively(file.toFile());
+            LOG.info("File " + uploadPath + '/' + filename + " deleted");
         } catch (MalformedURLException e) {
             LOG.warning(e.getLocalizedMessage());
         }

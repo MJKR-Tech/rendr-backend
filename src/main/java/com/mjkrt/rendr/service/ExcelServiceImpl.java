@@ -124,10 +124,9 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public void deleteAllTemplates() {
         LOG.info("Deleting all DataTemplates");
+        List<Long> templateIds = dataTemplateService.listAllIds();
         dataTemplateService.deleteAll();
-        dataTemplateService.listAll().stream()
-                .map(DataTemplate::getTemplateId)
-                .forEach(id -> fileService.delete(id + EXCEL_EXT));
+        templateIds.forEach(id -> fileService.delete(id + EXCEL_EXT));
     }
 
     @Override

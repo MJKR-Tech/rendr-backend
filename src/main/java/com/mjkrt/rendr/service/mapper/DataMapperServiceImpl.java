@@ -169,8 +169,7 @@ public class DataMapperServiceImpl implements DataMapperService {
         TableHolder th = tableHolderService.generateSubset(
                 findTableHolder(tableHolders, correctColumnHeaders),
                 columnHeaders);
-        boolean isAscending = (sortedDataContainer.getSortBy() == SortedOrdering.ASC);
-        th.setSortColumnAndDirection(sortedColumnHeader, isAscending);
+        th.setSortColumnAndDirection(sortedColumnHeader, sortedDataContainer.getSortBy());
         return th;
     }
     
