@@ -63,6 +63,7 @@ public class DataWriterServiceImpl implements DataWriterService {
             DataSheet dataSheet = optionalDataSheet.get();
             writeCellSubstitutionMappings(dataSheet, sheetToWrite, dataMap);
             writeTableMappings(dataSheet, sheetToWrite, cellSubstitutions);
+
         }
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
     }
@@ -81,7 +82,7 @@ public class DataWriterServiceImpl implements DataWriterService {
 
             Cell cell = row.getCell(c);
             String dataValue = cellSubstitutions.get(id);
-            writeToCell(cell, dataValue);
+            writeToCell(cell, dataValue, sheetToWrite);
         }
     }
     
@@ -123,7 +124,7 @@ public class DataWriterServiceImpl implements DataWriterService {
         for (String dataValue : data) {
             Row nextRow = sheet.getRow((int) startRow);
             Cell cell = nextRow.getCell((int) startCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            writeToCell(cell, dataValue);
+            writeToCell(cell, dataValue, sheet);
             startRow += 1;
         }
     }
@@ -139,12 +140,12 @@ public class DataWriterServiceImpl implements DataWriterService {
         Row row = sheet.getRow((int) startRow);
         for (String dataValue : data) {
             Cell cell = row.getCell((int) startCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            writeToCell(cell, dataValue);
+            writeToCell(cell, dataValue, sheet);
             startCol += 1;
         }
     }
     
-    private void writeToCell(Cell cell, String dataValue) {
+    private void writeToCell(Cell cell, String dataValue, Sheet sheet) {
         LOG.info("Writing to cell " + cell.getAddress() + " with value "+ dataValue);
         if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
             cell.setCellValue(new BigDecimal(dataValue).longValueExact());
@@ -153,6 +154,7 @@ public class DataWriterServiceImpl implements DataWriterService {
         } else {
             cell.setCellValue(dataValue);
         }
+        sheet.autoSizeColumn(cell.getColumnIndex());
     }
 
     @Override
