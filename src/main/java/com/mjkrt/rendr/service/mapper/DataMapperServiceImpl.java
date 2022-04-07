@@ -1,5 +1,6 @@
 package com.mjkrt.rendr.service.mapper;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -184,7 +185,10 @@ public class DataMapperServiceImpl implements DataMapperService {
             for (String key : keys) {
                 ColumnHeader ch = getColumnHeader(key, headers);
                 columnHeaders.add(ch);
-                String value = node.get(key).asText("");
+                JsonNode dataNode = node.get(key);
+                String value = (dataNode.isNumber())
+                        ? new BigDecimal(dataNode.asText()).toPlainString()
+                        : dataNode.asText("");
                 strings.add(value);
             }
             int count = 0;

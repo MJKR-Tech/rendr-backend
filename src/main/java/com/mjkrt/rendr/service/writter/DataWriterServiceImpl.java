@@ -51,7 +51,7 @@ public class DataWriterServiceImpl implements DataWriterService {
                 .map(workbook::getSheetAt)
                 .collect(Collectors.toList());
         List<DataSheet> dataSheets = dataTemplateService.findDataSheetsWithTemplateId(templateId);
-
+        
         for (Sheet sheetToWrite : sheetList) {
             String sheetName = sheetToWrite.getSheetName();
             Optional<DataSheet> optionalDataSheet = dataSheets.stream()
@@ -67,7 +67,10 @@ public class DataWriterServiceImpl implements DataWriterService {
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
     }
     
-    private void writeTableMappings(DataSheet dataSheet, Sheet sheetToWrite, Map<Long, String> cellSubstitutions) {
+    private void writeTableMappings(DataSheet dataSheet,
+            Sheet sheetToWrite,
+            Map<Long, String> cellSubstitutions) {
+        
         LOG.info("Writing table mappings");
         List<DataCell> dataCells = dataSheet.getDataCells();
         for (DataCell dc : dataCells) {
@@ -78,13 +81,7 @@ public class DataWriterServiceImpl implements DataWriterService {
 
             Cell cell = row.getCell(c);
             String dataValue = cellSubstitutions.get(id);
-            if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).longValueExact());
-            } else if (NumberUtils.isDigits(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).doubleValue());
-            } else {
-                cell.setCellValue(dataValue);
-            }
+            writeToCell(cell, dataValue);
         }
     }
     
@@ -115,39 +112,46 @@ public class DataWriterServiceImpl implements DataWriterService {
         }
     }
 
-    private void writeVerticalTable(long startRow, long startCol, List<String> data, Sheet sheet) {
+    private void writeVerticalTable(long startRow,
+            long startCol,
+            List<String> data, 
+            Sheet sheet) {
+        
         LOG.info("Writing vertical table at sheet " + sheet.getSheetName()
                 + ", starting at (" + startRow + ", " + startCol + ")");
         
         for (String dataValue : data) {
             Row nextRow = sheet.getRow((int) startRow);
             Cell cell = nextRow.getCell((int) startCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).longValueExact());
-            } else if (NumberUtils.isParsable(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).doubleValue());
-            } else {
-                cell.setCellValue(dataValue);
-            }
+            writeToCell(cell, dataValue);
             startRow += 1;
         }
     }
 
-    private void writeHorizontalTable(long startRow, long startCol, List<String> data, Sheet sheet) {
+    private void writeHorizontalTable(long startRow,
+            long startCol,
+            List<String> data,
+            Sheet sheet) {
+        
         LOG.info("Writing horizontal table at sheet " + sheet.getSheetName()
                 + ", starting at (" + startRow + ", " + startCol + ")");
         
         Row row = sheet.getRow((int) startRow);
         for (String dataValue : data) {
             Cell cell = row.getCell((int) startCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).longValueExact());
-            } else if (NumberUtils.isParsable(dataValue)) {
-                cell.setCellValue(new BigDecimal(dataValue).doubleValue());
-            } else {
-                cell.setCellValue(dataValue);
-            }
+            writeToCell(cell, dataValue);
             startCol += 1;
+        }
+    }
+    
+    private void writeToCell(Cell cell, String dataValue) {
+        LOG.info("Writing to cell " + cell.getAddress() + " with value "+ dataValue);
+        if (NumberUtils.isParsable(dataValue) && NumberUtils.isDigits(dataValue)) {
+            cell.setCellValue(new BigDecimal(dataValue).longValueExact());
+        } else if (NumberUtils.isParsable(dataValue)) {
+            cell.setCellValue(new BigDecimal(dataValue).doubleValue());
+        } else {
+            cell.setCellValue(dataValue);
         }
     }
 
