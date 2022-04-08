@@ -17,11 +17,18 @@ import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+/**
+ * The implementation of the TableHolderService Interface. Class does the combining of data from TableHolder, and
+ * joining of data into bigger subsets.
+ */
 @Service
 public class TableHolderServiceImpl implements TableHolderService {
 
     private static final Logger LOG = LogsCenter.getLogger(TableHolderServiceImpl.class);
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public boolean checkIfCanNaturalJoin(TableHolder t1, TableHolder t2) {
         LOG.info("Calling checkIfCanNaturalJoin");
@@ -46,6 +53,9 @@ public class TableHolderServiceImpl implements TableHolderService {
         return linkedPairs;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public TableHolder naturalJoin(TableHolder t1, TableHolder t2) {
         
@@ -65,6 +75,13 @@ public class TableHolderServiceImpl implements TableHolderService {
         return new TableHolder(newHeaders, newDataRows);
     }
 
+    /**
+     * Returns list of integers of unrelated ColumnHeaders.
+     *
+     * @param otherHeaders List of ColumnHeaders.
+     * @param linkedPairs The Pairs of linked ColumnHeader indexes.
+     * @return The list of integers of unrelated ColumnHeaders.
+     */
     private List<Integer> getOtherExcessHeaderIndexes(List<ColumnHeader> otherHeaders,
             List<Pair<Integer, Integer>> linkedPairs) {
 
@@ -80,6 +97,14 @@ public class TableHolderServiceImpl implements TableHolderService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a big subset list of ColumnHeaders from headers1 and headers2.
+     *
+     * @param headers1 The first list of ColumnHeaders.
+     * @param headers2 The second list of ColumnHeaders.
+     * @param unrelatedOtherIndexes The indexes of unrelated ColumnHeaders.
+     * @return The big subset list of ColumnHeaders.
+     */
     private List<ColumnHeader> naturalJoinHeaders(List<ColumnHeader> headers1,
             List<ColumnHeader> headers2,
             List<Integer> unrelatedOtherIndexes) {
@@ -92,6 +117,15 @@ public class TableHolderServiceImpl implements TableHolderService {
         return newColumnHeaders;
     }
 
+    /**
+     * Returns new set of list of String naturally joined from two sets.
+     *
+     * @param rows1 First set of list of String.
+     * @param rows2 Second set of list of String.
+     * @param linkedPairs The related indexes of lists of String.
+     * @param unrelatedOtherIndexes The unrelated indexes of lists of String.
+     * @return The new set of list of String.
+     */
     private Set<List<String>> naturalJoinDataRows(Set<List<String>> rows1,
             Set<List<String>> rows2,
             List<Pair<Integer, Integer>> linkedPairs,
@@ -111,6 +145,15 @@ public class TableHolderServiceImpl implements TableHolderService {
         return newDataRows;
     }
 
+    /**
+     * Returns new list of String naturally joined from two lists.
+     *
+     * @param rows1 The first list of String.
+     * @param rows2 The second list of String.
+     * @param linkedPairs The related indexes of String.
+     * @param unrelatedOtherIndexes The unrelated indexes of String.
+     * @return The new list of String.
+     */
     private List<String> naturalJoinSingleRows(List<String> thisRow,
             List<String> otherRow,
             List<Pair<Integer, Integer>> linkedPairs,
@@ -127,6 +170,14 @@ public class TableHolderServiceImpl implements TableHolderService {
         return newRow;
     }
 
+    /**
+     * Checks if two rows of data (list of String) match by Natural Join.
+     *
+     * @param thisRow The first list of String.
+     * @param otherRow The second list of String.
+     * @param linkedPairs The related indexes of String.
+     * @return True if joined, false otherwise.
+     */
     private boolean doesRowsMatchByNaturalJoin(List<String> thisRow,
             List<String> otherRow,
             List<Pair<Integer, Integer>> linkedPairs) {
@@ -137,6 +188,9 @@ public class TableHolderServiceImpl implements TableHolderService {
         return linkedPairs.stream().allMatch(matchByStringInRow);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public TableHolder generateSubset(TableHolder t, List<ColumnHeader> desiredColumns) {
         if (t == null) {
@@ -163,6 +217,13 @@ public class TableHolderServiceImpl implements TableHolderService {
         return new TableHolder(newHeaders, newRows);
     }
 
+    /**
+     * Returns the list of indexes where desired ColumnHeader in desiredColumns exists in currentHeaders.
+     *
+     * @param currentHeaders The list of ColumnHeaders to be mapped to.
+     * @param desiredColumns The list of ColumnHeaders to be mapped from.
+     * @return The list of indexes, where indexes -1 represents an empty ColumnHeader.
+     */
     private List<Integer> getMappingOfHeaders(List<ColumnHeader> currentHeaders,
             List<ColumnHeader> desiredColumns) {
 
@@ -182,6 +243,14 @@ public class TableHolderServiceImpl implements TableHolderService {
         return mappings;
     }
 
+    /**
+     * Return copy of List of ColumnHeaders with "MOCK" ColumnHeaders to fill empty Headers.
+     *
+     * @param currentHeaders The list of ColumnHeaders to copy.
+     * @param indexMappings The indexes of where each ColumnHeader to append to, where -1 indicates a "MOCK"
+     *                      ColumnHeader.
+     * @return The copy of List of ColumnHeaders.
+     */
     private List<ColumnHeader> getNewHeaders(List<ColumnHeader> currentHeaders, List<Integer> indexMappings) {
         LOG.info("Calling getNewHeaders");
         List<ColumnHeader> newHeaders = new ArrayList<>();
@@ -195,6 +264,13 @@ public class TableHolderServiceImpl implements TableHolderService {
         return newHeaders;
     }
 
+    /**
+     * Fills the list of String from set currentRows with empty String at places with "MOCK" ColumnHeaders.
+     *
+     * @param currentRows The set of list of String.
+     * @param indexMappings The indexes where -1 indicates a "MOCK" ColumnHeader.
+     * @return
+     */
     private Set<List<String>> getNewRows(Set<List<String>> currentRows, List<Integer> indexMappings) {
         LOG.info("Calling getNewRows");
         Set<List<String>> newRows = new HashSet<>();

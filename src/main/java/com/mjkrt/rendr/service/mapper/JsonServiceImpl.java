@@ -20,11 +20,19 @@ import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+/**
+ * The implementation of the JsonService Interface. Class converts the JSON files into more ColumnHeaders and
+ * JsonNodes.
+ */
 @Service
 public class JsonServiceImpl implements JsonService {
 
     private static final Logger LOG = LogsCenter.getLogger(JsonServiceImpl.class);
 
+    /**
+     *
+     * @inheritDoc
+     */
     @Override
     public List<ColumnHeader> getHeaders(JsonNode jsonNode) throws IOException {
         LOG.info("Getting headers from jsonNode");
@@ -46,6 +54,9 @@ public class JsonServiceImpl implements JsonService {
         return headers;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public List<JsonNode> getRows(JsonNode jsonNode) {
         LOG.info("Getting rows from jsonNode");
