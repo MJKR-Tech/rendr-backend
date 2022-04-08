@@ -8,6 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 
+/**
+ * JsonService.
+ *
+ * This service helps to provide an interface for JsonServices to parse JSON files to JsonNodes and ColumnHeaders.
+ */
 public interface JsonService {
     /**
      * Returns all the ColumnHeaders of the parsed JSON files.

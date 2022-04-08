@@ -8,6 +8,11 @@ import com.mjkrt.rendr.entity.DataCell;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 
+/**
+ * DataMapperService.
+ *
+ * This service helps to provide an interface for DataMappers to generate Data from JSON files and JsonNodes.
+ */
 public interface DataMapperService {
     /**
      * Returns TableHolders where each TableHolder is the biggest subset of ColumnHeaders with all its relevant

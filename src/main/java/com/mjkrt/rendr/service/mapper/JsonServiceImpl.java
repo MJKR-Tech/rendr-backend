@@ -21,6 +21,8 @@ import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 /**
+ * JsonServiceImpl
+ *
  * The implementation of the JsonService Interface. Class converts the JSON files into more ColumnHeaders and
  * JsonNodes.
  */
@@ -30,7 +32,6 @@ public class JsonServiceImpl implements JsonService {
     private static final Logger LOG = LogsCenter.getLogger(JsonServiceImpl.class);
 
     /**
-     *
      * @inheritDoc
      */
     @Override

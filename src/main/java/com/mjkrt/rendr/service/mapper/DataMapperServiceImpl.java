@@ -24,6 +24,8 @@ import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 /**
+ * DataMapperServiceImpl
+ *
  * The implementation of the DataMapperService Interface. Class does the mapping of data from
  * the JSON files to TableHolders.
  */

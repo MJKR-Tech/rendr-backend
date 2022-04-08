@@ -5,6 +5,12 @@ import java.util.List;
 import com.mjkrt.rendr.entity.helper.ColumnHeader;
 import com.mjkrt.rendr.entity.helper.TableHolder;
 
+/**
+ * TableHolderService.
+ *
+ * This service helps to provide an interface for TableHolderServices to combine data from TableHolders and
+ * ColumnHeaders.
+ */
 public interface TableHolderService {
 
     /**

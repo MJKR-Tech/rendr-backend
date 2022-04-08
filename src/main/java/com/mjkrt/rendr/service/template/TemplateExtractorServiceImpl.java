@@ -59,7 +59,7 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
     private static final String DESC_FLAG = "--";
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public DataTemplate extract(Workbook workbook, String fileName) {

@@ -18,6 +18,8 @@ import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.utils.LogsCenter;
 
 /**
+ * TableHolderServiceImpl
+ *
  * The implementation of the TableHolderService Interface. Class does the combining of data from TableHolder, and
  * joining of data into bigger subsets.
  */
