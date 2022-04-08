@@ -3,7 +3,6 @@ package com.mjkrt.rendr.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,14 +22,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mjkrt.rendr.entity.helper.ColumnHeader;
-import com.mjkrt.rendr.entity.helper.TableHolder;
 import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
-import com.mjkrt.rendr.service.mapper.DataMapperService;
 import com.mjkrt.rendr.service.ExcelService;
-import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+/**
+ * ExcelController.
+ * 
+ * This class provides the endpoints required for users and front-end application to tap onto.
+ */
 @CrossOrigin(origins = "${local.front.end.react.js.origin}")
 @RequestMapping("/api/v1")
 @RestController
@@ -44,6 +44,11 @@ public class ExcelController {
     @Autowired
     private ExcelService excelService;
 
+    /**
+     * Lists all DataTemplates present.
+     * 
+     * @return list of DataTemplates
+     */
     @GetMapping("/getTemplates")
     public List<DataTemplate> getTemplates() {
         LOG.info("GET /getTemplates called");
@@ -51,6 +56,12 @@ public class ExcelController {
         return excelService.getTemplates();
     }
 
+    /**
+     * Uploads an Excel template instance.
+     * 
+     * @param file Excel template instance to upload and extract
+     * @return DataTemplate ID of saved template instance
+     */
     @PostMapping("/uploadTemplate")
     public TemplateIdHolder uploadExcel(@RequestParam("file") MultipartFile file) {
         LOG.info("POST /uploadTemplate called");
@@ -58,6 +69,12 @@ public class ExcelController {
         return excelService.uploadTemplateFromFile(file);
     }
 
+    /**
+     * Delete DataTemplates based on list of IDs provided
+     * 
+     * @param templateIds list of DataTemplate IDs
+     * @return true if successful, else false
+     */
     @DeleteMapping("/deleteTemplate/{ids}")
     public boolean deleteTemplate(@PathVariable("ids") List<Long> templateIds) {
         LOG.info("DELETE /deleteTemplate/" + templateIds + " called");
@@ -65,6 +82,12 @@ public class ExcelController {
         return excelService.deleteTemplate(templateIds);
     }
 
+    /**
+     * Provides the sample template used in the application.
+     * 
+     * @param response HTTP response sent to user
+     * @throws IOException if writing Excel file to response fails or becomes corrupt
+     */
     @GetMapping("/downloadSampleTemplate")
     public void downloadTemplate(HttpServletResponse response) throws IOException {
         LOG.info("POST /downloadTemplate called");
@@ -73,6 +96,13 @@ public class ExcelController {
         excelService.copyByteStreamToResponse(response, stream, sampleTemplateFileName);
     }
 
+    /**
+     * Downloads the DataTemplate specified by its ID.
+     * 
+     * @param response HTTP response sent to user
+     * @param templateIdHolder DataTemplate ID in question
+     * @throws IOException if writing Excel file to response fails or becomes corrupt
+     */
     @PostMapping("/downloadTemplate")
     public void downloadTemplate(HttpServletResponse response, @RequestBody TemplateIdHolder templateIdHolder)
             throws IOException {
@@ -84,6 +114,14 @@ public class ExcelController {
         excelService.copyByteStreamToResponse(response, stream, fileName);
     }
 
+    /**
+     * Generates the Excel with data specified in the JSON body.
+     * The JSON body includes "fileName", "jsonObjects" and "templateID".
+     * 
+     * @param response HTTP response sent to user
+     * @param json json data body to used for Excel data population
+     * @throws IOException if writing Excel file to response fails or becomes corrupt
+     */
     @PostMapping("/generateData")
     public void generateData(HttpServletResponse response, @RequestBody JsonNode json) throws IOException {
         LOG.info("POST /generateData called");

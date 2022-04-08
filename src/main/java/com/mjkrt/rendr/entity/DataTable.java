@@ -19,6 +19,13 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mjkrt.rendr.entity.helper.SortedOrdering;
 
+/**
+ * DataTable.
+ *
+ * This instance represents an entry in data_table SQL table.
+ * It has a one-to-many relationship with DataContainer. 
+ * It has a many-to-one relationship with DataSheet. 
+ */
 @Entity
 public class DataTable {
 
@@ -37,6 +44,10 @@ public class DataTable {
     public DataTable() {
     }
 
+    /**
+     * Constructor for DataSheet.
+     * Also ensures bidirectional relationship between the DataContainers fed.
+     */
     public DataTable(long tableId, DataSheet dataSheet, List<DataContainer> dataContainers) {
         this.tableId = tableId;
         this.dataSheet = dataSheet;
@@ -44,6 +55,10 @@ public class DataTable {
         dataContainers.forEach(container -> container.setDataTable(this));
     }
 
+    /**
+     * Constructor for DataSheet.
+     * Also ensures bidirectional relationship between the DataContainers fed.
+     */
     public DataTable(List<DataContainer> dataContainers) {
         this.dataContainers = dataContainers;
         dataContainers.forEach(container -> container.setDataTable(this));
@@ -69,11 +84,23 @@ public class DataTable {
         this.dataSheet = dataSheet;
     }
 
+    /**
+     * Returns a list of DataContainers sorted by ordering
+     * 
+     * @return list of DataContainers sorted by ordering
+     */
     public List<DataContainer> getDataContainers() {
         dataContainers.sort(Comparator.comparing(DataContainer::getOrdering));
         return dataContainers;
     }
 
+    /**
+     * Returns the first DataContainer with a valid SortedOrdering parameter (i.e. not NOT_USED) if present.
+     * Else, the first instance will be returned.
+     * This method assumes there is at least one DataContainer instance present.
+     * 
+     * @return first instance of a non-NOT_USED DataContainer present in sorted order, else the first instance in list 
+     */
     public DataContainer getSortByContainer() {
         if (dataContainers.isEmpty()) {
             throw new IllegalStateException("A DataTable should have at least one DataContainer.");
@@ -84,6 +111,10 @@ public class DataTable {
         return dataContainerOptional.orElseGet(() -> getDataContainers().get(0));
     }
 
+    /**
+     * Sets DataContainers present in instance.
+     * Also ensures bidirectional relationship between the DataContainers fed.
+     */
     public void setDataContainers(List<DataContainer> dataContainers) {
         this.dataContainers.clear();
         this.dataContainers.addAll(dataContainers);

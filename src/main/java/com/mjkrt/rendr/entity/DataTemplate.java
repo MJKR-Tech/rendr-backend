@@ -15,6 +15,12 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * DataTemplate.
+ *
+ * This instance represents an entry in data_template SQL table.
+ * It has a one-to-many relationship with DataSheet. 
+ */
 @Entity
 public class DataTemplate {
     
@@ -33,6 +39,10 @@ public class DataTemplate {
     public DataTemplate() {
     }
 
+    /**
+     * Constructor for DataTemplate.
+     * Also ensures bidirectional relationship between the DataSheets fed.
+     */
     public DataTemplate(List<DataSheet> dataSheets, String templateName) {
         this.dataSheets = dataSheets;
         this.templateName = templateName;
@@ -53,6 +63,12 @@ public class DataTemplate {
         return dataSheets;
     }
 
+    /**
+     * Sets DataSheets present in instance.
+     * Also ensures bidirectional relationship between the DataSheets fed.
+     *
+     * @param dataSheets list of DataSheets
+     */
     public void setDataSheets(List<DataSheet> dataSheets) {
         this.dataSheets.clear();
         this.dataSheets.addAll(dataSheets);

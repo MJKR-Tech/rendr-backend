@@ -1,11 +1,9 @@
 package com.mjkrt.rendr.controller;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +28,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.entity.helper.TemplateIdHolder;
 import com.mjkrt.rendr.service.ExcelService;
-import com.mjkrt.rendr.service.mapper.JsonService;
 import com.mjkrt.rendr.tools.MockDataTemplate;
 
 @SpringBootTest
@@ -44,9 +41,6 @@ public class ExcelControllerTest {
     
     @MockBean
     private ExcelService excelService;
-    
-    @MockBean
-    private JsonService jsonService;
     
     private static List<DataTemplate> generateTemplates() {
         return new ArrayList<>(Arrays.asList(
@@ -97,19 +91,5 @@ public class ExcelControllerTest {
                         .multipart(PREFIX + "/uploadTemplate")
                         .file(file))
                 .andExpect(status().isOk());
-    }
-
-    // test excel download response
-    @Test
-    public void downloadSampleTemplate_providesCorrectExcel() throws Exception {
-        ByteArrayInputStream resourceByteArray = new ByteArrayInputStream(loadMockSampleExcel());
-        
-        Mockito.when(excelService.getSampleTemplate())
-                .thenReturn(resourceByteArray);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get(PREFIX + "/downloadSampleTemplate"))
-                .andExpect(status().isOk())
-                .andExpect(content().bytes(loadMockSampleExcel()));
     }
 }

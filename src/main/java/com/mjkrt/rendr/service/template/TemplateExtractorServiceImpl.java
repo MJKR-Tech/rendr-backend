@@ -25,20 +25,22 @@ import com.mjkrt.rendr.entity.DataTemplate;
 import com.mjkrt.rendr.entity.helper.SortedOrdering;
 import com.mjkrt.rendr.utils.LogsCenter;
 
-/*
-Syntax:
-(A | B) - exclusively A or B
-
-## a - single cell fill up, aka one-to-one replace
-!!(>|v) a - start of container to fill up with direction and alias name
-
-overall: (## | !!(> | v)) a [(++|--)]
-
-# is used for single cell fill up (desc at top of excel files)
-!! deals with where to start exploring for a table
-> | v deals with direction substitution
-## helps with substitution
-*/
+/**
+ * TemplateExtractorServiceImpl.
+ * 
+ * This class helps to implement the services required in TemplateExtractorService.
+ * Rules:
+ * - ## a : single cell fill up, aka one-to-one replace
+ * - !!(>|v) a : start of container to fill up with direction and alias name
+ * - a (++|--) : column a will be sorted by ascending/descending order respectively
+ * Overall: (!!(> | v) a [(++|--)]) | ## a
+ * 
+ * Notes:
+ * !! deals with where to start exploring for a table
+ * > | v deals with direction substitution
+ * ++ | -- deals with sorting columns
+ * ## deals with substitution
+ */
 @Service
 public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
@@ -56,6 +58,9 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
     private static final String DESC_FLAG = "--";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataTemplate extract(Workbook workbook, String fileName) {
         if (fileName == null) {

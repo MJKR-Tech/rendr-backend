@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 import com.mjkrt.rendr.service.template.DataTemplateService;
 import com.mjkrt.rendr.utils.LogsCenter;
 
+/**
+ * FileScheduleServiceImpl.
+ * 
+ * This class helps to implement the services required in FileScheduleService.
+ */
 @Service
 public class FileScheduleServiceImpl implements FileScheduleService {
 
@@ -32,6 +37,9 @@ public class FileScheduleServiceImpl implements FileScheduleService {
     @Autowired
     private DataTemplateService dataTemplateService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Scheduled(fixedDelayString = "${upload.frequency.milliseconds.clean-up}")
     @Override
     public void removeRedundantFiles() {
