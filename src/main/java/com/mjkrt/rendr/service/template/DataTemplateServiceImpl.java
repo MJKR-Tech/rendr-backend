@@ -28,7 +28,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     private DataTemplateRepository dataTemplateRepository;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<DataTemplate> listAll() {
@@ -38,7 +38,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<Long> listAllIds() {
@@ -50,7 +50,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public DataTemplate findById(long id) {
@@ -59,7 +59,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public boolean isPresent(long id) {
@@ -68,7 +68,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public DataTemplate save(DataTemplate dataTemplate) {
@@ -77,7 +77,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public void deleteById(long id) {
@@ -86,7 +86,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public void deleteAll() {
@@ -95,7 +95,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<DataTable> findDataTablesWithTemplateId(long id) {
@@ -113,7 +113,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<DataCell> findDataCellsWithTemplateId(long id) {
@@ -131,7 +131,7 @@ public class DataTemplateServiceImpl implements DataTemplateService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<DataSheet> findDataSheetsWithTemplateId(long id) {

@@ -33,7 +33,7 @@ public class FileServiceImpl implements FileService {
     private String uploadPath;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @PostConstruct
     public void init() {
@@ -46,7 +46,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public void save(MultipartFile file, String fileName) {
@@ -63,7 +63,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public Resource load(String filename) {
@@ -83,7 +83,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public Resource loadSample() {
@@ -92,7 +92,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public void delete(String filename) {
@@ -111,7 +111,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     @Override
     public List<String> listAll() {
