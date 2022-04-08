@@ -18,6 +18,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mjkrt.rendr.entity.helper.DataDirection;
 import com.mjkrt.rendr.entity.helper.SortedOrdering;
 
+/**
+ * DataContainer.
+ *
+ * This instance represents an entry in data_container SQL table.
+ * It has a many-to-one relationship with DataTable. 
+ */
 @Entity
 public class DataContainer {
     

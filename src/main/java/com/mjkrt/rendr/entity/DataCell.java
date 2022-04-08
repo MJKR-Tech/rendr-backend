@@ -13,6 +13,12 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * DataCell.
+ * 
+ * This instance represents an entry in data_cell SQL table.
+ * It has a many-to-one relationship with DataSheet. 
+ */
 @Entity
 public class DataCell {
 

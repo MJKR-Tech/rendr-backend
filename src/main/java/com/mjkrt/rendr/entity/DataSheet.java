@@ -16,6 +16,14 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * DataSheet.
+ *
+ * This instance represents an entry in data_sheet SQL table.
+ * It has a one-to-many relationship with DataTable. 
+ * It has a one-to-many relationship with DataCell. 
+ * It has a many-to-one relationship with DataTemplate. 
+ */
 @Entity
 public class DataSheet {
     
@@ -41,6 +49,10 @@ public class DataSheet {
     public DataSheet() {
     }
 
+    /**
+     * Constructor for DataSheet.
+     * Also ensures bidirectional relationship between the DataTables and DataCells fed.
+     */
     public DataSheet(long sheetId,
             List<DataTable> dataTables,
             List<DataCell> dataCells,
@@ -59,6 +71,10 @@ public class DataSheet {
         dataCells.forEach(cell -> cell.setDataSheet(this));
     }
 
+    /**
+     * Constructor for DataSheet.
+     * Also ensures bidirectional relationship between the DataTables and DataCells fed.
+     */
     public DataSheet(List<DataTable> dataTables, List<DataCell> dataCells, String sheetName, long sheetOrder) {
         this.dataTables = dataTables;
         this.dataCells = dataCells;
@@ -87,6 +103,12 @@ public class DataSheet {
         return dataTables;
     }
 
+    /**
+     * Sets DataTables present in instance.
+     * Also ensures bidirectional relationship between the DataTables fed.
+     * 
+     * @param dataTables list of DataTables
+     */
     public void setDataTables(List<DataTable> dataTables) {
         this.dataTables.clear();
         this.dataTables.addAll(dataTables);
@@ -97,6 +119,12 @@ public class DataSheet {
         return dataCells;
     }
 
+    /**
+     * Sets DataCells present in instance.
+     * Also ensures bidirectional relationship between the DataCells fed.
+     * 
+     * @param dataCells list of DataCells
+     */
     public void setDataCells(List<DataCell> dataCells) {
         this.dataCells.clear();
         this.dataCells.addAll(dataCells);
