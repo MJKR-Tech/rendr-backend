@@ -8,6 +8,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * TableHolder.
+ *
+ * This class represents a table, and holds the information that a table would have.
+ */
 public class TableHolder {
 
     private static Comparator<List<String>> generateComparator(int columnIdx, boolean isAsc, ColumnDataType type) {
@@ -85,6 +90,9 @@ public class TableHolder {
         this.dataRows.add(dataRow);
     }
 
+    /**
+     * Sets the order in which to sort the columns of the table.
+     */
     public void setSortColumnAndDirection(ColumnHeader header, SortedOrdering ordering) {
         int columnIdx = getColumnHeaders().indexOf(header);
         if (columnIdx < 0 || ordering == SortedOrdering.NOT_USED) {
@@ -94,6 +102,12 @@ public class TableHolder {
         sortByComparator = generateComparator(columnIdx, isAscending, columnHeaders.get(columnIdx).getType());
     }
 
+    /**
+     * Returns a list, where each element is a list containing the data in each row of the table.
+     * The ordering of the rows in the table is also ensured.
+     *
+     * @return A List of Lists containing the data of each row, in String format.
+     */
     public List<List<String>> generateOrderedTable() {
         return dataRows.stream()
                 .sorted(sortByComparator)

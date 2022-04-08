@@ -42,7 +42,10 @@ public class DataWriterServiceImpl implements DataWriterService {
 
     @Autowired
     private DataTemplateService dataTemplateService;
-    
+
+    /**
+     * @inheritDoc
+     */
     @Override
     public void mapDataToWorkbook(Map<Long, TableHolder> dataMap,
             Map<Long, String> cellSubstitutions,
@@ -64,14 +67,14 @@ public class DataWriterServiceImpl implements DataWriterService {
                 continue;
             }
             DataSheet dataSheet = optionalDataSheet.get();
-            writeCellSubstitutionMappings(dataSheet, sheetToWrite, dataMap);
-            writeTableMappings(dataSheet, sheetToWrite, cellSubstitutions);
+            writeCellSubstitutionMappings(dataSheet, sheetToWrite, cellSubstitutions);
+            writeTableMappings(dataSheet, sheetToWrite, dataMap);
 
         }
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
     }
     
-    private void writeTableMappings(DataSheet dataSheet,
+    private void writeCellSubstitutionMappings(DataSheet dataSheet,
             Sheet sheetToWrite,
             Map<Long, String> cellSubstitutions) {
         
@@ -89,7 +92,7 @@ public class DataWriterServiceImpl implements DataWriterService {
         }
     }
     
-    private void writeCellSubstitutionMappings(DataSheet dataSheet,
+    private void writeTableMappings(DataSheet dataSheet,
             Sheet sheetToWrite,
             Map<Long, TableHolder> dataMap) {
         
@@ -174,6 +177,9 @@ public class DataWriterServiceImpl implements DataWriterService {
         sheet.autoSizeColumn(cell.getColumnIndex());
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public ByteArrayInputStream writeToStream(Workbook workbook) {
         try {

@@ -2,6 +2,11 @@ package com.mjkrt.rendr.entity.helper;
 
 import java.util.Objects;
 
+/**
+ * TemplateIdHolder.
+ *
+ * This class represents the ID of an excel template.
+ */
 public class TemplateIdHolder {
     
     private long templateId;

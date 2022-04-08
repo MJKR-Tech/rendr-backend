@@ -62,6 +62,9 @@ public class ExcelServiceImpl implements ExcelService {
     @Autowired
     private TableHolderService tableHolderService;
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public List<DataTemplate> getTemplates() {
         LOG.info("Getting all templates");
@@ -70,7 +73,10 @@ public class ExcelServiceImpl implements ExcelService {
         LOG.info(templates.size() + " templates found: " + templates);
         return templates;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     @Override
     public TemplateIdHolder uploadTemplateFromFile(MultipartFile file) {
         LOG.info("Uploading file " + file.getOriginalFilename() + " as dataTemplate");
@@ -110,6 +116,9 @@ public class ExcelServiceImpl implements ExcelService {
         return dataTemplateService.save(template);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public boolean deleteTemplate(List<Long> templateIds) {
         LOG.info("Deleting DataTemplates " + templateIds);
@@ -121,6 +130,9 @@ public class ExcelServiceImpl implements ExcelService {
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void deleteAllTemplates() {
         LOG.info("Deleting all DataTemplates");
@@ -129,6 +141,9 @@ public class ExcelServiceImpl implements ExcelService {
         templateIds.forEach(id -> fileService.delete(id + EXCEL_EXT));
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public String getFileNameForTemplate(long templateId) {
         LOG.info("Deleting all DataTemplates");
@@ -136,6 +151,9 @@ public class ExcelServiceImpl implements ExcelService {
         return template.getTemplateName();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public ByteArrayInputStream getSampleTemplate() throws IOException {
         LOG.info("Obtaining sample template");
@@ -144,6 +162,9 @@ public class ExcelServiceImpl implements ExcelService {
         return new ByteArrayInputStream(byteArray);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public ByteArrayInputStream getTemplate(long templateId) throws IOException {
         LOG.info("Obtaining template with ID "+ templateId);
@@ -152,6 +173,9 @@ public class ExcelServiceImpl implements ExcelService {
         return new ByteArrayInputStream(byteArray);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public ByteArrayInputStream generateExcel(JsonNode dataNode) throws IOException {
         long templateId = dataNode.get("templateId").longValue();
@@ -185,6 +209,9 @@ public class ExcelServiceImpl implements ExcelService {
         return new XSSFWorkbook(templateResource.getInputStream());
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void copyByteStreamToResponse(HttpServletResponse response,
             ByteArrayInputStream stream,

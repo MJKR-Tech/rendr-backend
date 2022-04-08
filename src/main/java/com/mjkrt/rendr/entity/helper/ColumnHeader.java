@@ -2,6 +2,11 @@ package com.mjkrt.rendr.entity.helper;
 
 import java.util.Objects;
 
+/**
+ * ColumnHeader.
+ *
+ * This class represents a column's header in a table
+ */
 public class ColumnHeader implements Comparable<ColumnHeader> {
     
     public static ColumnHeader getMockColumnHeader() {
