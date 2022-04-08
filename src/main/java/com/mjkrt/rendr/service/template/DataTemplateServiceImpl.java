@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * DataTemplateServiceImpl.
+ * 
+ * This class helps to implement the services required in DataTemplateService.
+ */
 @Service
 public class DataTemplateServiceImpl implements DataTemplateService {
     
@@ -21,7 +26,10 @@ public class DataTemplateServiceImpl implements DataTemplateService {
 
     @Autowired
     private DataTemplateRepository dataTemplateRepository;
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DataTemplate> listAll() {
         LOG.info("Listing all dataTemplates");
@@ -29,6 +37,9 @@ public class DataTemplateServiceImpl implements DataTemplateService {
         return dataTemplateRepository.findAll(sortByTemplateIdAsc);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Long> listAllIds() {
         LOG.info("Listing all dataTemplateIds");
@@ -38,36 +49,54 @@ public class DataTemplateServiceImpl implements DataTemplateService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataTemplate findById(long id) {
         LOG.info("Finding dataTemplate by id " + id);
         return dataTemplateRepository.getById(id);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isPresent(long id) {
         LOG.info("Checking existence of dataTemplate by id " + id);
         return dataTemplateRepository.existsById(id);    
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataTemplate save(DataTemplate dataTemplate) {
         LOG.info("Saving dataTemplate " + dataTemplate);
         return dataTemplateRepository.save(dataTemplate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteById(long id) {
         LOG.info("Deleting dataTemplate by id " + id);
         dataTemplateRepository.deleteById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAll() {
         LOG.info("Deleting all dataTemplates");
         dataTemplateRepository.deleteAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DataTable> findDataTablesWithTemplateId(long id) {
         LOG.info("Obtaining dataTables with dataTemplateId " + id);
@@ -83,6 +112,9 @@ public class DataTemplateServiceImpl implements DataTemplateService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DataCell> findDataCellsWithTemplateId(long id) {
         LOG.info("Obtaining dataCells with dataTemplateId " + id);
@@ -98,6 +130,9 @@ public class DataTemplateServiceImpl implements DataTemplateService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DataSheet> findDataSheetsWithTemplateId(long id) {
         LOG.info("Obtaining dataSheets with dataTemplateId " + id);

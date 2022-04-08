@@ -39,6 +39,12 @@ overall: (## | !!(> | v)) a [(++|--)]
 > | v deals with direction substitution
 ## helps with substitution
 */
+
+/**
+ * TemplateExtractorServiceImpl.
+ * 
+ * This class helps to implement the services required in TemplateExtractorService.
+ */
 @Service
 public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
@@ -56,6 +62,9 @@ public class TemplateExtractorServiceImpl implements TemplateExtractorService {
 
     private static final String DESC_FLAG = "--";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataTemplate extract(Workbook workbook, String fileName) {
         if (fileName == null) {
