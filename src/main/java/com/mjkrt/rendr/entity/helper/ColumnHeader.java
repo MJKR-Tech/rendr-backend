@@ -2,8 +2,6 @@ package com.mjkrt.rendr.entity.helper;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class ColumnHeader implements Comparable<ColumnHeader> {
     
     public static ColumnHeader getMockColumnHeader() {
