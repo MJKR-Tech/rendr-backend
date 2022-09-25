@@ -9,4 +9,6 @@ docker pull michaeleelele/rendr-backend
 docker pull michaeleelele/mysql:5.7
 
 Step 3:
-Run docker image and backend should work
+Run docker image and backend should work. An example below would suffice
+docker run --network michaeleelele/rendr-backend --name rendr-backend-container -p 8080:8080 -d michaeleelele/rendr-backend
+
