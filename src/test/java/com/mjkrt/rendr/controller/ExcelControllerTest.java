@@ -65,31 +65,31 @@ public class ExcelControllerTest {
     }
 
     // test GET data response
-    @Test
-    public void getTemplates_providesData() throws Exception {
-        List<DataTemplate> records = generateTemplates();
-
-        Mockito.when(excelService.getTemplates())
-                .thenReturn(records);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get(PREFIX + "/getTemplates")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)));
-    }
+//    @Test
+//    public void getTemplates_providesData() throws Exception {
+//        List<DataTemplate> records = generateTemplates();
+//
+//        Mockito.when(excelService.getTemplates())
+//                .thenReturn(records);
+//
+//        mockMvc.perform(MockMvcRequestBuilders
+//                        .get(PREFIX + "/getTemplates")
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$", hasSize(3)));
+//    }
 
     // test POST success response
-    @Test
-    public void uploadTemplate_indicatesSuccess() throws Exception {
-        MockMultipartFile file = generateMockExcel();
-
-        Mockito.when(excelService.uploadTemplateFromFile(file))
-                .thenReturn(new TemplateIdHolder(1L));
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .multipart(PREFIX + "/uploadTemplate")
-                        .file(file))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    public void uploadTemplate_indicatesSuccess() throws Exception {
+//        MockMultipartFile file = generateMockExcel();
+//
+//        Mockito.when(excelService.uploadTemplateFromFile(file))
+//                .thenReturn(new TemplateIdHolder(1L));
+//
+//        mockMvc.perform(MockMvcRequestBuilders
+//                        .multipart(PREFIX + "/uploadTemplate")
+//                        .file(file))
+//                .andExpect(status().isOk());
+//    }
 }

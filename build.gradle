@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
 group = 'com.mjkrt'
@@ -38,3 +39,4 @@ test {
 		showStandardStreams = false
 	}
 }
+
