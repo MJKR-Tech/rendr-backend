@@ -2,7 +2,7 @@
 Customizable Report Rendering with MJKR-Tech’s Rendr for GSEngage21, built with Docker.
 
 Step 1:
-Download docker and sign up [here](docker.com)
+Download docker and sign up [here](https://www.docker.com)
 
 Step 2: Run the following through any CLI
 docker pull michaeleelele/rendr-backend
