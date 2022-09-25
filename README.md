@@ -19,7 +19,7 @@ Run docker image for mysql through the following commands-
 
 
 Step 4:
-Follow README under src/main/resources/mysql
+Follow README [here](src/main/resources/mysql)
   
 
 Step 5:
