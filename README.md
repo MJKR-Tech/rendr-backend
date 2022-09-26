@@ -24,5 +24,6 @@ Follow README [here](src/main/resources/mysql)
 
 Step 5:
 Run docker image for rendr-backend. An example below would suffice
+
 docker run --network michaeleelele/rendr-backend --name rendr-backend-container -p 8080:8080 -d michaeleelele/rendr-backend
 
