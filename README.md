@@ -17,6 +17,7 @@ Run docker image for mysql through the following commands-
 
   - `mysql -urendrUser -prendrMJKRTech`
 
+Please ensure you have MySQL installed. Please refer to Step 4 on how to install MySQL before running the commands above.
 
 Step 4:
 Follow README [here](src/main/resources/mysql)  
