@@ -21,8 +21,10 @@ Run docker image for mysql through the following commands-
 Step 4:
 Follow README [here](src/main/resources/mysql)
   
-Step 5:
-  - run -p 8081:8081 --name rendr-backend --link mysqldb:mysql -d rendr-backend 
+Step 5: 
+  
+  - docker run --name mysqldb -e MYSQL_ROOT_PASSWORD=rendrMJKRTech -e MYSQL_DATABASE=rendr_db -e MYSQL_USER=rendrUser -e MYSQL_PASSWORD=rendrMJKRTech -d mysql:8.0.30
+
   
 Step 6:
 Run docker image for rendr-backend. An example below would suffice
