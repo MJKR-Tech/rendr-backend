@@ -5,13 +5,13 @@ Step 1:
 Download docker and sign up [here](https://www.docker.com)
 
 Step 2: Run the following through any CLI
-  - `docker pull michaeleelele/rendr-backend`
-  - `docker pull michaeleelele/mysql:5.7`
+  - `docker pull michaeleelele/rendr:mysql`
+  - `docker pull michaeleelele/rendr:rendr-backend`
 
 Step 3:
 Run docker image for mysql through the following commands-
 
-  - `docker run --name mysqldb --network rendr-backend -e MYSQL_ROOT_PASSWORD=<MySQL password> -e MYSQL_DATABASE=rendr_db -e MYSQL_USER=rendrUser -e MYSQL_PASSWORD=rendrMJKRTech -d mysql:5.7`
+  - `docker run --name mysqldb --network rendr-backend -e MYSQL_ROOT_PASSWORD=<MySQL password> -e MYSQL_DATABASE=rendr_db -e MYSQL_USER=rendrUser -e MYSQL_PASSWORD=rendrMJKRTech -d mysql`
 
   - `docker exec -it <image ID> bash`
 
